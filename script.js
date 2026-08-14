@@ -1304,6 +1304,7 @@ function renderFinderPreview(values) {
           : ''
       }
 
+// JB REAL ESTATE V2 - Lead Capture enabled
       <form id="leadCaptureForm" class="lead-capture-form">
         <div class="lead-capture-heading">
           <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
