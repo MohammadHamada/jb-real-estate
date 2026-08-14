@@ -1,4 +1,4 @@
-// JB REAL ESTATE V2.8 - Reliable Property Finder button binding
+// JB REAL ESTATE V2.9 - Supabase publishable-key auth fix
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -283,8 +283,7 @@ const PROJECT_PAGE_SIZE = 9;
 
 function apiHeaders() {
   return {
-    apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`
+    apikey: SUPABASE_KEY
   };
 }
 
@@ -1518,9 +1517,10 @@ async function submitLeadCapture(event) {
   } catch (error) {
     console.error('Lead capture failed:', error);
     if (status) {
+      const readableError = String(error?.message || '').replace(/<[^>]*>/g, '').slice(0, 180);
       status.textContent = lang === 'ar'
-        ? 'تعذر حفظ بيانات التواصل الآن. حاول مرة أخرى بعد قليل.'
-        : 'We could not save your contact details right now. Please try again.';
+        ? `تعذر حفظ البيانات الآن.${readableError ? ' ' + readableError : ''}`
+        : `We could not save your contact details right now.${readableError ? ' ' + readableError : ''}`;
     }
     if (submitButton) submitButton.disabled = false;
   }
