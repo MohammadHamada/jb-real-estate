@@ -1833,3 +1833,88 @@ html[dir="ltr"] .lead-capture-form label.consent-row{
 .profile-modal-backdrop{
   background:rgba(19,70,112,.45) !important;
 }
+
+
+/* =========================================================
+   JB V2.4 — HERO LIGHTENING + VISIBLE GOLD CIRCLE
+   Primary brand navy remains #134670.
+   ========================================================= */
+
+.hero{
+  background:
+    radial-gradient(circle at 82% 42%, rgba(231,200,94,.12), transparent 26%),
+    linear-gradient(120deg,#1B527B 0%,#23628C 56%,#34779C 100%) !important;
+}
+
+/* The old overlay was making the hero much darker than the chosen palette. */
+.hero-overlay{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(19,70,112,.42) 0%,
+      rgba(19,70,112,.22) 50%,
+      rgba(19,70,112,.06) 100%
+    ) !important;
+}
+
+/* Make the decorative circle clearly gold and intentionally visible. */
+.hero::after{
+  right:-95px !important;
+  bottom:-145px !important;
+  width:610px !important;
+  height:610px !important;
+  border:2px solid rgba(214,174,53,.82) !important;
+  opacity:1 !important;
+  box-shadow:
+    0 0 0 30px rgba(214,174,53,.10),
+    0 0 0 62px rgba(214,174,53,.045) !important;
+}
+
+/* Add a soft gold glow around the visible arc without overpowering text. */
+.hero::before{
+  content:"";
+  position:absolute;
+  right:-40px;
+  bottom:-90px;
+  width:500px;
+  height:500px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+      transparent 58%,
+      rgba(214,174,53,.12) 59%,
+      rgba(214,174,53,.035) 70%,
+      transparent 72%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+}
+
+.hero-overlay{
+  z-index:1;
+}
+
+.hero::after,
+.hero::before{
+  pointer-events:none;
+}
+
+@media (max-width:900px){
+  .hero::after{
+    right:-245px !important;
+    bottom:-180px !important;
+    width:520px !important;
+    height:520px !important;
+  }
+
+  .hero::before{
+    right:-205px;
+    bottom:-130px;
+    width:430px;
+    height:430px;
+  }
+}
