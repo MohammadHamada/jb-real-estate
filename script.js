@@ -1,1572 +1,1615 @@
+// JB REAL ESTATE V2.8 - Reliable Property Finder button binding
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
+   Supabase REST + Finder V2 + Developers + Projects + Compare
    ========================================================= */
 
-:root{
-  --navy:#0D1B2A;
-  --navy2:#071321;
-  --gold:#D4AF37;
-  --gold2:#E7C45A;
-  --white:#fff;
-  --ink:#132033;
-  --muted:#667085;
-  --line:#e6e8ec;
-  --soft:#f5f7fa;
-  --radius:20px;
-  --shadow:0 18px 50px rgba(13,27,42,.12);
-}
-
-*{box-sizing:border-box}
-
-html{scroll-behavior:smooth}
-
-body{
-  margin:0;
-  color:var(--ink);
-  background:#fff;
-  font-family:Poppins,Cairo,sans-serif;
-  line-height:1.65;
-}
-
-body[dir="rtl"]{font-family:Cairo,Poppins,sans-serif}
-body.modal-open{overflow:hidden}
-
-.container{width:min(1160px,92%);margin:auto}
-
-.site-header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(7,19,33,.96);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(212,175,55,.2);
-}
-
-.nav-wrap{
-  min-height:82px;
-  display:flex;
-  align-items:center;
-  gap:26px;
-}
-
-.brand img{
-  width:82px;
-  height:58px;
-  object-fit:contain;
-}
-
-.main-nav{
-  display:flex;
-  gap:22px;
-  flex:1;
-  justify-content:center;
-}
-
-.main-nav a,.footer a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.main-nav a{
-  color:#f7f7f7;
-  font-size:14px;
-}
-
-.main-nav a:hover{color:var(--gold2)}
-
-.nav-actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.lang-btn{
-  border:1px solid rgba(255,255,255,.3);
-  background:transparent;
-  color:#fff;
-  border-radius:999px;
-  padding:9px 13px;
-  cursor:pointer;
-  font-family:inherit;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:48px;
-  padding:0 20px;
-  border-radius:999px;
-  text-decoration:none;
-  font-weight:700;
-  border:1px solid transparent;
-  cursor:pointer;
-  font-family:inherit;
-}
-
-.btn-small{
-  min-height:40px;
-  padding:0 15px;
-  font-size:13px;
-}
-
-.btn-gold{
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:var(--navy);
-}
-
-.btn-outline{
-  border-color:rgba(255,255,255,.45);
-  color:#fff;
-  background:rgba(255,255,255,.03);
-}
-
-.btn-outline-dark{
-  border-color:var(--navy);
-  color:var(--navy);
-  background:#fff;
-}
-
-.btn-navy{
-  background:var(--navy);
-  color:#fff;
-}
-
-.hero{
-  min-height:720px;
-  display:flex;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 80% 30%,rgba(212,175,55,.16),transparent 35%),
-    linear-gradient(135deg,var(--navy2),var(--navy));
-}
-
-.hero:after{
-  content:"";
-  position:absolute;
-  right:-120px;
-  bottom:-160px;
-  width:600px;
-  height:600px;
-  border:1px solid rgba(212,175,55,.35);
-  border-radius:50%;
-  box-shadow:
-    0 0 0 28px rgba(212,175,55,.06),
-    0 0 0 58px rgba(212,175,55,.03);
-}
-
-.hero-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    90deg,
-    rgba(7,19,33,.95) 0%,
-    rgba(7,19,33,.8) 48%,
-    rgba(7,19,33,.35) 100%
-  );
-}
-
-.hero-content{
-  position:relative;
-  z-index:2;
-  color:#fff;
-  max-width:760px;
-  padding:110px 0;
-}
-
-.eyebrow{
-  letter-spacing:.22em;
-  font-size:12px;
-  font-weight:700;
-  color:var(--gold2);
-  text-transform:uppercase;
-}
-
-.eyebrow.dark{color:#9b7a16}
-
-.hero h1{
-  font-size:clamp(42px,7vw,76px);
-  line-height:1.05;
-  margin:18px 0;
-}
-
-.hero p{
-  font-size:19px;
-  color:#e5e8ed;
-  max-width:680px;
-}
-
-.hero-actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin:30px 0;
-}
-
-.hero-note{
-  color:#d4af37;
-  font-size:13px;
-}
-
-.section{padding:92px 0}
-
-.section-head{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:25px;
-  margin-bottom:38px;
-}
-
-.section-head.center{
-  display:block;
-  text-align:center;
-  max-width:780px;
-  margin:0 auto 40px;
-}
-
-.section-head h2,.split h2{
-  font-size:clamp(30px,4vw,48px);
-  line-height:1.15;
-  margin:8px 0 12px;
-}
-
-.section-head p,.split p{
-  color:var(--muted);
-  margin:0;
-}
-
-.dynamic-count{
-  color:var(--muted);
-  margin-top:8px;
-  font-size:14px;
-}
-
-.section-action{margin-top:28px}
-
-.finder{background:var(--soft)}
-
-.finder-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  background:#fff;
-  padding:24px;
-  border-radius:24px;
-  box-shadow:var(--shadow);
-}
-
-label{
-  display:grid;
-  gap:7px;
-  font-size:13px;
-  font-weight:700;
-}
-
-select,input{
-  width:100%;
-  height:50px;
-  border:1px solid #d8dce3;
-  border-radius:12px;
-  padding:0 14px;
-  background:#fff;
-  font:inherit;
-  color:var(--ink);
-}
-
-.finder-submit{
-  width:100%;
-  align-self:end;
-}
-
-.finder-result{
-  margin-top:18px;
-  background:var(--navy);
-  color:#fff;
-  padding:24px;
-  border-radius:16px;
-}
-
-.finder-result-content{
-  display:grid;
-  gap:14px;
-}
-
-.finder-result-label{
-  color:var(--gold2);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.14em;
-}
-
-.finder-result-content h3{
-  margin:0;
-  font-size:28px;
-}
-
-.finder-result-content p{
-  color:#cbd2db;
-  margin:0;
-}
-
-.readiness-score{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.readiness-score strong{
-  display:grid;
-  place-items:center;
-  width:86px;
-  height:86px;
-  border:2px solid var(--gold);
-  border-radius:50%;
-  color:var(--gold2);
-  font-size:24px;
-}
-
-.finder-result-next{
-  padding:14px 16px;
-  border:1px solid rgba(212,175,55,.3);
-  background:rgba(212,175,55,.08);
-  border-radius:12px;
-}
-
-.finder-shortlist{
-  display:grid;
-  gap:10px;
-  margin-top:4px;
-}
-
-.finder-shortlist-item{
-  width:100%;
-  text-align:left;
-  border:1px solid rgba(212,175,55,.25);
-  border-radius:12px;
-  background:rgba(255,255,255,.04);
-  color:#fff;
-  padding:14px 16px;
-  cursor:pointer;
-  font:inherit;
-}
-
-body[dir="rtl"] .finder-shortlist-item{text-align:right}
-
-.finder-shortlist-item strong{
-  display:block;
-  color:var(--gold2);
-}
-
-.finder-shortlist-item span{
-  display:block;
-  color:#cbd2db;
-  font-size:13px;
-  margin-top:4px;
-}
-
-.dark-section{
-  background:var(--navy);
-  color:#fff;
-}
-
-.split{
-  display:grid;
-  grid-template-columns:1.05fr .95fr;
-  gap:70px;
-  align-items:center;
-}
-
-.dark-section p{color:#cbd2db}
-
-.value-cards{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.value-cards article{
-  padding:22px;
-  border:1px solid rgba(212,175,55,.25);
-  border-radius:18px;
-  background:rgba(255,255,255,.035);
-}
-
-.value-cards b{color:var(--gold2)}
-.value-cards h3{margin:8px 0}
-.value-cards p{font-size:14px;margin:0}
-
-.text-link{
-  color:var(--gold);
-  font-weight:700;
-  text-decoration:none;
-}
-
-.dark-section .text-link{color:var(--gold2)}
-
-.cards-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
-}
-
-.dynamic-project-grid .data-loading,
-.dynamic-project-grid .data-error,
-.dynamic-project-grid .data-empty{
-  grid-column:1/-1;
-}
-
-.project-card{
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  overflow:hidden;
-  background:#fff;
-  box-shadow:0 10px 30px rgba(13,27,42,.06);
-}
-
-.dynamic-project-card{
-  display:flex;
-  flex-direction:column;
-}
-
-.project-image{
-  height:210px;
-  background:linear-gradient(135deg,#0b1b2f,#244363);
-  position:relative;
-}
-
-.project-image:after{
-  content:"JB";
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  color:rgba(212,175,55,.28);
-  font-size:90px;
-  font-weight:700;
-}
-
-.dynamic-project-image{
-  background-size:cover;
-  background-position:center;
-}
-
-.card-body{
-  padding:22px;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-}
-
-.tag{
-  font-size:10px;
-  letter-spacing:.14em;
-  color:#8a6d16;
-  font-weight:700;
-}
-
-.card-body h3{
-  font-size:25px;
-  margin:8px 0 3px;
-}
-
-.card-body p{
-  color:var(--muted);
-  font-size:14px;
-}
-
-.project-card-topline{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.project-location{
-  color:var(--muted);
-  font-size:11px;
-}
-
-.project-developer{
-  margin:0 0 14px;
-  font-weight:600;
-}
-
-.project-meta{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:auto;
-}
-
-.project-meta span{
-  background:var(--soft);
-  border-radius:999px;
-  padding:7px 10px;
-  font-size:11px;
-  color:var(--ink);
-}
-
-.project-card-actions{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-top:18px;
-}
-
-.text-button{
-  border:0;
-  background:transparent;
-  padding:0;
-  color:var(--gold);
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.compare-chip{
-  border:1px solid #d8dce3;
-  background:#fff;
-  color:var(--ink);
-  border-radius:999px;
-  padding:7px 10px;
-  font:inherit;
-  font-size:11px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.compare-chip.is-selected{
-  border-color:var(--gold);
-  background:#fbf6df;
-}
-
-.light-gold{background:#fbfaf5}
-
-.developer-search{
-  display:flex;
-  max-width:760px;
-  margin:auto;
-  gap:10px;
-}
-
-.developer-row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:28px;
-}
-
-.developer-pill{
-  padding:14px 18px;
-  background:#fff;
-  border:1px solid #eadfbd;
-  border-radius:999px;
-  font-weight:700;
-}
-
-.developer-pill span{
-  font-size:11px;
-  color:#8c7a4a;
-  margin-left:8px;
-}
-
-.developer-pill-button{
-  cursor:pointer;
-  font:inherit;
-  color:var(--ink);
-}
-
-.compare-status{
-  text-align:center;
-  color:var(--muted);
-  margin-bottom:18px;
-}
-
-.compare-preview{
-  border:1px solid var(--line);
-  border-radius:18px;
-  overflow:auto;
-  margin-bottom:28px;
-  background:#fff;
-}
-
-.compare-empty{
-  padding:34px;
-  text-align:center;
-  color:var(--muted);
-}
-
-.compare-row{
-  display:grid;
-  grid-template-columns:1.5fr repeat(3,1fr);
-  min-width:720px;
-}
-
-.compare-row-dynamic{
-  min-width:640px;
-}
-
-.compare-row span{
-  padding:16px;
-  border-bottom:1px solid var(--line);
-  border-right:1px solid var(--line);
-}
-
-.compare-row.head{
-  background:var(--navy);
-  color:#fff;
-  font-weight:700;
-}
-
-.compare-row:last-child span{border-bottom:0}
-
-.compare-criteria{
-  font-weight:700;
-  background:#fbfaf5;
-}
-
-.international{
-  background:linear-gradient(135deg,var(--navy2),var(--navy));
-  color:#fff;
-}
-
-.international p,.international li{color:#d3d9e0}
-
-.international ul{
-  padding-left:20px;
-  margin:20px 0;
-}
-
-.international-box{
-  border:1px solid rgba(212,175,55,.35);
-  border-radius:24px;
-  padding:40px;
-  background:rgba(255,255,255,.035);
-}
-
-.currency{
-  font-size:80px;
-  font-weight:700;
-  color:var(--gold2);
-  line-height:1;
-}
-
-.final-cta{background:#f8f8f6}
-.final-cta p{color:var(--muted)}
-
-.footer{
-  background:#071321;
-  color:#cbd2db;
-  padding:55px 0 20px;
-}
-
-.footer-grid{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr;
-  gap:40px;
-}
-
-.footer-logo{
-  width:130px;
-  height:90px;
-  object-fit:contain;
-}
-
-.footer h4{color:#fff;margin-top:0}
-
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,.1);
-  margin-top:35px;
-  padding-top:18px;
-  font-size:12px;
-  color:#8d98a6;
-}
-
-.center{text-align:center}
-
-.data-loading,
-.data-error,
-.data-empty{
-  border:1px dashed #d8dce3;
-  border-radius:16px;
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-  background:#fff;
-}
-
-
-/* PROFILE MODAL */
-
-.profile-modal{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:grid;
-  place-items:center;
-  padding:24px;
-}
-
-.profile-modal[hidden]{display:none}
-
-.profile-modal-backdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(7,19,33,.78);
-  backdrop-filter:blur(6px);
-}
-
-.profile-modal-card{
-  position:relative;
-  z-index:1;
-  width:min(900px,96vw);
-  max-height:88vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:24px;
-  padding:36px;
-  box-shadow:0 30px 80px rgba(0,0,0,.28);
-}
-
-.profile-modal-close{
-  position:absolute;
-  top:14px;
-  right:16px;
-  width:40px;
-  height:40px;
-  border:0;
-  border-radius:50%;
-  background:var(--soft);
-  color:var(--navy);
-  font-size:24px;
-  cursor:pointer;
-}
-
-body[dir="rtl"] .profile-modal-close{
-  right:auto;
-  left:16px;
-}
-
-.profile-heading h2{
-  font-size:clamp(30px,5vw,48px);
-  line-height:1.1;
-  margin:8px 0 12px;
-}
-
-.profile-heading p{
-  color:var(--muted);
-}
-
-.profile-project-developer{
-  font-weight:700;
-  color:#8a6d16!important;
-}
-
-.profile-facts{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin:26px 0;
-}
-
-.profile-facts>div{
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-}
-
-.profile-facts span{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  margin-bottom:6px;
-}
-
-.profile-facts strong{
-  display:block;
-  font-size:15px;
-}
-
-.profile-subtitle{
-  margin-top:30px;
-}
-
-.profile-project-list{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:24px;
-}
-
-.profile-project-link{
-  text-align:left;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#fff;
-  padding:14px;
-  cursor:pointer;
-  font:inherit;
-}
-
-body[dir="rtl"] .profile-project-link{text-align:right}
-
-.profile-project-link span{
-  display:block;
-  font-weight:700;
-}
-
-.profile-project-link small{
-  display:block;
-  color:var(--muted);
-  margin-top:3px;
-}
-
-.profile-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:24px;
-}
-
-.profile-source-link{margin-top:8px}
-
-
-/* RTL */
-
-body[dir="rtl"] .nav-actions{margin-right:auto}
-body[dir="rtl"] .developer-pill span{
-  margin-left:0;
-  margin-right:8px;
-}
-body[dir="rtl"] .international ul{
-  padding-left:0;
-  padding-right:20px;
-}
-body[dir="rtl"] .compare-row span{
-  border-right:0;
-  border-left:1px solid var(--line);
-}
-
-
-/* RESPONSIVE */
-
-@media(max-width:900px){
-  .main-nav{display:none}
-  .nav-actions{margin-left:auto}
-  body[dir="rtl"] .nav-actions{
-    margin-left:0;
-    margin-right:auto;
+const SUPABASE_URL = "https://cmjeijjkdztlvhqzcjrg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_foGnQkjteOAQ7XL6SBqAVA_fQACuQ7a";
+const SUPABASE_REST = `${SUPABASE_URL}/rest/v1`;
+
+const translations = {
+  en: {
+    'nav.properties':'Properties',
+    'nav.projects':'Projects',
+    'nav.developers':'Developers',
+    'nav.compare':'Compare',
+    'nav.investment':'Investment',
+    'nav.about':'About JB',
+    'nav.cta':'Find My Property',
+
+    'hero.eyebrow':'JB REAL ESTATE GROUP',
+    'hero.title':'Find. Compare. Decide. Invest.',
+    'hero.text':'Explore opportunities across Egypt, compare developers and projects, and get personalized guidance before you buy.',
+    'hero.primary':'Find My Property',
+    'hero.secondary':'Compare Projects',
+    'hero.note':'One market. Multiple options. One trusted partner.',
+
+    'finder.eyebrow':'PROPERTY FINDER',
+    'finder.title':'Tell us what you are looking for.',
+    'finder.text':'Start with your priorities. JB will use them to build a focused shortlist.',
+    'finder.button':'Find My Best Matches',
+    'finder.privacy':'Your search is private. Contact details are only requested if you want the full shortlist or a JB advisor to follow up.',
+
+
+    'fields.location':'Location',
+    'fields.budget':'Budget',
+    'fields.type':'Property type',
+    'fields.purpose':'Purpose',
+    'fields.delivery':'Delivery',
+    'fields.payment':'Payment preference',
+    'fields.bedrooms':'Bedrooms',
+    'fields.timeline':'Buying timeline',
+
+    'options.anyLocation':'Any location',
+    'options.northCoast':'North Coast',
+    'options.newCairo':'New Cairo',
+    'options.newCapital':'New Capital',
+    'options.ainSokhna':'Ain Sokhna',
+    'options.sheikhZayed':'Sheikh Zayed',
+
+    'options.anyBudget':'Any budget',
+    'options.under5':'Under EGP 5M',
+    'options.5to10':'EGP 5M–10M',
+    'options.10to20':'EGP 10M–20M',
+    'options.20plus':'EGP 20M+',
+
+    'options.anyType':'Any type',
+    'options.apartment':'Apartment',
+    'options.chalet':'Chalet',
+    'options.villa':'Villa',
+    'options.twin':'Twin House',
+    'options.commercial':'Commercial',
+
+    'options.anyPurpose':'Any purpose',
+    'options.investment':'Investment',
+    'options.personal':'Personal use',
+    'options.both':'Both',
+
+    'options.anyDelivery':'Any delivery',
+    'options.ready':'Ready',
+    'options.1to3':'1–3 years',
+    'options.3plus':'3+ years',
+
+    'options.anyPayment':'No preference',
+    'options.lowDown':'Lower down payment',
+    'options.longPlan':'Longer payment plan',
+    'options.cash':'Cash / strong upfront payment',
+
+    'options.anyBedrooms':'No preference',
+    'options.1to2':'1–2 bedrooms',
+    'options.3bed':'3 bedrooms',
+    'options.4plus':'4+ bedrooms',
+
+    'options.anyTimeline':'Just exploring',
+    'options.now':'Ready to buy now',
+    'options.3months':'Within 3 months',
+    'options.6months':'Within 6 months',
+    'options.later':'6+ months',
+
+    'value.eyebrow':'WHY JB',
+    'value.title':'We are not here to show you one property. We help you understand your options.',
+    'value.text':'JB is being built as a real estate intelligence, advisory and brokerage platform: discover the market, compare alternatives, make a better-informed decision, then complete your purchase with JB.',
+    'value.link':'See how comparison works →',
+    'value.card1.title':'Multiple Options',
+    'value.card1.text':'Compare opportunities instead of relying on a single sales pitch.',
+    'value.card2.title':'Clear Sources',
+    'value.card2.text':'Track the source and freshness of important project information.',
+    'value.card3.title':'Personal Guidance',
+    'value.card3.text':'Move from search to a focused shortlist and advisor conversation.',
+    'value.card4.title':'Purchase Support',
+    'value.card4.text':'Keep the relationship with JB through the buying journey.',
+
+    'projects.eyebrow':'EXPLORE',
+    'projects.title':'Projects',
+    'projects.link':'Find my best options →',
+
+    'developers.eyebrow':'MARKET DIRECTORY',
+    'developers.title':'Explore Developers',
+    'developers.text':'Browse verified developer profiles and explore their published projects.',
+    'developers.search':'Search developer...',
+    'developers.searchBtn':'Search',
+
+    'compare.eyebrow':'COMPARE BEFORE YOU BUY',
+    'compare.title':'One market. Clearer decisions.',
+    'compare.text':'Select up to three projects and compare the verified data currently available.',
+
+    'intl.eyebrow':'INTERNATIONAL BUYERS',
+    'intl.title':'Invest in Egypt with a clearer view of the market.',
+    'intl.text':'JB will provide English-first discovery, project comparison and buyer guidance for international clients interested in Egypt.',
+    'intl.li1':'Arabic + English from V1',
+    'intl.li2':'Investment-focused property search',
+    'intl.li3':'Transparent sources and update dates',
+    'intl.li4':'Personalized consultation',
+    'intl.button':'Request a consultation',
+    'intl.boxTitle':'Built for local and international buyers',
+    'intl.boxText':'The data model is designed to support multiple languages, currencies and future market modules such as land and commercial opportunities.',
+
+    'cta.eyebrow':'READY TO START?',
+    'cta.title':'Tell JB what you want to buy.',
+    'cta.text':'We will turn your requirements into a focused property shortlist.',
+    'cta.button':'Build My Shortlist',
+
+    'footer.contact':'Contact',
+    'footer.social':'Social',
+    'footer.demo':'Live market database connected to Supabase.'
+  },
+
+  ar: {
+    'nav.properties':'العقارات',
+    'nav.projects':'المشروعات',
+    'nav.developers':'المطورون',
+    'nav.compare':'مقارنة',
+    'nav.investment':'الاستثمار',
+    'nav.about':'عن JB',
+    'nav.cta':'ابحث عن عقارك',
+
+    'hero.eyebrow':'مجموعة JB للعقارات',
+    'hero.title':'ابحث. قارن. اختر. استثمر.',
+    'hero.text':'اكتشف الفرص العقارية في مصر، وقارن بين المطورين والمشروعات، واحصل على توجيه يناسب احتياجاتك قبل الشراء.',
+    'hero.primary':'ابحث عن عقارك',
+    'hero.secondary':'قارن المشروعات',
+    'hero.note':'سوق واحد. خيارات متعددة. شريك واحد تثق به.',
+
+    'finder.eyebrow':'الباحث العقاري',
+    'finder.title':'قل لنا ماذا تبحث عنه.',
+    'finder.text':'ابدأ باحتياجاتك، وستستخدمها JB لبناء قائمة مختصرة تناسبك.',
+    'finder.button':'اعرض أفضل الخيارات المناسبة لي',
+    'finder.privacy':'بحثك خاص. نطلب بيانات التواصل فقط إذا أردت القائمة الكاملة أو متابعة مستشار JB معك.',
+
+
+    'fields.location':'الموقع',
+    'fields.budget':'الميزانية',
+    'fields.type':'نوع العقار',
+    'fields.purpose':'الهدف من الشراء',
+    'fields.delivery':'موعد التسليم',
+    'fields.payment':'تفضيل السداد',
+    'fields.bedrooms':'عدد غرف النوم',
+    'fields.timeline':'موعد الشراء',
+
+    'options.anyLocation':'أي موقع',
+    'options.northCoast':'الساحل الشمالي',
+    'options.newCairo':'القاهرة الجديدة',
+    'options.newCapital':'العاصمة الإدارية الجديدة',
+    'options.ainSokhna':'العين السخنة',
+    'options.sheikhZayed':'الشيخ زايد',
+
+    'options.anyBudget':'أي ميزانية',
+    'options.under5':'أقل من 5 مليون جنيه',
+    'options.5to10':'من 5 إلى 10 مليون جنيه',
+    'options.10to20':'من 10 إلى 20 مليون جنيه',
+    'options.20plus':'20 مليون جنيه فأكثر',
+
+    'options.anyType':'أي نوع',
+    'options.apartment':'شقة',
+    'options.chalet':'شاليه',
+    'options.villa':'فيلا',
+    'options.twin':'توين هاوس',
+    'options.commercial':'تجاري',
+
+    'options.anyPurpose':'أي هدف',
+    'options.investment':'استثمار',
+    'options.personal':'استخدام شخصي',
+    'options.both':'استثمار واستخدام شخصي',
+
+    'options.anyDelivery':'أي موعد للتسليم',
+    'options.ready':'جاهز للتسليم',
+    'options.1to3':'من سنة إلى 3 سنوات',
+    'options.3plus':'أكثر من 3 سنوات',
+
+    'options.anyPayment':'لا يوجد تفضيل',
+    'options.lowDown':'مقدم أقل',
+    'options.longPlan':'فترة سداد أطول',
+    'options.cash':'كاش / مقدم كبير',
+
+    'options.anyBedrooms':'لا يوجد تفضيل',
+    'options.1to2':'غرفة إلى غرفتين',
+    'options.3bed':'3 غرف',
+    'options.4plus':'4 غرف فأكثر',
+
+    'options.anyTimeline':'ما زلت أستكشف السوق',
+    'options.now':'جاهز للشراء الآن',
+    'options.3months':'خلال 3 أشهر',
+    'options.6months':'خلال 6 أشهر',
+    'options.later':'بعد 6 أشهر',
+
+    'value.eyebrow':'لماذا JB؟',
+    'value.title':'لسنا هنا لنعرض عليك عقارًا واحدًا. نحن نساعدك على فهم اختياراتك.',
+    'value.text':'نبني JB كمنصة للذكاء والاستشارات والوساطة العقارية: اكتشف السوق، قارن البدائل، اتخذ قرارًا أكثر وعيًا، ثم أكمل عملية الشراء من خلال JB.',
+    'value.link':'شاهد كيف تعمل المقارنة ←',
+    'value.card1.title':'خيارات متعددة',
+    'value.card1.text':'قارن الفرص بدل الاعتماد على عرض بيع واحد.',
+    'value.card2.title':'مصادر واضحة',
+    'value.card2.text':'تعرف على مصدر المعلومات ومدى حداثتها.',
+    'value.card3.title':'توجيه شخصي',
+    'value.card3.text':'انتقل من البحث إلى قائمة مختصرة وحوار مع مستشار.',
+    'value.card4.title':'دعم أثناء الشراء',
+    'value.card4.text':'تستمر علاقتك مع JB خلال رحلة الشراء.',
+
+    'projects.eyebrow':'اكتشف',
+    'projects.title':'المشروعات',
+    'projects.link':'ابحث عن أفضل الخيارات ←',
+
+    'developers.eyebrow':'دليل السوق',
+    'developers.title':'اكتشف المطورين',
+    'developers.text':'تصفح ملفات المطورين الموثقة واستكشف مشروعاتهم المنشورة.',
+    'developers.search':'ابحث عن مطور...',
+    'developers.searchBtn':'بحث',
+
+    'compare.eyebrow':'قارن قبل أن تشتري',
+    'compare.title':'سوق واحد. قرارات أوضح.',
+    'compare.text':'اختر حتى 3 مشروعات وقارن البيانات الموثقة المتاحة حاليًا.',
+
+    'intl.eyebrow':'للمشترين الدوليين',
+    'intl.title':'استثمر في مصر برؤية أوضح للسوق.',
+    'intl.text':'ستوفر JB تجربة اكتشاف ومقارنة وإرشاد باللغة الإنجليزية للعملاء الدوليين المهتمين بالسوق المصري.',
+    'intl.li1':'العربية + الإنجليزية من الإصدار الأول',
+    'intl.li2':'بحث عقاري يركز على الاستثمار',
+    'intl.li3':'مصادر واضحة وتواريخ تحديث',
+    'intl.li4':'استشارة شخصية',
+    'intl.button':'اطلب استشارة',
+    'intl.boxTitle':'مصمم للعملاء المحليين والدوليين',
+    'intl.boxText':'تم تصميم نموذج البيانات لدعم اللغات والعملات المتعددة وإضافة وحدات مستقبلية مثل الأراضي والعقارات التجارية.',
+
+    'cta.eyebrow':'جاهز للبدء؟',
+    'cta.title':'قل لـ JB ماذا تريد أن تشتري.',
+    'cta.text':'سنحوّل احتياجاتك إلى قائمة مختصرة من الخيارات العقارية.',
+    'cta.button':'أنشئ قائمتي المختصرة',
+
+    'footer.contact':'تواصل معنا',
+    'footer.social':'تابعنا',
+    'footer.demo':'قاعدة بيانات السوق الحية متصلة بـ Supabase.'
+  }
+};
+
+
+let lang = localStorage.getItem('jbLanguage') || 'en';
+if (!['en','ar'].includes(lang)) lang = 'en';
+
+let developers = [];
+let projects = [];
+let filteredDevelopers = [];
+let comparison = [];
+let projectPropertyTypeMap = new Map();
+
+let visibleProjects = 9;
+const PROJECT_PAGE_SIZE = 9;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function apiHeaders() {
+  return {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`
+  };
+}
+
+async function supabaseGet(path) {
+  const response = await fetch(`${SUPABASE_REST}/${path}`, {
+    headers: apiHeaders()
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase ${response.status}: ${errorText}`);
   }
 
-  .hero{min-height:650px}
+  return response.json();
+}
 
-  .finder-grid{
-    grid-template-columns:1fr 1fr;
+async function supabasePost(path, payload) {
+  const response = await fetch(`${SUPABASE_REST}/${path}`, {
+    method: 'POST',
+    headers: {
+      ...apiHeaders(),
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Supabase POST failed: ${response.status}`);
   }
 
-  .cards-3,.split,.footer-grid{
-    grid-template-columns:1fr;
+  return true;
+}
+
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function formatMoney(value, currency = 'EGP') {
+  if (value === null || value === undefined || value === '') {
+    return lang === 'ar' ? 'غير متاح حاليًا' : 'Not currently available';
   }
 
-  .value-cards{
-    grid-template-columns:1fr;
-  }
-
-  .section-head{display:block}
-
-  .section-head .text-link{
-    display:inline-block;
-    margin-top:12px;
-  }
-
-  .brand img{width:72px}
-
-  .hero-content{padding:90px 0}
-
-  .profile-facts{
-    grid-template-columns:1fr 1fr;
+  try {
+    return new Intl.NumberFormat(lang === 'ar' ? 'ar-EG' : 'en-EG', {
+      style: 'currency',
+      currency: currency || 'EGP',
+      maximumFractionDigits: 0
+    }).format(Number(value));
+  } catch {
+    return `${Number(value).toLocaleString()} ${currency || 'EGP'}`;
   }
 }
 
-@media(max-width:560px){
-  .nav-wrap{min-height:70px}
-  .nav-actions .btn{display:none}
+function formatDate(value) {
+  if (!value) return lang === 'ar' ? 'غير متاح' : 'Not available';
 
-  .hero h1{font-size:42px}
-  .hero p{font-size:16px}
+  const date = new Date(value);
 
-  .section{padding:68px 0}
-
-  .finder-grid{
-    grid-template-columns:1fr;
-    padding:16px;
+  if (Number.isNaN(date.getTime())) {
+    return escapeHtml(value);
   }
 
-  .developer-search{
-    flex-direction:column;
+  return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+
+function projectName(project) {
+  return lang === 'ar'
+    ? (project.name_ar || project.name_en)
+    : (project.name_en || project.name_ar);
+}
+
+function developerName(developer) {
+  return lang === 'ar'
+    ? (developer.name_ar || developer.name_en)
+    : (developer.name_en || developer.name_ar);
+}
+
+function projectDeveloper(project) {
+  const developer = project.developers || {};
+
+  return lang === 'ar'
+    ? (developer.name_ar || developer.name_en || '')
+    : (developer.name_en || developer.name_ar || '');
+}
+
+function projectLocation(project) {
+  const location = project.locations || {};
+
+  if (location.area && location.city && location.area !== location.city) {
+    return `${location.area} · ${location.city}`;
   }
 
-  .compare-row{
-    font-size:13px;
-  }
+  return location.area || location.city || (lang === 'ar' ? 'مصر' : 'Egypt');
+}
 
-  .profile-modal{
-    padding:10px;
-  }
-
-  .profile-modal-card{
-    padding:28px 20px;
-  }
-
-  .profile-facts{
-    grid-template-columns:1fr;
-  }
-
-  .profile-project-list{
-    grid-template-columns:1fr;
-  }
-
-  .project-card-actions{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .currency{font-size:60px}
+function text(value, fallbackEn = 'Not available', fallbackAr = 'غير متاح') {
+  return value || (lang === 'ar' ? fallbackAr : fallbackEn);
 }
 
 
 /* =========================================================
-   JB REAL ESTATE — UI / LEAD CAPTURE V2
-   Light premium system
+   LANGUAGE
    ========================================================= */
 
-:root{
-  --navy:#0d1b2a;
-  --navy2:#17314d;
-  --gold:#d4af37;
-  --gold2:#e4c55d;
-  --ink:#132238;
-  --muted:#64748b;
-  --line:#e3e8ef;
-  --paper:#ffffff;
-  --warm:#f7f5ef;
-  --soft:#f4f7fa;
-}
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.dir = document.documentElement.dir;
 
-body{
-  background:#fff;
-  color:var(--ink);
-}
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.dataset.i18n;
+    if (translations[lang]?.[key]) {
+      element.textContent = translations[lang][key];
+    }
+  });
 
-.hero{
-  min-height:500px;
-  background:
-    radial-gradient(circle at 84% 45%, rgba(212,175,55,.13), transparent 24%),
-    linear-gradient(118deg,#0b1b2b 0%,#10263a 70%,#132f48 100%);
-}
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.dataset.i18nPlaceholder;
+    if (translations[lang]?.[key]) {
+      element.placeholder = translations[lang][key];
+    }
+  });
 
-.hero-content{
-  padding:84px 0 76px;
-  max-width:820px;
-}
-
-.hero h1{
-  max-width:760px;
-}
-
-.finder.section{
-  background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);
-}
-
-.finder-grid{
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 20px 60px rgba(16,33,52,.08);
-}
-
-.finder-privacy-note{
-  margin:15px auto 0;
-  max-width:860px;
-  text-align:center;
-  font-size:13px;
-  color:var(--muted);
-}
-
-.dark-section{
-  background:var(--warm);
-  color:var(--ink);
-}
-
-.dark-section .eyebrow{
-  color:#9b7506;
-}
-
-.dark-section p{
-  color:var(--muted);
-}
-
-.dark-section .text-link{
-  color:#9b7506;
-}
-
-.value-cards article{
-  background:#fff;
-  border:1px solid #e7e1d4;
-  box-shadow:0 10px 30px rgba(16,33,52,.05);
-}
-
-.dynamic-project-card{
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 14px 38px rgba(15,31,48,.07);
-  overflow:hidden;
-}
-
-.dynamic-project-card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 20px 48px rgba(15,31,48,.12);
-}
-
-.dynamic-project-image{
-  min-height:225px;
-  position:relative;
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  overflow:hidden;
-}
-
-.dynamic-project-image.has-photo{
-  color:#fff;
-}
-
-.project-image-location{
-  position:absolute;
-  inset-inline-start:16px;
-  bottom:14px;
-  padding:7px 10px;
-  border-radius:999px;
-  background:rgba(5,18,31,.72);
-  color:#fff;
-  font-size:11px;
-  backdrop-filter:blur(8px);
-}
-
-.project-image-fallback{
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  gap:7px;
-  color:#fff;
-  background:
-    radial-gradient(circle at 22% 20%,rgba(212,175,55,.26),transparent 26%),
-    linear-gradient(135deg,#163653,#0c1c2b);
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 20%,rgba(108,184,212,.35),transparent 30%),
-    linear-gradient(135deg,#1d4d68,#0d2639);
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(212,175,55,.28),transparent 28%),
-    linear-gradient(135deg,#353b46,#121d2a);
-}
-
-.project-fallback-logo{
-  max-width:88px;
-  max-height:56px;
-  object-fit:contain;
-  filter:drop-shadow(0 4px 12px rgba(0,0,0,.12));
-}
-
-.project-fallback-initials{
-  font-size:42px;
-  font-weight:700;
-  letter-spacing:.04em;
-  color:var(--gold2);
-}
-
-.project-fallback-name{
-  font-size:17px;
-  font-weight:700;
-}
-
-.project-image-fallback small{
-  color:rgba(255,255,255,.72);
-}
-
-.project-price{
-  font-weight:600;
-}
-
-.profile-modal-backdrop{
-  background:rgba(11,25,39,.70);
-  backdrop-filter:blur(8px);
-}
-
-.profile-modal-card{
-  max-width:980px;
-  background:#fff;
-  box-shadow:0 30px 100px rgba(5,16,28,.28);
-}
-
-.profile-brand-row{
-  display:flex;
-  gap:22px;
-  align-items:flex-start;
-}
-
-.profile-developer-logo{
-  width:92px;
-  height:92px;
-  object-fit:contain;
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:12px;
-  background:#fff;
-}
-
-.profile-developer-monogram{
-  width:92px;
-  height:92px;
-  display:grid;
-  place-items:center;
-  border-radius:20px;
-  background:var(--navy);
-  color:var(--gold2);
-  font-size:28px;
-  font-weight:700;
-}
-
-.profile-nav-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:20px;
-  padding-inline-end:44px;
-}
-
-.profile-back{
-  border:0;
-  background:transparent;
-  color:#9b7506;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-  padding:7px 0;
-}
-
-.profile-breadcrumb{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.profile-project-hero .dynamic-project-image{
-  min-height:300px;
-  border-radius:22px;
-  margin-bottom:26px;
-}
-
-.profile-developer-button{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:0;
-  background:transparent;
-  padding:0;
-  color:#8a6706;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.profile-developer-button img{
-  width:28px;
-  height:28px;
-  object-fit:contain;
-}
-
-.btn-outline-dark{
-  border:1px solid var(--navy);
-  background:#fff;
-  color:var(--navy);
-}
-
-.lead-capture-form{
-  margin-top:22px;
-  padding:24px;
-  border-radius:20px;
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 12px 35px rgba(16,33,52,.06);
-}
-
-.lead-capture-heading{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  align-items:baseline;
-  margin-bottom:18px;
-}
-
-.lead-capture-heading strong{
-  font-size:20px;
-}
-
-.lead-capture-heading span{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.lead-capture-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-}
-
-.lead-capture-grid label{
-  display:grid;
-  gap:7px;
-}
-
-.lead-capture-grid label > span{
-  font-size:12px;
-  font-weight:600;
-  color:var(--ink);
-}
-
-.lead-capture-grid input,
-.lead-capture-grid select{
-  min-height:48px;
-  border:1px solid #d7dee8;
-  border-radius:12px;
-  padding:0 13px;
-  font:inherit;
-  background:#fff;
-  color:var(--ink);
-}
-
-.consent-row{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  margin:17px 0;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.7;
-}
-
-.consent-row input{
-  margin-top:4px;
-  flex:0 0 auto;
-}
-
-.finder-result-head{
-  display:flex;
-  justify-content:space-between;
-  gap:24px;
-  align-items:flex-start;
-}
-
-.shortlist-locked{
-  margin-top:16px;
-  padding:15px 18px;
-  border:1px dashed #d7b342;
-  background:#fffaf0;
-  border-radius:14px;
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:center;
-}
-
-.shortlist-locked span{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.finder-shortlist-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.finder-shortlist-thumb{
-  width:52px;
-  height:52px;
-  border-radius:12px;
-  overflow:hidden;
-  flex:0 0 auto;
-  display:grid;
-  place-items:center;
-  background:var(--navy);
-  color:var(--gold2);
-}
-
-.finder-shortlist-thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.finder-shortlist-thumb b{
-  font-size:15px;
-}
-
-.finder-shortlist-copy{
-  display:grid;
-  gap:3px;
-  text-align:start;
-}
-
-.finder-shortlist-copy small{
-  color:var(--muted);
-}
-
-.lead-capture-status{
-  margin:10px 0 0;
-  font-size:12px;
-  color:#a74d36;
-}
-
-.lead-success{
-  display:grid;
-  gap:7px;
-  padding:7px 0;
-}
-
-.lead-success strong{
-  color:#1f6d4d;
-}
-
-@media (max-width:900px){
-  .hero{min-height:430px}
-  .hero-content{padding:62px 0}
-  .lead-capture-grid{grid-template-columns:1fr}
-  .finder-result-head,
-  .shortlist-locked,
-  .lead-capture-heading,
-  .profile-nav-row{
-    align-items:flex-start;
-    flex-direction:column;
+  const toggle = document.getElementById('langToggle');
+  if (toggle) {
+    toggle.textContent = lang === 'en' ? 'العربية' : 'English';
+    toggle.setAttribute('aria-label',
+      lang === 'en' ? 'Switch to Arabic' : 'التحويل إلى الإنجليزية');
   }
-  .profile-brand-row{flex-direction:column}
+
+  localStorage.setItem('jbLanguage', lang);
+
+  renderProjects();
+  renderDevelopers(filteredDevelopers.length ? filteredDevelopers : developers);
+  renderComparison();
+
+  // Re-render dynamic finder content in the selected language
+  // without losing the user's selected search criteria.
+  const finderResult = document.getElementById('finderResult');
+  if (currentSearchProfile && finderResult && !finderResult.hidden) {
+    renderFinderPreview({...currentSearchProfile}, false);
+  }
+
+  // Re-render the currently open developer/project profile in the new language.
+  const modal = document.getElementById('profileModal');
+  if (modal && !modal.hidden && modalHistory.length) {
+    const current = modalHistory[modalHistory.length - 1];
+    if (current?.type === 'developer') {
+      showDeveloperProfile(current.id, false);
+    } else if (current?.type === 'project') {
+      showProjectProfile(current.id, current.parentDeveloperId || null, false);
+    }
+  }
 }
 
-@media (max-width:600px){
-  .hero{min-height:390px}
-  .dynamic-project-image{min-height:190px}
-  .profile-project-hero .dynamic-project-image{min-height:210px}
-}
+document.getElementById('langToggle')?.addEventListener('click', () => {
+  lang = lang === 'en' ? 'ar' : 'en';
+  applyLang();
+});
 
 
 /* =========================================================
-   JB V2 HOTFIX — Lead consent checkbox layout
-   Fixes global input width/height rules affecting checkbox.
+   LOAD MARKET DATA
    ========================================================= */
 
-.lead-capture-form .consent-row{
-  display:flex;
-  flex-direction:row;
-  align-items:flex-start;
-  justify-content:flex-start;
-  gap:10px;
-  margin:18px 0;
-  width:100%;
-  min-height:0;
-  font-size:12px;
-  font-weight:400;
-  line-height:1.7;
-  color:var(--muted);
+async function loadMarketData() {
+  try {
+    /*
+      Important:
+      We intentionally load the three tables separately instead of using
+      nested PostgREST relationships. This avoids failures caused by stale
+      or unavailable relationship metadata in the REST schema cache.
+    */
+
+    const [developerData, projectData, locationData, propertyTypeData, projectPropertyTypeData] = await Promise.all([
+      supabaseGet(
+        'developers?select=id,slug,name_ar,name_en,short_description_ar,short_description_en,description_ar,description_en,website_url,logo_url,founded_year,developer_type,verification_status,last_verified_at&is_published=eq.true&order=name_en.asc'
+      ),
+
+      supabaseGet(
+        'projects?select=id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,starting_price,currency,delivery_date,construction_status,handover_status,website_url,cover_image_url,verification_status,last_verified_at,developer_id,location_id&is_published=eq.true&order=name_en.asc'
+      ),
+
+      supabaseGet(
+        'locations?select=id,city,area'
+      ),
+
+      supabaseGet(
+        'property_types?select=id,slug,name_ar,name_en'
+      ),
+
+      supabaseGet(
+        'project_property_types?select=project_id,property_type_id'
+      )
+    ]);
+
+    developers = Array.isArray(developerData) ? developerData : [];
+
+    const developerMap = new Map(
+      developers.map(developer => [developer.id, developer])
+    );
+
+    const locationMap = new Map(
+      (Array.isArray(locationData) ? locationData : [])
+        .map(location => [location.id, location])
+    );
+
+    const propertyTypeById = new Map(
+      (Array.isArray(propertyTypeData) ? propertyTypeData : [])
+        .map(type => [type.id, type])
+    );
+
+    projectPropertyTypeMap = new Map();
+
+    (Array.isArray(projectPropertyTypeData) ? projectPropertyTypeData : [])
+      .forEach(link => {
+        const type = propertyTypeById.get(link.property_type_id);
+        if (!type) return;
+
+        if (!projectPropertyTypeMap.has(link.project_id)) {
+          projectPropertyTypeMap.set(link.project_id, []);
+        }
+
+        projectPropertyTypeMap.get(link.project_id).push(type);
+      });
+
+    projects = (Array.isArray(projectData) ? projectData : []).map(project => ({
+      ...project,
+      developers: developerMap.get(project.developer_id) || null,
+      locations: locationMap.get(project.location_id) || null
+    }));
+
+    filteredDevelopers = [...developers];
+
+    renderDevelopers(filteredDevelopers);
+    renderProjects();
+    renderComparison();
+
+  } catch (error) {
+    console.error('JB market database connection failed:', error);
+
+    const projectsGrid = document.getElementById('projectsGrid');
+    const developerRow = document.getElementById('developerRow');
+    const projectCount = document.getElementById('projectCount');
+    const developerCount = document.getElementById('developerCount');
+
+    if (projectCount) {
+      projectCount.textContent = lang === 'ar'
+        ? 'تعذر الاتصال بقاعدة البيانات'
+        : 'Database connection error';
+    }
+
+    if (developerCount) {
+      developerCount.textContent = lang === 'ar'
+        ? 'تعذر الاتصال بقاعدة البيانات'
+        : 'Database connection error';
+    }
+
+    if (projectsGrid) {
+      projectsGrid.innerHTML = `
+        <div class="data-error">
+          <strong>${lang === 'ar' ? 'تعذر تحميل المشروعات.' : 'Projects could not be loaded.'}</strong>
+          <br>
+          <small>${escapeHtml(error.message || String(error))}</small>
+        </div>
+      `;
+    }
+
+    if (developerRow) {
+      developerRow.innerHTML = `
+        <div class="data-error">
+          <strong>${lang === 'ar' ? 'تعذر تحميل دليل المطورين.' : 'The developer directory could not be loaded.'}</strong>
+          <br>
+          <small>${escapeHtml(error.message || String(error))}</small>
+        </div>
+      `;
+    }
+  }
 }
 
-.lead-capture-form .consent-row input[type="checkbox"]{
-  width:18px !important;
-  height:18px !important;
-  min-width:18px;
-  min-height:18px;
-  flex:0 0 18px;
-  margin:3px 0 0;
-  padding:0;
-  border-radius:4px;
-  accent-color:var(--gold);
-  cursor:pointer;
+
+
+function projectInitials(project) {
+  const value = projectName(project)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
+
+  return escapeHtml(value || 'RE');
 }
 
-.lead-capture-form .consent-row span{
-  display:block;
-  flex:1 1 auto;
-  width:auto;
-  min-width:0;
-  max-width:none;
-  color:var(--muted);
-  text-align:start;
-  white-space:normal;
-  overflow-wrap:anywhere;
-}
-
-.lead-capture-form{
-  min-height:0;
-}
-
-.lead-capture-form .btn{
-  justify-self:start;
-}
-
-[dir="rtl"] .lead-capture-form .consent-row{
-  text-align:right;
-}
-
-@media (max-width:600px){
-  .lead-capture-form{
-    padding:18px;
+function projectVisual(project) {
+  if (project.cover_image_url) {
+    return `
+      <div class="project-image dynamic-project-image has-photo"
+           style="background-image:
+             linear-gradient(180deg,rgba(6,23,38,.05),rgba(6,23,38,.58)),
+             url('${escapeHtml(project.cover_image_url)}')">
+        <span class="project-image-location">${escapeHtml(projectLocation(project))}</span>
+      </div>
+    `;
   }
 
-  .lead-capture-form .consent-row{
-    font-size:11.5px;
+  const developer = project.developers || {};
+  const logo = developer.logo_url
+    ? `<img class="project-fallback-logo" src="${escapeHtml(developer.logo_url)}" alt="${escapeHtml(projectDeveloper(project))} logo" loading="lazy">`
+    : '';
+
+  return `
+    <div class="project-image dynamic-project-image project-image-fallback" data-project-kind="${escapeHtml(project.project_type || 'Residential')}">
+      ${logo}
+      <span class="project-fallback-initials">${projectInitials(project)}</span>
+      <span class="project-fallback-name">${escapeHtml(projectName(project))}</span>
+      <small>${escapeHtml(projectLocation(project))}</small>
+    </div>
+  `;
+}
+
+function availabilityPrice(project) {
+  if (project.starting_price) return formatMoney(project.starting_price, project.currency);
+
+  return lang === 'ar'
+    ? 'تحقق من السعر الحالي مع JB'
+    : 'Verify current price with JB';
+}
+
+function availabilityDelivery(project) {
+  if (project.delivery_date) return formatDate(project.delivery_date);
+
+  return lang === 'ar'
+    ? 'يتم التحقق من موعد التسليم'
+    : 'Delivery under verification';
+}
+
+/* =========================================================
+   PROJECTS
+   ========================================================= */
+
+function projectCard(project) {
+  const name = escapeHtml(projectName(project));
+  const developer = escapeHtml(projectDeveloper(project));
+  const location = escapeHtml(projectLocation(project));
+  const type = escapeHtml(text(project.project_type));
+  const price = escapeHtml(availabilityPrice(project));
+  const selected = comparison.some(item => item.id === project.id);
+
+  return `
+    <article class="project-card dynamic-project-card">
+
+      ${projectVisual(project)}
+
+      <div class="card-body">
+
+        <div class="project-card-topline">
+          <span class="tag">
+            ${project.verification_status === 'verified'
+              ? (lang === 'ar' ? 'موثّق' : 'VERIFIED')
+              : (lang === 'ar' ? 'بيانات السوق' : 'MARKET DATA')}
+          </span>
+
+          <span class="project-location">${location}</span>
+        </div>
+
+        <h3>${name}</h3>
+
+        <p class="project-developer">${developer}</p>
+
+        <div class="project-meta">
+          <span>${type}</span>
+          <span class="project-price">${price}</span>
+        </div>
+
+        <div class="project-card-actions">
+
+          <button
+            class="text-link project-profile-btn"
+            type="button"
+            data-project-profile="${project.id}">
+            ${lang === 'ar' ? 'عرض المشروع ←' : 'View project →'}
+          </button>
+
+          <button
+            class="compare-chip ${selected ? 'is-selected' : ''}"
+            type="button"
+            data-project-compare="${project.id}">
+            ${selected
+              ? (lang === 'ar' ? '✓ تمت الإضافة' : '✓ Added')
+              : (lang === 'ar' ? '+ مقارنة' : '+ Compare')}
+          </button>
+
+        </div>
+
+      </div>
+    </article>
+  `;
+}
+
+function renderProjects(list = projects) {
+  const grid = document.getElementById('projectsGrid');
+  const count = document.getElementById('projectCount');
+  const loadMore = document.getElementById('loadMoreProjects');
+
+  if (!grid) return;
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="data-empty">
+        ${lang === 'ar' ? 'لا توجد مشروعات مطابقة.' : 'No matching projects found.'}
+      </div>
+    `;
+
+    if (count) count.textContent = lang === 'ar' ? '0 مشروع' : '0 projects';
+    if (loadMore) loadMore.hidden = true;
+    return;
   }
 
-  .lead-capture-form .btn{
-    width:100%;
-    justify-content:center;
+  const visible = list.slice(0, visibleProjects);
+
+  grid.innerHTML = visible.map(projectCard).join('');
+
+  if (count) {
+    count.textContent =
+      lang === 'ar'
+        ? `${list.length} مشروعًا منشورًا`
+        : `${list.length} published projects`;
+  }
+
+  if (loadMore) {
+    loadMore.hidden = visibleProjects >= list.length;
+    loadMore.textContent =
+      lang === 'ar' ? 'عرض المزيد من المشروعات' : 'Load more projects';
   }
 }
+
+document.getElementById('loadMoreProjects')?.addEventListener('click', () => {
+  visibleProjects += PROJECT_PAGE_SIZE;
+  renderProjects();
+});
 
 
 /* =========================================================
-   JB V2.1 — LIGHTER PREMIUM PALETTE
-   Same navy family, brighter and less visually heavy.
+   DEVELOPERS
    ========================================================= */
 
-:root{
-  --navy:#1B3A57;
-  --navy2:#284F70;
-  --gold:#D6AE35;
-  --gold2:#E7C85E;
-  --ink:#17304A;
-  --muted:#6B7D90;
-  --warm:#FAF9F5;
-  --soft:#F5F8FB;
-  --line:#E3EAF0;
-}
+function renderDevelopers(list) {
+  const row = document.getElementById('developerRow');
+  const count = document.getElementById('developerCount');
 
-.site-header{
-  background:rgba(25,53,79,.97);
-  border-bottom-color:rgba(226,196,93,.22);
-}
+  if (!row) return;
 
-.hero{
-  background:
-    radial-gradient(circle at 84% 45%, rgba(231,200,94,.16), transparent 25%),
-    linear-gradient(118deg,#1A3954 0%,#214866 65%,#2C5878 100%);
-}
+  if (!list.length) {
+    row.innerHTML = `
+      <div class="data-empty">
+        ${lang === 'ar' ? 'لم يتم العثور على مطور.' : 'No developer found.'}
+      </div>
+    `;
 
-.hero::after{
-  opacity:.45;
-}
+    if (count) count.textContent = lang === 'ar' ? '0 مطور' : '0 developers';
 
-.finder.section{
-  background:linear-gradient(180deg,#F6F9FC 0%,#FFFFFF 100%);
-}
+    return;
+  }
 
-.finder-result{
-  background:linear-gradient(135deg,#234762,#2D5875);
-  border:1px solid rgba(231,200,94,.28);
-  box-shadow:0 18px 45px rgba(25,53,79,.12);
-}
+  row.innerHTML = list.map(developer => `
+    <button
+      class="developer-pill developer-pill-button"
+      type="button"
+      data-developer-profile="${developer.id}">
 
-.finder-result-content p,
-.finder-result-next,
-.finder-shortlist-copy small{
-  color:#DCE6EE;
-}
+      ${escapeHtml(developerName(developer))}
 
-.finder-shortlist-item{
-  background:rgba(255,255,255,.055);
-  border-color:rgba(231,200,94,.28);
-}
+      <span>
+        ${lang === 'ar' ? 'عرض الملف' : 'Profile'}
+      </span>
 
-.shortlist-locked{
-  background:#FFFDF6;
-  color:var(--ink);
-  border-color:#DFC35D;
-}
+    </button>
+  `).join('');
 
-.shortlist-locked span{
-  color:#728195;
-}
-
-.lead-capture-form{
-  background:#FFFFFF;
-  border-color:#DCE5EC;
-  box-shadow:0 16px 38px rgba(28,61,88,.08);
-}
-
-.dark-section{
-  background:#F8F7F2;
-  color:var(--ink);
-}
-
-.value-cards article{
-  background:#FFFFFF;
-}
-
-.project-image-fallback{
-  background:
-    radial-gradient(circle at 22% 20%,rgba(231,200,94,.24),transparent 27%),
-    linear-gradient(135deg,#2D5875,#1B3A57);
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 18%,rgba(146,207,229,.32),transparent 30%),
-    linear-gradient(135deg,#3C718C,#244C69);
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(231,200,94,.24),transparent 28%),
-    linear-gradient(135deg,#4B6174,#263E55);
-}
-
-.profile-modal-backdrop{
-  background:rgba(27,58,87,.58);
-}
-
-.footer{
-  background:#1A344D;
-}
-
-.btn-navy{
-  background:#1B3A57;
-  border-color:#1B3A57;
-}
-
-.btn-navy:hover{
-  background:#284F70;
-  border-color:#284F70;
-}
-
-.compare-chip,
-.btn-outline-dark{
-  border-color:#315A78;
-  color:#1B3A57;
-}
-
-@media (max-width:900px){
-  .site-header{
-    background:#1B3A57;
+  if (count) {
+    count.textContent =
+      lang === 'ar'
+        ? `${list.length} مطورًا موثقًا`
+        : `${list.length} verified developers`;
   }
 }
+
+function searchDevelopers() {
+  const query =
+    document.getElementById('developerSearch')?.value
+      .trim()
+      .toLowerCase() || '';
+
+  filteredDevelopers = developers.filter(developer => {
+    return [
+      developer.name_en,
+      developer.name_ar,
+      developer.slug
+    ]
+      .filter(Boolean)
+      .some(value => String(value).toLowerCase().includes(query));
+  });
+
+  renderDevelopers(filteredDevelopers);
+}
+
+document.getElementById('developerSearchBtn')?.addEventListener('click', searchDevelopers);
+
+document.getElementById('developerSearch')?.addEventListener('input', searchDevelopers);
+
+
+/* =========================================================
+   PROFILES / NAVIGATION
+   ========================================================= */
+
+let modalHistory = [];
+
+function openModal(html, state = null, pushHistory = true) {
+  const modal = document.getElementById('profileModal');
+  const content = document.getElementById('profileModalContent');
+
+  if (!modal || !content) return;
+
+  if (pushHistory && state) {
+    const current = modalHistory[modalHistory.length - 1];
+    const sameState = current &&
+      current.type === state.type &&
+      current.id === state.id;
+
+    if (!sameState) modalHistory.push(state);
+  }
+
+  content.innerHTML = html;
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+
+  const card = modal.querySelector('.profile-modal-card');
+  if (card) card.scrollTop = 0;
+}
+
+function closeModal() {
+  const modal = document.getElementById('profileModal');
+  if (!modal) return;
+
+  modal.hidden = true;
+  document.body.classList.remove('modal-open');
+  modalHistory = [];
+}
+
+function modalBack() {
+  if (modalHistory.length <= 1) {
+    closeModal();
+    return;
+  }
+
+  modalHistory.pop();
+  const previous = modalHistory[modalHistory.length - 1];
+
+  if (!previous) {
+    closeModal();
+  } else if (previous.type === 'developer') {
+    showDeveloperProfile(previous.id, false);
+  } else if (previous.type === 'project') {
+    showProjectProfile(previous.id, previous.parentDeveloperId || null, false);
+  }
+}
+
+document.getElementById('profileModalClose')?.addEventListener('click', closeModal);
+document.querySelector('[data-close-modal]')?.addEventListener('click', closeModal);
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeModal();
+});
+
+function developerLogo(developer) {
+  return developer?.logo_url
+    ? `<img class="profile-developer-logo" src="${escapeHtml(developer.logo_url)}" alt="${escapeHtml(developerName(developer))} logo" loading="lazy">`
+    : `<div class="profile-developer-monogram">${escapeHtml((developerName(developer) || 'D').slice(0,2).toUpperCase())}</div>`;
+}
+
+function showDeveloperProfile(id, pushHistory = true) {
+  const developer = developers.find(item => item.id === id);
+  if (!developer) return;
+
+  const relatedProjects = projects.filter(project => project.developer_id === id);
+
+  const description =
+    lang === 'ar'
+      ? (developer.description_ar || developer.short_description_ar || developer.description_en || '')
+      : (developer.description_en || developer.short_description_en || developer.description_ar || '');
+
+  openModal(`
+    <div class="profile-brand-row">
+      ${developerLogo(developer)}
+      <div class="profile-heading">
+        <span class="eyebrow dark">${lang === 'ar' ? 'ملف المطور' : 'DEVELOPER PROFILE'}</span>
+        <h2 id="profileModalTitle">${escapeHtml(developerName(developer))}</h2>
+        <p>${escapeHtml(description || (
+          lang === 'ar'
+            ? 'ملف مطور موثق ضمن قاعدة بيانات JB.'
+            : 'Verified developer profile in the JB Market Database.'
+        ))}</p>
+      </div>
+    </div>
+
+    <div class="profile-facts">
+      <div>
+        <span>${lang === 'ar' ? 'سنة التأسيس' : 'Founded'}</span>
+        <strong>${escapeHtml(developer.founded_year || '—')}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'المشروعات المنشورة' : 'Published projects'}</span>
+        <strong>${relatedProjects.length}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'حالة التحقق' : 'Verification'}</span>
+        <strong>${escapeHtml(developer.verification_status || '—')}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'آخر تحقق' : 'Last verified'}</span>
+        <strong>${formatDate(developer.last_verified_at)}</strong>
+      </div>
+    </div>
+
+    <h3 class="profile-subtitle">${lang === 'ar' ? 'مشروعات المطور' : 'Developer projects'}</h3>
+
+    <div class="profile-project-list">
+      ${
+        relatedProjects.length
+          ? relatedProjects.map(project => `
+              <button
+                class="profile-project-link"
+                type="button"
+                data-project-profile="${project.id}"
+                data-parent-developer="${developer.id}">
+                <span>${escapeHtml(projectName(project))}</span>
+                <small>${escapeHtml(projectLocation(project))}</small>
+              </button>
+            `).join('')
+          : `<p>${lang === 'ar' ? 'لا توجد مشروعات منشورة حاليًا.' : 'No published projects yet.'}</p>`
+      }
+    </div>
+
+    ${
+      developer.website_url
+        ? `<a class="btn btn-navy profile-source-link"
+              href="${escapeHtml(developer.website_url)}"
+              target="_blank" rel="noopener">
+              ${lang === 'ar' ? 'الموقع الرسمي للمطور' : 'Official developer website'}
+           </a>`
+        : ''
+    }
+  `, { type: 'developer', id }, pushHistory);
+}
+
+function showProjectProfile(id, parentDeveloperId = null, pushHistory = true) {
+  const project = projects.find(item => item.id === id);
+  if (!project) return;
+
+  const developer = developers.find(item => item.id === project.developer_id);
+  const description =
+    lang === 'ar'
+      ? (project.description_ar || project.overview_ar || project.description_en || project.overview_en || '')
+      : (project.description_en || project.overview_en || project.description_ar || project.overview_ar || '');
+
+  const backDeveloperId = parentDeveloperId || project.developer_id;
+
+  openModal(`
+    <div class="profile-nav-row">
+      <button class="profile-back" type="button" data-modal-back>
+        ${lang === 'ar'
+          ? `→ العودة إلى ${escapeHtml(developer ? developerName(developer) : 'المطور')}`
+          : `← Back to ${escapeHtml(developer ? developerName(developer) : 'developer')}`}
+      </button>
+      <span class="profile-breadcrumb">${escapeHtml(projectDeveloper(project))} / ${escapeHtml(projectName(project))}</span>
+    </div>
+
+    <div class="profile-project-hero">
+      ${projectVisual(project)}
+    </div>
+
+    <div class="profile-heading">
+      <span class="eyebrow dark">${lang === 'ar' ? 'ملف المشروع' : 'PROJECT PROFILE'}</span>
+      <h2 id="profileModalTitle">${escapeHtml(projectName(project))}</h2>
+      <button class="profile-developer-button" type="button" data-developer-profile="${project.developer_id}">
+        ${developer?.logo_url ? `<img src="${escapeHtml(developer.logo_url)}" alt="" loading="lazy">` : ''}
+        <span>${escapeHtml(projectDeveloper(project))}</span>
+      </button>
+      <p>${escapeHtml(description || (
+        lang === 'ar'
+          ? 'مشروع منشور ضمن قاعدة بيانات JB مع بيانات المصدر والتحقق المتاحة.'
+          : 'Published project in the JB Market Database with available source and verification data.'
+      ))}</p>
+    </div>
+
+    <div class="profile-facts">
+      <div>
+        <span>${lang === 'ar' ? 'الموقع' : 'Location'}</span>
+        <strong>${escapeHtml(projectLocation(project))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'نوع المشروع' : 'Project type'}</span>
+        <strong>${escapeHtml(text(project.project_type))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'السعر الحالي' : 'Current price'}</span>
+        <strong>${escapeHtml(availabilityPrice(project))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'التسليم' : 'Delivery'}</span>
+        <strong>${escapeHtml(availabilityDelivery(project))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'حالة الإنشاء' : 'Construction'}</span>
+        <strong>${escapeHtml(project.construction_status || (lang === 'ar' ? 'قيد التحقق' : 'Under verification'))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'حالة التحقق' : 'Verification'}</span>
+        <strong>${escapeHtml(project.verification_status || '—')}</strong>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-gold" type="button" data-project-compare="${project.id}">
+        ${comparison.some(item => item.id === project.id)
+          ? (lang === 'ar' ? '✓ موجود في المقارنة' : '✓ In comparison')
+          : (lang === 'ar' ? 'أضف للمقارنة' : 'Add to comparison')}
+      </button>
+
+      <a class="btn btn-outline-dark" href="#finder" data-project-consult="${project.id}">
+        ${lang === 'ar' ? 'اطلب استشارة من JB' : 'Ask JB about this project'}
+      </a>
+
+      ${
+        project.website_url
+          ? `<a class="btn btn-navy"
+                href="${escapeHtml(project.website_url)}"
+                target="_blank" rel="noopener">
+                ${lang === 'ar' ? 'المصدر الرسمي' : 'Official source'}
+             </a>`
+          : ''
+      }
+    </div>
+  `, { type: 'project', id, parentDeveloperId: backDeveloperId }, pushHistory);
+}
+
+document.addEventListener('click', event => {
+  const backButton = event.target.closest('[data-modal-back]');
+  const developerButton = event.target.closest('[data-developer-profile]');
+  const projectButton = event.target.closest('[data-project-profile]');
+  const compareButton = event.target.closest('[data-project-compare]');
+  const consultButton = event.target.closest('[data-project-consult]');
+
+  if (backButton) {
+    modalBack();
+    return;
+  }
+
+  if (developerButton) {
+    const parentState = modalHistory[modalHistory.length - 1];
+    showDeveloperProfile(developerButton.dataset.developerProfile, true);
+  }
+
+  if (projectButton) {
+    const parentDeveloperId =
+      projectButton.dataset.parentDeveloper ||
+      modalHistory.findLast?.(state => state.type === 'developer')?.id ||
+      null;
+
+    showProjectProfile(projectButton.dataset.projectProfile, parentDeveloperId, true);
+  }
+
+  if (compareButton) {
+    toggleComparison(compareButton.dataset.projectCompare);
+  }
+
+  if (consultButton) {
+    closeModal();
+    setTimeout(() => document.getElementById('finder')?.scrollIntoView({behavior:'smooth'}), 50);
+  }
+});
+
+/* =========================================================
+   COMPARISON — MAXIMUM 3 PROJECTS
+   ========================================================= */
+
+function toggleComparison(id) {
+  const project = projects.find(item => item.id === id);
+
+  if (!project) return;
+
+  const exists = comparison.some(item => item.id === id);
+
+  if (exists) {
+    comparison = comparison.filter(item => item.id !== id);
+  } else {
+    if (comparison.length >= 3) {
+      alert(
+        lang === 'ar'
+          ? 'يمكنك مقارنة 3 مشروعات كحد أقصى.'
+          : 'You can compare a maximum of 3 projects.'
+      );
+
+      return;
+    }
+
+    comparison.push(project);
+  }
+
+  renderProjects();
+  renderComparison();
+
+  const modal = document.getElementById('profileModal');
+
+  if (modal && !modal.hidden) {
+    showProjectProfile(id);
+  }
+}
+
+function renderComparison() {
+  const preview = document.getElementById('comparePreview');
+  const status = document.getElementById('compareStatus');
+  const clearButton = document.getElementById('clearComparison');
+
+  if (!preview) return;
+
+  if (!comparison.length) {
+    preview.innerHTML = `
+      <div class="compare-empty">
+        ${lang === 'ar'
+          ? 'لم تختر أي مشروعات للمقارنة بعد.'
+          : 'No projects selected yet.'}
+      </div>
+    `;
+
+    if (status) {
+      status.textContent =
+        lang === 'ar'
+          ? 'اختر حتى 3 مشروعات باستخدام زر مقارنة داخل بطاقة المشروع.'
+          : 'Select up to 3 projects using the Compare button on project cards.';
+    }
+
+    if (clearButton) clearButton.hidden = true;
+
+    return;
+  }
+
+  const columns = comparison.length;
+
+  const header = comparison
+    .map(project => `<span>${escapeHtml(projectName(project))}</span>`)
+    .join('');
+
+  const row = (labelEn, labelAr, valueGetter) => `
+    <div class="compare-row compare-row-dynamic" style="grid-template-columns:1.25fr repeat(${columns},1fr)">
+      <span class="compare-criteria">${lang === 'ar' ? labelAr : labelEn}</span>
+      ${comparison.map(project => `<span>${valueGetter(project)}</span>`).join('')}
+    </div>
+  `;
+
+  preview.innerHTML = `
+    <div class="compare-row head compare-row-dynamic"
+         style="grid-template-columns:1.25fr repeat(${columns},1fr)">
+      <span>${lang === 'ar' ? 'المعيار' : 'Criteria'}</span>
+      ${header}
+    </div>
+
+    ${row(
+      'Developer',
+      'المطور',
+      project => escapeHtml(projectDeveloper(project))
+    )}
+
+    ${row(
+      'Location',
+      'الموقع',
+      project => escapeHtml(projectLocation(project))
+    )}
+
+    ${row(
+      'Project type',
+      'نوع المشروع',
+      project => escapeHtml(text(project.project_type))
+    )}
+
+    ${row(
+      'Starting price',
+      'السعر المبدئي',
+      project => escapeHtml(formatMoney(project.starting_price, project.currency))
+    )}
+
+    ${row(
+      'Delivery',
+      'التسليم',
+      project => formatDate(project.delivery_date)
+    )}
+
+    ${row(
+      'Verification',
+      'التحقق',
+      project => escapeHtml(project.verification_status || '—')
+    )}
+  `;
+
+  if (status) {
+    status.textContent =
+      lang === 'ar'
+        ? `تم اختيار ${comparison.length} من 3 مشروعات.`
+        : `${comparison.length} of 3 projects selected.`;
+  }
+
+  if (clearButton) {
+    clearButton.hidden = false;
+    clearButton.textContent =
+      lang === 'ar' ? 'مسح المقارنة' : 'Clear comparison';
+  }
+}
+
+document.getElementById('clearComparison')?.addEventListener('click', () => {
+  comparison = [];
+  renderProjects();
+  renderComparison();
+});
+
+
+/* =========================================================
+   PROPERTY FINDER V3
+   Preliminary shortlist + consent-based lead capture
+   ========================================================= */
+
+const finderForm = document.getElementById('finderForm');
+let currentSearchProfile = null;
+let currentShortlist = [];
+
+function getFinderValues() {
+  return {
+    location: document.getElementById('location')?.value || '',
+    budget: document.getElementById('budget')?.value || '',
+    type: document.getElementById('type')?.value || '',
+    purpose: document.getElementById('purpose')?.value || '',
+    delivery: document.getElementById('delivery')?.value || '',
+    payment: document.getElementById('payment')?.value || '',
+    bedrooms: document.getElementById('bedrooms')?.value || '',
+    timeline: document.getElementById('timeline')?.value || ''
+  };
+}
+
+function calculateReadiness(values) {
+  const filled = Object.values(values).filter(Boolean).length;
+  let readiness = Math.round((filled / 8) * 60);
+
+  if (values.timeline === 'now') readiness += 25;
+  else if (values.timeline === '3months') readiness += 20;
+  else if (values.timeline === '6months') readiness += 12;
+  else if (values.timeline === 'later') readiness += 5;
+
+  if (values.budget) readiness += 10;
+  if (values.payment) readiness += 5;
+
+  return Math.min(readiness, 100);
+}
+
+function normalizeUnitType(value = '') {
+  const key = String(value).trim().toLowerCase();
+
+  const aliases = {
+    'apartment': ['apartment'],
+    'chalet': ['chalet'],
+    'villa': ['villa'],
+    'twin house': ['twin-house', 'twin house'],
+    'townhouse': ['townhouse', 'town house'],
+    'duplex': ['duplex'],
+    'commercial': ['commercial', 'office', 'clinic', 'retail', 'shop']
+  };
+
+  return aliases[key] || [key];
+}
+
+function projectMatchesUnitType(project, selectedType) {
+  if (!selectedType) return true;
+
+  const wanted = normalizeUnitType(selectedType);
+  const linkedTypes = projectPropertyTypeMap.get(project.id) || [];
+
+  const linkedValues = linkedTypes.flatMap(type => [
+    String(type.slug || '').toLowerCase(),
+    String(type.name_en || '').toLowerCase(),
+    String(type.name_ar || '').toLowerCase()
+  ]);
+
+  if (wanted.some(value => linkedValues.includes(value))) {
+    return true;
+  }
+
+  // Fallback for commercial/mixed-use projects whose detailed unit-type
+  // rows have not yet been enriched.
+  const broadProjectType = String(project.project_type || '').toLowerCase();
+
+  if (selectedType === 'Commercial') {
+    return broadProjectType.includes('commercial') ||
+           broadProjectType.includes('mixed use') ||
+           broadProjectType.includes('mixed-use') ||
+           broadProjectType.includes('medical') ||
+           broadProjectType.includes('office');
+  }
+
+  // If detailed unit data is absent, do not falsely claim a residential
+  // project matches a specific unit type.
+  return false;
+}
+
+function shortlistProjects(values) {
+  return projects.filter(project => {
+    const locationMatch = !values.location || (() => {
+      const location =
+        `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+      return location.includes(values.location.toLowerCase());
+    })();
+
+    const unitTypeMatch = projectMatchesUnitType(project, values.type);
+
+    return locationMatch && unitTypeMatch;
+  });
+}
+
+function shortlistItem(project) {
+  return `
+    <button class="finder-shortlist-item" type="button" data-project-profile="${project.id}">
+      <span class="finder-shortlist-thumb">
+        ${
+          project.cover_image_url
+            ? `<img src="${escapeHtml(project.cover_image_url)}" alt="" loading="lazy">`
+            : `<b>${projectInitials(project)}</b>`
+        }
+      </span>
+      <span class="finder-shortlist-copy">
+        <strong>${escapeHtml(projectName(project))}</strong>
+        <small>${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}</small>
+      </span>
+    </button>
+  `;
+}
+
+function renderFinderPreview(values, shouldScroll = true) {
+  const result = document.getElementById('finderResult');
+  if (!result) return;
+
+  const readiness = calculateReadiness(values);
+  currentShortlist = shortlistProjects(values);
+  currentSearchProfile = {...values, readiness};
+
+  const preview = currentShortlist.slice(0, 3);
+
+  result.hidden = false;
+  result.innerHTML = `
+    <div class="finder-result-content">
+      <div class="finder-result-head">
+        <div>
+          <span class="finder-result-label">
+            ${lang === 'ar' ? 'نتيجة أولية من JB' : 'YOUR JB PREVIEW'}
+          </span>
+          <h3>
+            ${lang === 'ar'
+              ? 'هذه بداية قائمتك المختصرة'
+              : 'Here is the start of your shortlist'}
+          </h3>
+        </div>
+        <div class="readiness-score">
+          <strong>${readiness}%</strong>
+          <span>${lang === 'ar' ? 'اكتمال ملف البحث' : 'Search profile'}</span>
+        </div>
+      </div>
+
+      <p>
+        ${lang === 'ar'
+          ? 'نعرض نتائج أولية مطابقة للموقع ونوع الوحدة المسجلين في قاعدة البيانات، بدون طلب بيانات شخصية. للحصول على القائمة الكاملة وحفظ متطلباتك ومتابعة مستشار JB، يمكنك ترك وسيلة تواصل.'
+          : 'We show initial matches using the selected location and unit type available in the database, without asking for personal details. To receive the full shortlist, save your requirements and optionally speak with a JB advisor, leave your preferred contact details.'}
+      </p>
+
+      <div class="finder-shortlist">
+        ${
+          preview.length
+            ? preview.map(shortlistItem).join('')
+            : `<div class="data-empty">${
+                lang === 'ar'
+                  ? 'لا توجد نتائج منشورة مطابقة لهذا الموقع حاليًا.'
+                  : 'No published projects currently match this location.'
+              }</div>`
+        }
+      </div>
+
+      ${
+        currentShortlist.length > 3
+          ? `<div class="shortlist-locked">
+              <strong>${lang === 'ar'
+                ? `هناك ${currentShortlist.length - 3} نتيجة إضافية`
+                : `${currentShortlist.length - 3} more results available`}</strong>
+              <span>${lang === 'ar'
+                ? 'أدخل بيانات التواصل للحصول على القائمة الكاملة وحفظ ملف البحث.'
+                : 'Add your contact details to unlock the full shortlist and save this search.'}</span>
+            </div>`
+          : ''
+      }
+
+      <form id="leadCaptureForm" class="lead-capture-form">
+        <div class="lead-capture-heading">
+          <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
+          <span>${lang === 'ar'
+            ? 'لن نطلب منك إنشاء حساب الآن.'
+            : 'No account creation required.'}</span>
+        </div>
+
+        <div class="lead-capture-grid">
+          <label>
+            <span>${lang === 'ar' ? 'الاسم' : 'Name'}</span>
+            <input id="leadName" name="name" autocomplete="name" required
+                   placeholder="${lang === 'ar' ? 'اسمك' : 'Your name'}">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'الهاتف / WhatsApp' : 'Phone / WhatsApp'}</span>
+            <input id="leadPhone" name="phone" type="tel" autocomplete="tel" required
+                   placeholder="${lang === 'ar' ? '01xxxxxxxxx' : '+20 ...'}">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'البريد الإلكتروني (اختياري)' : 'Email (optional)'}</span>
+            <input id="leadEmail" name="email" type="email" autocomplete="email"
+                   placeholder="name@example.com">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'أفضل وسيلة تواصل' : 'Preferred contact'}</span>
+            <select id="leadContactPreference" required>
+              <option value="whatsapp">${lang === 'ar' ? 'WhatsApp' : 'WhatsApp'}</option>
+              <option value="phone">${lang === 'ar' ? 'مكالمة هاتفية' : 'Phone call'}</option>
+              <option value="email">${lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="consent-row">
+          <input id="leadConsent" type="checkbox" required>
+          <span>${lang === 'ar'
+            ? 'أوافق على أن تستخدم JB بياناتي ومتطلبات البحث للتواصل معي بخصوص خيارات عقارية مناسبة. يمكنني طلب إيقاف التواصل في أي وقت.'
+            : 'I agree that JB may use my contact details and search requirements to follow up about relevant property options. I can opt out at any time.'}</span>
+        </label>
+
+        <button class="btn btn-gold" type="submit">
+          ${lang === 'ar' ? 'احفظ بحثي واعرض القائمة الكاملة' : 'Save my search & show full shortlist'}
+        </button>
+
+        <p id="leadCaptureStatus" class="lead-capture-status" aria-live="polite"></p>
+      </form>
+    </div>
+  `;
+
+  if (shouldScroll) result.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function submitLeadCapture(event) {
+  event.preventDefault();
+
+  const status = document.getElementById('leadCaptureStatus');
+  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+  const name = document.getElementById('leadName')?.value.trim() || '';
+  const phone = document.getElementById('leadPhone')?.value.trim() || '';
+  const email = document.getElementById('leadEmail')?.value.trim() || '';
+  const preferred = document.getElementById('leadContactPreference')?.value || 'whatsapp';
+  const consent = Boolean(document.getElementById('leadConsent')?.checked);
+
+  if (!name || !phone || !consent || !currentSearchProfile) return;
+
+  if (submitButton) submitButton.disabled = true;
+  if (status) {
+    status.textContent = lang === 'ar' ? 'جارٍ حفظ طلبك...' : 'Saving your request...';
+  }
+
+  try {
+    await supabasePost('lead_capture_submissions', {
+      full_name: name,
+      phone,
+      email: email || null,
+      preferred_contact: preferred,
+      consent_to_contact: consent,
+      consent_text_version: 'jb-web-v2-2026-08-14',
+      source: 'website_property_finder',
+      language: lang,
+      search_profile: currentSearchProfile,
+      matched_project_ids: currentShortlist.slice(0, 20).map(project => project.id),
+      page_path: window.location.pathname,
+      referrer: document.referrer || null,
+      user_agent: navigator.userAgent || null
+    });
+
+    const fullList = currentShortlist.slice(0, 10);
+
+    event.currentTarget.innerHTML = `
+      <div class="lead-success">
+        <strong>${lang === 'ar' ? 'تم حفظ بحثك بنجاح.' : 'Your search has been saved.'}</strong>
+        <span>${lang === 'ar'
+          ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب اختيارك.'
+          : 'You can now review the full shortlist. JB can follow up using your preferred channel.'}</span>
+      </div>
+    `;
+
+    const shortlistContainer = document.querySelector('#finderResult .finder-shortlist');
+    const locked = document.querySelector('#finderResult .shortlist-locked');
+
+    if (shortlistContainer) {
+      shortlistContainer.innerHTML = fullList.length
+        ? fullList.map(shortlistItem).join('')
+        : shortlistContainer.innerHTML;
+    }
+
+    if (locked) locked.remove();
+
+  } catch (error) {
+    console.error('Lead capture failed:', error);
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'تعذر حفظ بيانات التواصل الآن. حاول مرة أخرى بعد قليل.'
+        : 'We could not save your contact details right now. Please try again.';
+    }
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
+let finderBusy = false;
+
+function runFinder(event) {
+  if (event) event.preventDefault();
+  if (finderBusy) return;
+
+  const result = document.getElementById('finderResult');
+  const button = document.getElementById('finderSubmit');
+
+  try {
+    finderBusy = true;
+    if (button) {
+      button.disabled = true;
+      button.dataset.originalText = button.textContent;
+      button.textContent = lang === 'ar' ? 'جارٍ إعداد النتائج...' : 'Building matches...';
+    }
+
+    renderFinderPreview(getFinderValues(), true);
+  } catch (error) {
+    console.error('Finder failed:', error);
+
+    if (result) {
+      result.hidden = false;
+      result.innerHTML = `
+        <div class="finder-result-content">
+          <div class="data-error">
+            <strong>${lang === 'ar' ? 'تعذر تشغيل الباحث العقاري.' : 'The property finder could not run.'}</strong>
+            <span>${lang === 'ar'
+              ? 'أعد تحميل الصفحة وحاول مرة أخرى. إذا استمرت المشكلة سنراجع اتصال البيانات.'
+              : 'Refresh the page and try again. If the issue continues, we will check the data connection.'}</span>
+          </div>
+        </div>
+      `;
+      result.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  } finally {
+    finderBusy = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent =
+        button.dataset.originalText ||
+        (lang === 'ar' ? 'اعرض أفضل الخيارات المناسبة لي' : 'Find My Best Matches');
+    }
+  }
+}
+
+function bindFinderControls() {
+  const form = document.getElementById('finderForm');
+  const button = document.getElementById('finderSubmit');
+
+  if (form && !form.dataset.finderBound) {
+    form.dataset.finderBound = 'true';
+    form.addEventListener('submit', runFinder);
+  }
+
+  if (button && !button.dataset.finderClickBound) {
+    button.dataset.finderClickBound = 'true';
+    button.addEventListener('click', runFinder);
+  }
+}
+
+bindFinderControls();
+
+document.addEventListener('submit', event => {
+  if (event.target?.id === 'leadCaptureForm') {
+    submitLeadCapture(event);
+  }
+});
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+const yearElement = document.getElementById('year');
+
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
+
+applyLang();
+bindFinderControls();
+
+document.addEventListener('DOMContentLoaded', () => {
+  bindFinderControls();
+});
+
+loadMarketData();
