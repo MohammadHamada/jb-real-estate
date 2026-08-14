@@ -4,7 +4,7 @@
    Supabase REST + Finder V2 + Developers + Projects + Compare
    ========================================================= */
 
-const SUPABASE_URL = "https://cmjejijkdztlvhqzcjrg.supabase.co";
+const SUPABASE_URL = "https://cmjeijjkdztlvhqzcjrg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_foGnQkjteOAQ7XL6SBqAVA_fQACuQ7a";
 const SUPABASE_REST = `${SUPABASE_URL}/rest/v1`;
 
