@@ -421,49 +421,233 @@ document.getElementById('langToggle')?.addEventListener('click', () => {
 
 async function loadMarketData() {
   try {
-    const [developerData, projectData] = await Promise.all([
+
+    /*
+      Load developers, projects and locations separately.
+      This avoids problems with nested Supabase REST relationships.
+    */
+
+    const [developerData, projectData, locationData] = await Promise.all([
+
       supabaseGet(
         'developers?select=id,slug,name_ar,name_en,short_description_ar,short_description_en,description_ar,description_en,website_url,logo_url,founded_year,developer_type,verification_status,last_verified_at&is_published=eq.true&order=name_en.asc'
       ),
 
       supabaseGet(
-        'projects?select=id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,starting_price,currency,delivery_date,construction_status,handover_status,website_url,cover_image_url,verification_status,last_verified_at,developer_id,location_id,developers(id,slug,name_ar,name_en),locations(id,city,area)&is_published=eq.true&order=name_en.asc'
+        'projects?select=id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,starting_price,currency,delivery_date,construction_status,handover_status,website_url,cover_image_url,verification_status,last_verified_at,developer_id,location_id&is_published=eq.true&order=name_en.asc'
+      ),
+
+      supabaseGet(
+        'locations?select=id,city,area'
       )
+
     ]);
 
-    developers = developerData || [];
-    projects = projectData || [];
-    filteredDevelopers = [...developers];
 
-    renderDevelopers(filteredDevelopers);
+    /* ===============================
+       Store developers
+       =============================== */
+
+    developers =
+      Array.isArray(developerData)
+        ? developerData
+        : [];
+
+
+    /* ===============================
+       Build lookup maps
+       =============================== */
+
+    const developerMap = new Map(
+      developers.map(developer => [
+        developer.id,
+        developer
+      ])
+    );
+
+
+    const locationMap = new Map(
+      (
+        Array.isArray(locationData)
+          ? locationData
+          : []
+      ).map(location => [
+        location.id,
+        location
+      ])
+    );
+
+
+    /* ===============================
+       Attach developer + location
+       information to every project
+       =============================== */
+
+    projects =
+      (
+        Array.isArray(projectData)
+          ? projectData
+          : []
+      ).map(project => ({
+
+        ...project,
+
+        developers:
+          developerMap.get(
+            project.developer_id
+          ) || null,
+
+        locations:
+          locationMap.get(
+            project.location_id
+          ) || null
+
+      }));
+
+
+    /* ===============================
+       Developer search base
+       =============================== */
+
+    filteredDevelopers = [
+      ...developers
+    ];
+
+
+    /* ===============================
+       Render website
+       =============================== */
+
+    renderDevelopers(
+      filteredDevelopers
+    );
+
     renderProjects();
+
     renderComparison();
 
-  } catch (error) {
-    console.error('JB market database connection failed:', error);
 
-    const projectsGrid = document.getElementById('projectsGrid');
-    const developerRow = document.getElementById('developerRow');
+    console.log(
+      `JB Market Database loaded: ${developers.length} developers, ${projects.length} projects`
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'JB market database connection failed:',
+      error
+    );
+
+
+    const projectsGrid =
+      document.getElementById(
+        'projectsGrid'
+      );
+
+    const developerRow =
+      document.getElementById(
+        'developerRow'
+      );
+
+    const projectCount =
+      document.getElementById(
+        'projectCount'
+      );
+
+    const developerCount =
+      document.getElementById(
+        'developerCount'
+      );
+
+
+    /* ===============================
+       Project error
+       =============================== */
+
+    if (projectCount) {
+
+      projectCount.textContent =
+        lang === 'ar'
+          ? 'تعذر الاتصال بقاعدة البيانات'
+          : 'Database connection error';
+
+    }
+
 
     if (projectsGrid) {
+
       projectsGrid.innerHTML = `
+
         <div class="data-error">
-          ${lang === 'ar'
-            ? 'تعذر تحميل المشروعات من قاعدة البيانات حاليًا.'
-            : 'Projects could not be loaded from the database right now.'}
+
+          <strong>
+            ${
+              lang === 'ar'
+                ? 'تعذر تحميل المشروعات.'
+                : 'Projects could not be loaded.'
+            }
+          </strong>
+
+          <br>
+
+          <small>
+            ${escapeHtml(
+              error.message ||
+              String(error)
+            )}
+          </small>
+
         </div>
+
       `;
+
     }
 
-    if (developerRow) {
-      developerRow.innerHTML = `
-        <div class="data-error">
-          ${lang === 'ar'
-            ? 'تعذر تحميل دليل المطورين حاليًا.'
-            : 'The developer directory could not be loaded right now.'}
-        </div>
-      `;
+
+    /* ===============================
+       Developer error
+       =============================== */
+
+    if (developerCount) {
+
+      developerCount.textContent =
+        lang === 'ar'
+          ? 'تعذر الاتصال بقاعدة البيانات'
+          : 'Database connection error';
+
     }
+
+
+    if (developerRow) {
+
+      developerRow.innerHTML = `
+
+        <div class="data-error">
+
+          <strong>
+            ${
+              lang === 'ar'
+                ? 'تعذر تحميل دليل المطورين.'
+                : 'The developer directory could not be loaded.'
+            }
+          </strong>
+
+          <br>
+
+          <small>
+            ${escapeHtml(
+              error.message ||
+              String(error)
+            )}
+          </small>
+
+        </div>
+
+      `;
+
+    }
+
   }
 }
 
