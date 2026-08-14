@@ -1,3 +1,4 @@
+// JB REAL ESTATE V2.1 - Lead Capture POST/RLS fix
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -304,7 +305,7 @@ async function supabasePost(path, payload) {
     headers: {
       ...apiHeaders(),
       'Content-Type': 'application/json',
-      Prefer: 'return=representation'
+      Prefer: 'return=minimal'
     },
     body: JSON.stringify(payload)
   });
@@ -314,8 +315,7 @@ async function supabasePost(path, payload) {
     throw new Error(message || `Supabase POST failed: ${response.status}`);
   }
 
-  const data = await response.json();
-  return Array.isArray(data) ? data[0] : data;
+  return true;
 }
 
 
@@ -1304,7 +1304,6 @@ function renderFinderPreview(values) {
           : ''
       }
 
-// JB REAL ESTATE V2 - Lead Capture enabled
       <form id="leadCaptureForm" class="lead-capture-form">
         <div class="lead-capture-heading">
           <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
