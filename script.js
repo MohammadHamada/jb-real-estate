@@ -1,4 +1,4 @@
-// JB REAL ESTATE V2.9 - Supabase publishable-key auth fix
+// JB REAL ESTATE V3.0 - Lead success UI async-event fix
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -1460,8 +1460,14 @@ function renderFinderPreview(values, shouldScroll = true) {
 async function submitLeadCapture(event) {
   event.preventDefault();
 
-  const status = document.getElementById('leadCaptureStatus');
-  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+  // IMPORTANT:
+  // event.currentTarget becomes null after an awaited operation when the
+  // submit listener is delegated from document. Capture the real form now.
+  const form = event.target?.closest?.('#leadCaptureForm') || event.target;
+  const status = form?.querySelector?.('#leadCaptureStatus') ||
+                 document.getElementById('leadCaptureStatus');
+  const submitButton = form?.querySelector?.('button[type="submit"]') || null;
+
   const name = document.getElementById('leadName')?.value.trim() || '';
   const phone = document.getElementById('leadPhone')?.value.trim() || '';
   const email = document.getElementById('leadEmail')?.value.trim() || '';
@@ -1471,8 +1477,11 @@ async function submitLeadCapture(event) {
   if (!name || !phone || !consent || !currentSearchProfile) return;
 
   if (submitButton) submitButton.disabled = true;
+
   if (status) {
-    status.textContent = lang === 'ar' ? 'جارٍ حفظ طلبك...' : 'Saving your request...';
+    status.textContent = lang === 'ar'
+      ? 'جارٍ حفظ طلبك...'
+      : 'Saving your request...';
   }
 
   try {
@@ -1482,7 +1491,7 @@ async function submitLeadCapture(event) {
       email: email || null,
       preferred_contact: preferred,
       consent_to_contact: consent,
-      consent_text_version: 'jb-web-v2-2026-08-14',
+      consent_text_version: 'jb-web-v3-2026-08-14',
       source: 'website_property_finder',
       language: lang,
       search_profile: currentSearchProfile,
@@ -1494,34 +1503,45 @@ async function submitLeadCapture(event) {
 
     const fullList = currentShortlist.slice(0, 10);
 
-    event.currentTarget.innerHTML = `
-      <div class="lead-success">
-        <strong>${lang === 'ar' ? 'تم حفظ بحثك بنجاح.' : 'Your search has been saved.'}</strong>
-        <span>${lang === 'ar'
-          ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب اختيارك.'
-          : 'You can now review the full shortlist. JB can follow up using your preferred channel.'}</span>
-      </div>
-    `;
+    // Update the captured form instead of event.currentTarget.
+    if (form) {
+      form.innerHTML = `
+        <div class="lead-success">
+          <strong>${lang === 'ar'
+            ? 'تم حفظ بحثك بنجاح.'
+            : 'Your search has been saved.'}</strong>
+          <span>${lang === 'ar'
+            ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب وسيلة التواصل التي اخترتها.'
+            : 'You can now review the full shortlist. JB can follow up using your preferred contact method.'}</span>
+        </div>
+      `;
+    }
 
-    const shortlistContainer = document.querySelector('#finderResult .finder-shortlist');
-    const locked = document.querySelector('#finderResult .shortlist-locked');
+    const shortlistContainer =
+      document.querySelector('#finderResult .finder-shortlist');
+    const locked =
+      document.querySelector('#finderResult .shortlist-locked');
 
-    if (shortlistContainer) {
-      shortlistContainer.innerHTML = fullList.length
-        ? fullList.map(shortlistItem).join('')
-        : shortlistContainer.innerHTML;
+    if (shortlistContainer && fullList.length) {
+      shortlistContainer.innerHTML =
+        fullList.map(shortlistItem).join('');
     }
 
     if (locked) locked.remove();
 
   } catch (error) {
     console.error('Lead capture failed:', error);
+
     if (status) {
-      const readableError = String(error?.message || '').replace(/<[^>]*>/g, '').slice(0, 180);
+      const readableError = String(error?.message || '')
+        .replace(/<[^>]*>/g, '')
+        .slice(0, 180);
+
       status.textContent = lang === 'ar'
         ? `تعذر حفظ البيانات الآن.${readableError ? ' ' + readableError : ''}`
         : `We could not save your contact details right now.${readableError ? ' ' + readableError : ''}`;
     }
+
     if (submitButton) submitButton.disabled = false;
   }
 }
