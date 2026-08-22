@@ -1,157 +1,174 @@
 /* =========================================================
-   JB V3.4 — Finder readability + grouped results
+   JB V3.5 — Finder typography refinement
    Add this block at the END of styles.css
+   Keeps Poppins/Cairo; improves readability without changing JS
    ========================================================= */
 
+/* Section intro text */
 .finder-result-copy{
-  font-size:16px !important;
-  line-height:1.75 !important;
-  font-weight:500 !important;
+  font-size:17px !important;
+  line-height:1.8 !important;
+  font-weight:600 !important;
+  color:#ffffff !important;
 }
 
-.match-group{
-  margin-top:22px;
-}
-
-.match-group + .match-group{
-  margin-top:28px;
-}
-
+/* Group headings */
 .match-group-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:18px;
-  margin:0 0 13px;
-  padding:0 2px;
+  align-items:flex-start !important;
 }
 
 .match-group-head strong{
-  font-size:19px;
-  line-height:1.3;
-  font-weight:800;
-  color:#fff;
+  font-size:20px !important;
+  line-height:1.3 !important;
+  font-weight:800 !important;
+  color:#ffffff !important;
+  letter-spacing:-0.01em;
 }
 
 .match-group-head span{
-  font-size:14px;
-  line-height:1.5;
-  font-weight:600;
-  color:#dce8f1;
+  display:block;
+  margin-top:4px;
+  font-size:15px !important;
+  line-height:1.55 !important;
+  font-weight:600 !important;
+  color:#ffffff !important;
+  opacity:.92;
 }
 
+/* Card overall readability */
 .matching-card{
-  align-items:flex-start !important;
-  gap:16px !important;
-  min-height:125px;
-  padding:19px 20px !important;
-  text-align:start !important;
+  padding:22px 22px !important;
+  min-height:132px !important;
 }
 
 .matching-card-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  width:100%;
+  gap:18px !important;
 }
 
+/* Project title */
 .match-project-name{
-  font-size:18px !important;
-  line-height:1.3 !important;
+  font-size:19px !important;
+  line-height:1.35 !important;
   font-weight:800 !important;
-  color:#f0c94d !important;
+  color:#ffffff !important;
+  letter-spacing:-0.01em;
 }
 
+/* Match score */
 .match-score{
-  flex:0 0 auto;
-  font-size:15px !important;
-  line-height:1.3 !important;
+  font-size:16px !important;
+  line-height:1.35 !important;
   font-weight:800 !important;
-  color:#f0c94d !important;
+  color:#ffffff !important;
 }
 
+/* Developer + location */
 .match-meta{
-  display:block;
-  margin-top:7px;
-  font-size:14px !important;
-  line-height:1.5 !important;
-  font-weight:600 !important;
-  color:#eef5fa !important;
-}
-
-.match-price{
-  display:block;
-  margin-top:9px;
+  display:block !important;
+  margin-top:8px !important;
   font-size:15px !important;
-  line-height:1.45 !important;
+  line-height:1.55 !important;
+  font-weight:650 !important;
+  color:#ffffff !important;
+}
+
+/* Price */
+.match-price{
+  display:block !important;
+  margin-top:10px !important;
+  font-size:16px !important;
+  line-height:1.5 !important;
   font-weight:800 !important;
+  color:#ffffff !important;
 }
 
-.price-official{
-  color:#fff !important;
-}
-
-.price-market{
-  color:#f0c94d !important;
-}
-
+/* Force official / market / unknown price labels to same clear white */
+.price-official,
+.price-market,
 .price-unknown{
-  color:#d8e1e8 !important;
+  color:#ffffff !important;
 }
 
+/* Match reasons become clearer separated chips/lines */
 .match-reasons{
   display:flex !important;
-  flex-wrap:wrap;
-  gap:7px 12px;
-  margin-top:10px !important;
+  flex-wrap:wrap !important;
+  gap:8px 10px !important;
+  margin-top:12px !important;
 }
 
 .match-reasons em{
-  font-size:14px !important;
-  line-height:1.55 !important;
-  font-weight:600 !important;
-  font-style:normal;
+  display:inline-flex !important;
+  align-items:center !important;
+  padding:5px 8px !important;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  font-size:15px !important;
+  line-height:1.4 !important;
+  font-weight:650 !important;
+  font-style:normal !important;
+  color:#ffffff !important;
+  background:rgba(255,255,255,.04);
 }
 
-.match-positive{
-  color:#fff !important;
-}
-
+.match-positive,
 .match-gap{
-  color:#d6dfe7 !important;
+  color:#ffffff !important;
 }
 
+/* Slightly dim potential cards, but keep text readable */
 .potential-group .matching-card{
-  opacity:.94;
-  border-style:dashed !important;
+  opacity:1 !important;
 }
 
 .potential-group .match-project-name,
-.potential-group .match-score{
-  color:#f2d66f !important;
+.potential-group .match-score,
+.potential-group .match-price,
+.potential-group .match-meta,
+.potential-group .match-reasons em{
+  color:#ffffff !important;
 }
 
-.shortlist-locked{
-  font-size:14px !important;
-  line-height:1.55 !important;
+/* Locked-results text */
+.shortlist-locked strong{
+  font-size:16px !important;
+  font-weight:800 !important;
+}
+
+.shortlist-locked span{
+  font-size:15px !important;
+  line-height:1.5 !important;
+  font-weight:600 !important;
+}
+
+/* Arabic keeps Cairo; English keeps Poppins */
+html[lang="ar"] .matching-card,
+html[lang="ar"] .match-group-head,
+html[lang="ar"] .finder-result-copy{
+  font-family:"Cairo",sans-serif !important;
+}
+
+html[lang="en"] .matching-card,
+html[lang="en"] .match-group-head,
+html[lang="en"] .finder-result-copy{
+  font-family:"Poppins",sans-serif !important;
 }
 
 @media(max-width:700px){
-  .match-group-head{
-    align-items:flex-start;
-    flex-direction:column;
-    gap:5px;
+  .finder-result-copy{
+    font-size:15.5px !important;
+  }
+
+  .match-group-head strong{
+    font-size:18px !important;
+  }
+
+  .match-group-head span{
+    font-size:14px !important;
   }
 
   .matching-card{
-    padding:16px !important;
-  }
-
-  .matching-card-title{
-    align-items:flex-start;
-    flex-direction:column;
-    gap:5px;
+    padding:18px !important;
   }
 
   .match-project-name{
@@ -159,13 +176,13 @@
   }
 
   .match-score,
-  .match-meta,
   .match-price,
+  .match-meta,
   .match-reasons em{
-    font-size:13.5px !important;
+    font-size:14px !important;
   }
 
-  .finder-result-copy{
-    font-size:15px !important;
+  .match-reasons em{
+    padding:4px 7px !important;
   }
 }
