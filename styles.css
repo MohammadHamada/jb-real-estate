@@ -1869,7 +1869,14 @@ html[dir="ltr"] .lead-capture-form label.consent-row{
     0 0 0 30px rgba(214,174,53,.10),
     0 0 0 62px rgba(214,174,53,.045) !important;
 }
-
+/* JB V3.1 Matching Engine */
+.matching-card{align-items:flex-start!important;gap:14px!important;text-align:start!important}
+.matching-card-title{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%}
+.match-score{flex:0 0 auto;color:#E7C85E;font-size:12px;font-style:normal}
+.match-reasons{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:7px}
+.match-reasons em{font-style:normal;font-size:11px;line-height:1.5}
+.match-positive{color:#EAF6EF}.match-gap{color:#D6DEE6}
+@media(max-width:600px){.matching-card-title{align-items:flex-start;flex-direction:column;gap:4px}}
 /* Add a soft gold glow around the visible arc without overpowering text. */
 .hero::before{
   content:"";
