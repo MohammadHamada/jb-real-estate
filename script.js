@@ -1,4 +1,4 @@
-// JB REAL ESTATE V3.2 - Official + Market Reference Pricing
+// JB REAL ESTATE V3.3 - Budget hard-filter + clearer pricing labels
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -1402,21 +1402,20 @@ function projectMatch(project, values) {
     if (bestPrice.price && range) {
       const price = Number(bestPrice.price);
 
-      if (price >= range[0] && price <= range[1]) {
-        score += bestPrice.sourceClass === 'official' ? 15 : 11;
-
-        reasons.push(
-          bestPrice.sourceClass === 'official'
-            ? (lang === 'ar' ? '✓ السعر الرسمي داخل الميزانية' : '✓ Official price fits budget')
-            : (lang === 'ar' ? '✓ المرجع السعري السوقي داخل الميزانية' : '✓ Market reference fits budget')
-        );
-      } else {
-        gaps.push(
-          bestPrice.sourceClass === 'official'
-            ? (lang === 'ar' ? 'السعر الرسمي خارج الميزانية' : 'Official price is outside budget')
-            : (lang === 'ar' ? 'المرجع السعري السوقي خارج الميزانية' : 'Market reference is outside budget')
-        );
+      // Budget is a buyer constraint, not just a soft preference.
+      // If a known official/market-reference price is outside the selected range,
+      // exclude the project instead of showing it as a high match.
+      if (price < range[0] || price > range[1]) {
+        return null;
       }
+
+      score += bestPrice.sourceClass === 'official' ? 15 : 11;
+
+      reasons.push(
+        bestPrice.sourceClass === 'official'
+          ? (lang === 'ar' ? '✓ السعر الرسمي داخل الميزانية' : '✓ Official price fits budget')
+          : (lang === 'ar' ? '✓ المرجع السعري السوقي داخل الميزانية' : '✓ Market reference fits budget')
+      );
     } else {
       gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
     }
@@ -1507,6 +1506,17 @@ function shortlistItem(project) {
 
         <small>${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}</small>
 
+        ${
+          (() => {
+            const pricing = bestAvailableProjectPrice(project);
+            if (!pricing.price) return '';
+            const label = pricing.sourceClass === 'official'
+              ? (lang === 'ar' ? 'سعر رسمي' : 'Official price')
+              : (lang === 'ar' ? 'مرجع سوقي' : 'Market reference');
+            return `<small class="price-source-note">${label}: ${escapeHtml(formatMoney(pricing.price, project.currency || 'EGP'))}</small>`;
+          })()
+        }
+
         <span class="match-reasons">
           ${match.reasons.slice(0,3).map(x => `<em class="match-positive">${escapeHtml(x)}</em>`).join('')}
           ${match.gaps.slice(0,2).map(x => `<em class="match-gap">○ ${escapeHtml(x)}</em>`).join('')}
@@ -1548,8 +1558,8 @@ function renderFinderPreview(values, shouldScroll = true) {
 
       <p>
         ${lang === 'ar'
-          ? 'نعرض نتائج أولية مطابقة للموقع ونوع الوحدة المسجلين في قاعدة البيانات، بدون طلب بيانات شخصية. للحصول على القائمة الكاملة وحفظ متطلباتك ومتابعة مستشار JB، يمكنك ترك وسيلة تواصل.'
-          : 'We show initial matches using the selected location and unit type available in the database, without asking for personal details. To receive the full shortlist, save your requirements and optionally speak with a JB advisor, leave your preferred contact details.'}
+          ? 'نرتب المشروعات وفق الموقع ونوع الوحدة والميزانية. نعتمد السعر الرسمي أولًا، ونستخدم المرجع السوقي الموثق فقط عند غياب سعر رسمي حالي. أي مشروع له سعر معروف خارج ميزانيتك يتم استبعاده.'
+          : 'We rank projects using your selected location, unit type and budget. Official prices are preferred; verified market references are used only when an official current price is unavailable. Projects with a known price outside your selected budget are excluded.'}
       </p>
 
       <div class="finder-shortlist">
