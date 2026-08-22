@@ -1,4 +1,4 @@
-// JB REAL ESTATE V3.3 - Budget hard-filter + clearer pricing labels
+// JB REAL ESTATE V3.4 - Grouped results + larger readable cards
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -1487,9 +1487,28 @@ function shortlistProjects(values) {
 
 function shortlistItem(project) {
   const match = project._match || {score:0, reasons:[], gaps:[]};
+  const pricing = bestAvailableProjectPrice(project);
+
+  const priceLabel = !pricing.price
+    ? (lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification')
+    : pricing.sourceClass === 'official'
+      ? (lang === 'ar'
+          ? `سعر رسمي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Official price: ${formatMoney(pricing.price, project.currency || 'EGP')}`)
+      : (lang === 'ar'
+          ? `مرجع سوقي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Market reference: ${formatMoney(pricing.price, project.currency || 'EGP')}`);
+
+  const priceClass = !pricing.price
+    ? 'price-unknown'
+    : pricing.sourceClass === 'official'
+      ? 'price-official'
+      : 'price-market';
 
   return `
-    <button class="finder-shortlist-item matching-card" type="button" data-project-profile="${project.id}">
+    <button class="finder-shortlist-item matching-card ${pricing.price ? 'confirmed-match-card' : 'potential-match-card'}"
+            type="button"
+            data-project-profile="${project.id}">
       <span class="finder-shortlist-thumb">
         ${
           project.cover_image_url
@@ -1500,25 +1519,20 @@ function shortlistItem(project) {
 
       <span class="finder-shortlist-copy">
         <span class="matching-card-title">
-          <strong>${escapeHtml(projectName(project))}</strong>
+          <strong class="match-project-name">${escapeHtml(projectName(project))}</strong>
           <b class="match-score">${match.score}% ${lang === 'ar' ? 'تطابق' : 'Match'}</b>
         </span>
 
-        <small>${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}</small>
+        <small class="match-meta">
+          ${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}
+        </small>
 
-        ${
-          (() => {
-            const pricing = bestAvailableProjectPrice(project);
-            if (!pricing.price) return '';
-            const label = pricing.sourceClass === 'official'
-              ? (lang === 'ar' ? 'سعر رسمي' : 'Official price')
-              : (lang === 'ar' ? 'مرجع سوقي' : 'Market reference');
-            return `<small class="price-source-note">${label}: ${escapeHtml(formatMoney(pricing.price, project.currency || 'EGP'))}</small>`;
-          })()
-        }
+        <strong class="match-price ${priceClass}">
+          ${escapeHtml(priceLabel)}
+        </strong>
 
         <span class="match-reasons">
-          ${match.reasons.slice(0,3).map(x => `<em class="match-positive">${escapeHtml(x)}</em>`).join('')}
+          ${match.reasons.slice(0,4).map(x => `<em class="match-positive">${escapeHtml(x)}</em>`).join('')}
           ${match.gaps.slice(0,2).map(x => `<em class="match-gap">○ ${escapeHtml(x)}</em>`).join('')}
         </span>
       </span>
@@ -1534,9 +1548,23 @@ function renderFinderPreview(values, shouldScroll = true) {
   currentShortlist = shortlistProjects(values);
   currentSearchProfile = {...values, readiness};
 
-  const preview = currentShortlist.slice(0, 3);
+  const confirmedMatches = currentShortlist.filter(
+    project => Boolean(bestAvailableProjectPrice(project).price)
+  );
+
+  const potentialMatches = currentShortlist.filter(
+    project => !bestAvailableProjectPrice(project).price
+  );
+
+  const confirmedPreview = confirmedMatches.slice(0, 3);
+  const remainingPreviewSlots = Math.max(0, 3 - confirmedPreview.length);
+  const potentialPreview = potentialMatches.slice(0, remainingPreviewSlots);
+
+  const shownCount = confirmedPreview.length + potentialPreview.length;
+  const hiddenCount = Math.max(0, currentShortlist.length - shownCount);
 
   result.hidden = false;
+
   result.innerHTML = `
     <div class="finder-result-content">
       <div class="finder-result-head">
@@ -1550,36 +1578,77 @@ function renderFinderPreview(values, shouldScroll = true) {
               : 'Your best available matches'}
           </h3>
         </div>
+
         <div class="readiness-score">
           <strong>${readiness}%</strong>
           <span>${lang === 'ar' ? 'اكتمال ملف البحث' : 'Search profile'}</span>
         </div>
       </div>
 
-      <p>
-        ${lang === 'ar'
-          ? 'نرتب المشروعات وفق الموقع ونوع الوحدة والميزانية. نعتمد السعر الرسمي أولًا، ونستخدم المرجع السوقي الموثق فقط عند غياب سعر رسمي حالي. أي مشروع له سعر معروف خارج ميزانيتك يتم استبعاده.'
-          : 'We rank projects using your selected location, unit type and budget. Official prices are preferred; verified market references are used only when an official current price is unavailable. Projects with a known price outside your selected budget are excluded.'}
+      <p class="finder-result-copy">
+        ${
+          lang === 'ar'
+            ? 'نرتب المشروعات وفق الموقع ونوع الوحدة والميزانية. نعتمد السعر الرسمي أولًا، ونستخدم المرجع السوقي الموثق فقط عند غياب سعر رسمي حالي. أي مشروع له سعر معروف خارج ميزانيتك يتم استبعاده.'
+            : 'We rank projects using your selected location, unit type and budget. Official prices are preferred; verified market references are used only when an official current price is unavailable. Projects with a known price outside your selected budget are excluded.'
+        }
       </p>
 
-      <div class="finder-shortlist">
-        ${
-          preview.length
-            ? preview.map(shortlistItem).join('')
-            : `<div class="data-empty">${
-                lang === 'ar'
-                  ? 'لا توجد نتائج منشورة مطابقة لهذا الموقع حاليًا.'
-                  : 'No published projects currently match this location.'
-              }</div>`
-        }
-      </div>
+      ${
+        confirmedPreview.length
+          ? `
+            <section class="match-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar' ? 'أفضل التطابقات المؤكدة' : 'Best Matches'}</strong>
+                <span>${lang === 'ar'
+                  ? 'السعر معروف ومناسب للميزانية المختارة'
+                  : 'Known price and budget-aligned'}</span>
+              </div>
+
+              <div class="finder-shortlist">
+                ${confirmedPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
 
       ${
-        currentShortlist.length > 3
+        potentialPreview.length
+          ? `
+            <section class="match-group potential-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar'
+                  ? 'خيارات محتملة تحتاج تحقق السعر'
+                  : 'Potential Matches — Price Verification Needed'}</strong>
+                <span>${lang === 'ar'
+                  ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي غير موثق بعد'
+                  : 'Location and unit type fit, but current price still needs verification'}</span>
+              </div>
+
+              <div class="finder-shortlist">
+                ${potentialPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
+
+      ${
+        !shownCount
+          ? `<div class="data-empty">${
+              lang === 'ar'
+                ? 'لا توجد نتائج منشورة مطابقة لهذه المتطلبات حاليًا.'
+                : 'No published projects currently match these requirements.'
+            }</div>`
+          : ''
+      }
+
+      ${
+        hiddenCount > 0
           ? `<div class="shortlist-locked">
               <strong>${lang === 'ar'
-                ? `هناك ${currentShortlist.length - 3} نتيجة إضافية`
-                : `${currentShortlist.length - 3} more results available`}</strong>
+                ? `هناك ${hiddenCount} نتيجة إضافية`
+                : `${hiddenCount} more results available`}</strong>
               <span>${lang === 'ar'
                 ? 'أدخل بيانات التواصل للحصول على القائمة الكاملة وحفظ ملف البحث.'
                 : 'Add your contact details to unlock the full shortlist and save this search.'}</span>
@@ -1587,7 +1656,7 @@ function renderFinderPreview(values, shouldScroll = true) {
           : ''
       }
 
-      <form id="leadCaptureForm" class="lead-capture-form">
+<form id="leadCaptureForm" class="lead-capture-form">
         <div class="lead-capture-heading">
           <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
           <span>${lang === 'ar'
@@ -1703,14 +1772,69 @@ async function submitLeadCapture(event) {
       `;
     }
 
-    const shortlistContainer =
-      document.querySelector('#finderResult .finder-shortlist');
-    const locked =
-      document.querySelector('#finderResult .shortlist-locked');
+    const resultRoot = document.querySelector('#finderResult .finder-result-content');
+    const locked = document.querySelector('#finderResult .shortlist-locked');
 
-    if (shortlistContainer && fullList.length) {
-      shortlistContainer.innerHTML =
-        fullList.map(shortlistItem).join('');
+    if (resultRoot && fullList.length) {
+      const confirmed = fullList.filter(
+        project => Boolean(bestAvailableProjectPrice(project).price)
+      );
+
+      const potential = fullList.filter(
+        project => !bestAvailableProjectPrice(project).price
+      );
+
+      resultRoot.querySelectorAll('.match-group').forEach(group => group.remove());
+
+      const groupsHtml = `
+        ${
+          confirmed.length
+            ? `
+              <section class="match-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar' ? 'أفضل التطابقات المؤكدة' : 'Best Matches'}</strong>
+                  <span>${lang === 'ar'
+                    ? 'السعر معروف ومناسب للميزانية المختارة'
+                    : 'Known price and budget-aligned'}</span>
+                </div>
+
+                <div class="finder-shortlist">
+                  ${confirmed.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+
+        ${
+          potential.length
+            ? `
+              <section class="match-group potential-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar'
+                    ? 'خيارات محتملة تحتاج تحقق السعر'
+                    : 'Potential Matches — Price Verification Needed'}</strong>
+                  <span>${lang === 'ar'
+                    ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي غير موثق بعد'
+                    : 'Location and unit type fit, but current price still needs verification'}</span>
+                </div>
+
+                <div class="finder-shortlist">
+                  ${potential.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+      `;
+
+      const insertBefore = locked || form;
+
+      if (insertBefore) {
+        insertBefore.insertAdjacentHTML('beforebegin', groupsHtml);
+      } else {
+        resultRoot.insertAdjacentHTML('beforeend', groupsHtml);
+      }
     }
 
     if (locked) locked.remove();
