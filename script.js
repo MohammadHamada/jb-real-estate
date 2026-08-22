@@ -1,4 +1,4 @@
-// JB REAL ESTATE V3.0 - Lead success UI async-event fix
+// JB REAL ESTATE V3.1 - Matching Engine V1
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -1259,9 +1259,9 @@ function calculateReadiness(values) {
   return Math.min(readiness, 100);
 }
 
+
 function normalizeUnitType(value = '') {
   const key = String(value).trim().toLowerCase();
-
   const aliases = {
     'apartment': ['apartment'],
     'chalet': ['chalet'],
@@ -1271,7 +1271,6 @@ function normalizeUnitType(value = '') {
     'duplex': ['duplex'],
     'commercial': ['commercial', 'office', 'clinic', 'retail', 'shop']
   };
-
   return aliases[key] || [key];
 }
 
@@ -1280,51 +1279,158 @@ function projectMatchesUnitType(project, selectedType) {
 
   const wanted = normalizeUnitType(selectedType);
   const linkedTypes = projectPropertyTypeMap.get(project.id) || [];
-
   const linkedValues = linkedTypes.flatMap(type => [
     String(type.slug || '').toLowerCase(),
     String(type.name_en || '').toLowerCase(),
     String(type.name_ar || '').toLowerCase()
   ]);
 
-  if (wanted.some(value => linkedValues.includes(value))) {
-    return true;
-  }
+  if (wanted.some(value => linkedValues.includes(value))) return true;
 
-  // Fallback for commercial/mixed-use projects whose detailed unit-type
-  // rows have not yet been enriched.
-  const broadProjectType = String(project.project_type || '').toLowerCase();
+  const broad = String(project.project_type || '').toLowerCase();
 
   if (selectedType === 'Commercial') {
-    return broadProjectType.includes('commercial') ||
-           broadProjectType.includes('mixed use') ||
-           broadProjectType.includes('mixed-use') ||
-           broadProjectType.includes('medical') ||
-           broadProjectType.includes('office');
+    return broad.includes('commercial') ||
+           broad.includes('mixed use') ||
+           broad.includes('mixed-use') ||
+           broad.includes('medical') ||
+           broad.includes('office');
   }
 
-  // If detailed unit data is absent, do not falsely claim a residential
-  // project matches a specific unit type.
   return false;
 }
 
+function budgetRange(value) {
+  return {
+    under5: [0, 5000000],
+    '5to10': [5000000, 10000000],
+    '10to20': [10000000, 20000000],
+    '20plus': [20000000, Infinity]
+  }[value] || null;
+}
+
+function deliverySignal(project, choice) {
+  if (!choice) return {known:false, match:true};
+  if (!project.delivery_date) return {known:false, match:false};
+
+  const delivery = new Date(project.delivery_date);
+  if (Number.isNaN(delivery.getTime())) return {known:false, match:false};
+
+  const years = (delivery - new Date()) / (365.25 * 24 * 60 * 60 * 1000);
+
+  if (choice === 'Ready') return {known:true, match:years <= .25};
+  if (choice === '1-3') return {known:true, match:years > .25 && years <= 3};
+  if (choice === '3plus') return {known:true, match:years > 3};
+
+  return {known:true, match:true};
+}
+
+function projectMatch(project, values) {
+  let score = 0;
+  const reasons = [];
+  const gaps = [];
+
+  if (values.location) {
+    const loc = `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+    if (!loc.includes(values.location.toLowerCase())) return null;
+    score += 35;
+    reasons.push(lang === 'ar' ? '✓ الموقع مطابق' : '✓ Location matches');
+  } else {
+    score += 20;
+  }
+
+  if (values.type) {
+    if (!projectMatchesUnitType(project, values.type)) return null;
+    score += 30;
+    reasons.push(lang === 'ar' ? '✓ نوع الوحدة مطابق' : '✓ Unit type matches');
+  } else {
+    score += 15;
+  }
+
+  if (values.budget) {
+    const range = budgetRange(values.budget);
+    if (project.starting_price && range) {
+      const price = Number(project.starting_price);
+      if (price >= range[0] && price <= range[1]) {
+        score += 15;
+        reasons.push(lang === 'ar' ? '✓ السعر داخل الميزانية' : '✓ Price fits budget');
+      } else {
+        gaps.push(lang === 'ar' ? 'السعر المنشور خارج الميزانية' : 'Published price is outside budget');
+      }
+    } else {
+      gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
+    }
+  } else {
+    score += 7;
+  }
+
+  if (values.delivery) {
+    const d = deliverySignal(project, values.delivery);
+    if (d.known && d.match) {
+      score += 10;
+      reasons.push(lang === 'ar' ? '✓ التسليم متوافق' : '✓ Delivery matches');
+    } else if (d.known) {
+      gaps.push(lang === 'ar' ? 'التسليم المنشور غير مطابق' : 'Published delivery differs');
+    } else {
+      gaps.push(lang === 'ar' ? 'موعد التسليم قيد التحقق' : 'Delivery under verification');
+    }
+  } else {
+    score += 5;
+  }
+
+  const projectType = String(project.project_type || '').toLowerCase();
+
+  if (values.purpose === 'Personal use') {
+    if (projectType.includes('residential') || projectType.includes('coastal') || projectType.includes('mixed')) {
+      score += 5;
+      reasons.push(lang === 'ar' ? '✓ مناسب للاستخدام الشخصي' : '✓ Suitable for personal use');
+    }
+  } else if (values.purpose === 'Investment') {
+    if (projectType) {
+      score += 5;
+      reasons.push(lang === 'ar' ? '✓ نوع المشروع قابل للتقييم استثماريًا' : '✓ Project type is investment-relevant');
+    }
+  } else if (values.purpose === 'Both') {
+    score += 5;
+  } else {
+    score += 2;
+  }
+
+  if (project.verification_status === 'verified') {
+    score += 5;
+    reasons.push(lang === 'ar' ? '✓ مشروع موثّق' : '✓ Verified project');
+  }
+
+  if (values.payment) {
+    gaps.push(lang === 'ar' ? 'بيانات السداد قيد الاستكمال' : 'Payment data under enrichment');
+  }
+
+  if (values.bedrooms) {
+    gaps.push(lang === 'ar' ? 'بيانات غرف النوم قيد الاستكمال' : 'Bedroom data under enrichment');
+  }
+
+  return {
+    score: Math.min(100, score),
+    reasons,
+    gaps
+  };
+}
+
 function shortlistProjects(values) {
-  return projects.filter(project => {
-    const locationMatch = !values.location || (() => {
-      const location =
-        `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
-      return location.includes(values.location.toLowerCase());
-    })();
-
-    const unitTypeMatch = projectMatchesUnitType(project, values.type);
-
-    return locationMatch && unitTypeMatch;
-  });
+  return projects
+    .map(project => {
+      const match = projectMatch(project, values);
+      return match ? {...project, _match: match} : null;
+    })
+    .filter(Boolean)
+    .sort((a,b) => (b._match?.score || 0) - (a._match?.score || 0));
 }
 
 function shortlistItem(project) {
+  const match = project._match || {score:0, reasons:[], gaps:[]};
+
   return `
-    <button class="finder-shortlist-item" type="button" data-project-profile="${project.id}">
+    <button class="finder-shortlist-item matching-card" type="button" data-project-profile="${project.id}">
       <span class="finder-shortlist-thumb">
         ${
           project.cover_image_url
@@ -1332,9 +1438,19 @@ function shortlistItem(project) {
             : `<b>${projectInitials(project)}</b>`
         }
       </span>
+
       <span class="finder-shortlist-copy">
-        <strong>${escapeHtml(projectName(project))}</strong>
+        <span class="matching-card-title">
+          <strong>${escapeHtml(projectName(project))}</strong>
+          <b class="match-score">${match.score}% ${lang === 'ar' ? 'تطابق' : 'Match'}</b>
+        </span>
+
         <small>${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}</small>
+
+        <span class="match-reasons">
+          ${match.reasons.slice(0,3).map(x => `<em class="match-positive">${escapeHtml(x)}</em>`).join('')}
+          ${match.gaps.slice(0,2).map(x => `<em class="match-gap">○ ${escapeHtml(x)}</em>`).join('')}
+        </span>
       </span>
     </button>
   `;
@@ -1360,8 +1476,8 @@ function renderFinderPreview(values, shouldScroll = true) {
           </span>
           <h3>
             ${lang === 'ar'
-              ? 'هذه بداية قائمتك المختصرة'
-              : 'Here is the start of your shortlist'}
+              ? 'أفضل النتائج المتاحة حاليًا'
+              : 'Your best available matches'}
           </h3>
         </div>
         <div class="readiness-score">
