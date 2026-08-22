@@ -1,4 +1,4 @@
-// JB REAL ESTATE V3.1 - Matching Engine V1
+// JB REAL ESTATE V3.2 - Official + Market Reference Pricing
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
@@ -272,6 +272,7 @@ let projects = [];
 let filteredDevelopers = [];
 let comparison = [];
 let projectPropertyTypeMap = new Map();
+let projectMarketPriceMap = new Map();
 
 let visibleProjects = 9;
 const PROJECT_PAGE_SIZE = 9;
@@ -470,7 +471,7 @@ async function loadMarketData() {
       or unavailable relationship metadata in the REST schema cache.
     */
 
-    const [developerData, projectData, locationData, propertyTypeData, projectPropertyTypeData] = await Promise.all([
+    const [developerData, projectData, locationData, propertyTypeData, projectPropertyTypeData, marketPriceData] = await Promise.all([
       supabaseGet(
         'developers?select=id,slug,name_ar,name_en,short_description_ar,short_description_en,description_ar,description_en,website_url,logo_url,founded_year,developer_type,verification_status,last_verified_at&is_published=eq.true&order=name_en.asc'
       ),
@@ -489,6 +490,10 @@ async function loadMarketData() {
 
       supabaseGet(
         'project_property_types?select=project_id,property_type_id'
+      ),
+
+      supabaseGet(
+        'project_market_price_summary?select=project_id,market_price_min,market_price_max,market_checked_at,reference_count'
       )
     ]);
 
@@ -521,6 +526,11 @@ async function loadMarketData() {
 
         projectPropertyTypeMap.get(link.project_id).push(type);
       });
+
+    projectMarketPriceMap = new Map(
+      (Array.isArray(marketPriceData) ? marketPriceData : [])
+        .map(row => [row.project_id, row])
+    );
 
     projects = (Array.isArray(projectData) ? projectData : []).map(project => ({
       ...project,
@@ -617,12 +627,50 @@ function projectVisual(project) {
   `;
 }
 
-function availabilityPrice(project) {
-  if (project.starting_price) return formatMoney(project.starting_price, project.currency);
 
-  return lang === 'ar'
-    ? 'تحقق من السعر الحالي مع JB'
-    : 'Verify current price with JB';
+function projectMarketReference(project) {
+  return projectMarketPriceMap.get(project.id) || null;
+}
+
+function bestAvailableProjectPrice(project) {
+  if (project.starting_price) {
+    return {
+      price: Number(project.starting_price),
+      sourceClass: 'official',
+      checkedAt: project.last_verified_at || null
+    };
+  }
+
+  const market = projectMarketReference(project);
+  if (market?.market_price_min) {
+    return {
+      price: Number(market.market_price_min),
+      sourceClass: 'market_reference',
+      checkedAt: market.market_checked_at || null
+    };
+  }
+
+  return { price: null, sourceClass: 'unavailable', checkedAt: null };
+}
+
+function availabilityPrice(project) {
+  const best = bestAvailableProjectPrice(project);
+
+  if (!best.price) {
+    return lang === 'ar'
+      ? 'تحقق من السعر الحالي مع JB'
+      : 'Verify current price with JB';
+  }
+
+  const money = formatMoney(best.price, project.currency || 'EGP');
+
+  if (best.sourceClass === 'market_reference') {
+    return lang === 'ar'
+      ? `${money} — مرجع سوقي`
+      : `${money} — Market reference`;
+  }
+
+  return money;
 }
 
 function availabilityDelivery(project) {
@@ -1349,13 +1397,25 @@ function projectMatch(project, values) {
 
   if (values.budget) {
     const range = budgetRange(values.budget);
-    if (project.starting_price && range) {
-      const price = Number(project.starting_price);
+    const bestPrice = bestAvailableProjectPrice(project);
+
+    if (bestPrice.price && range) {
+      const price = Number(bestPrice.price);
+
       if (price >= range[0] && price <= range[1]) {
-        score += 15;
-        reasons.push(lang === 'ar' ? '✓ السعر داخل الميزانية' : '✓ Price fits budget');
+        score += bestPrice.sourceClass === 'official' ? 15 : 11;
+
+        reasons.push(
+          bestPrice.sourceClass === 'official'
+            ? (lang === 'ar' ? '✓ السعر الرسمي داخل الميزانية' : '✓ Official price fits budget')
+            : (lang === 'ar' ? '✓ المرجع السعري السوقي داخل الميزانية' : '✓ Market reference fits budget')
+        );
       } else {
-        gaps.push(lang === 'ar' ? 'السعر المنشور خارج الميزانية' : 'Published price is outside budget');
+        gaps.push(
+          bestPrice.sourceClass === 'official'
+            ? (lang === 'ar' ? 'السعر الرسمي خارج الميزانية' : 'Official price is outside budget')
+            : (lang === 'ar' ? 'المرجع السعري السوقي خارج الميزانية' : 'Market reference is outside budget')
+        );
       }
     } else {
       gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
