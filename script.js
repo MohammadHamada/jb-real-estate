@@ -1,4 +1,4 @@
-// JB REAL ESTATE — PRODUCTION FRONTEND V1
+// JB REAL ESTATE — PRODUCTION FRONTEND V1.1 — CLASSIC FINDER DISPLAY
 // JB REAL ESTATE V2.8 - Reliable Property Finder button binding
 /* =========================================================
    JB REAL ESTATE
@@ -1713,10 +1713,13 @@ async function renderFinderPreview(values, shouldScroll = true) {
   if (!result) return;
 
   const readiness = calculateReadiness(values);
+
   result.hidden = false;
   result.innerHTML = `
     <div class="data-empty">
-      ${lang === 'ar' ? 'جارٍ البحث في مشروعات JB المتاحة...' : 'Searching JB available projects...'}
+      ${lang === 'ar'
+        ? 'جارٍ البحث في مشروعات JB المتاحة...'
+        : 'Searching JB available projects...'}
     </div>
   `;
 
@@ -1739,6 +1742,7 @@ async function renderFinderPreview(values, shouldScroll = true) {
               : 'Here is the start of your shortlist'}
           </h3>
         </div>
+
         <div class="readiness-score">
           <strong>${readiness}%</strong>
           <span>${lang === 'ar' ? 'اكتمال ملف البحث' : 'Search profile'}</span>
@@ -1747,8 +1751,8 @@ async function renderFinderPreview(values, shouldScroll = true) {
 
       <p>
         ${lang === 'ar'
-          ? 'نعرض نتائج أولية مطابقة للموقع ونوع الوحدة المسجلين في قاعدة البيانات، بدون طلب بيانات شخصية. للحصول على القائمة الكاملة وحفظ متطلباتك ومتابعة مستشار JB، يمكنك ترك وسيلة تواصل.'
-          : 'We show initial matches using the selected location and unit type available in the database, without asking for personal details. To receive the full shortlist, save your requirements and optionally speak with a JB advisor, leave your preferred contact details.'}
+          ? 'نعرض نتائج أولية مطابقة لاحتياجاتك من المشروعات المتاحة في قاعدة بيانات JB، بدون طلب بيانات شخصية. للحصول على القائمة الكاملة وحفظ متطلباتك ومتابعة مستشار JB، يمكنك ترك وسيلة تواصل.'
+          : 'We show an initial shortlist matching your requirements from the projects available in the JB database, without asking for personal details. To receive the full shortlist, save your requirements and optionally speak with a JB advisor, leave your preferred contact details.'}
       </p>
 
       <div class="finder-shortlist">
@@ -1757,8 +1761,8 @@ async function renderFinderPreview(values, shouldScroll = true) {
             ? preview.map(shortlistItem).join('')
             : `<div class="data-empty">${
                 lang === 'ar'
-                  ? 'لا توجد نتائج منشورة مطابقة لهذا الموقع حاليًا.'
-                  : 'No published projects currently match this location.'
+                  ? 'لا توجد نتائج منشورة مطابقة لهذه المتطلبات حاليًا.'
+                  : 'No published projects currently match these requirements.'
               }</div>`
         }
       </div>
@@ -1787,49 +1791,49 @@ async function renderFinderPreview(values, shouldScroll = true) {
         <div class="lead-capture-grid">
           <label>
             <span>${lang === 'ar' ? 'الاسم' : 'Name'}</span>
-            <input id="leadName" name="name" autocomplete="name" required
-                   placeholder="${lang === 'ar' ? 'اسمك' : 'Your name'}">
+            <input id="leadName" name="full_name" required autocomplete="name">
           </label>
 
           <label>
-            <span>${lang === 'ar' ? 'الهاتف / WhatsApp' : 'Phone / WhatsApp'}</span>
-            <input id="leadPhone" name="phone" type="tel" autocomplete="tel" required
-                   placeholder="${lang === 'ar' ? '01xxxxxxxxx' : '+20 ...'}">
+            <span>${lang === 'ar' ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'}</span>
+            <input id="leadPhone" name="phone" required autocomplete="tel">
           </label>
 
           <label>
             <span>${lang === 'ar' ? 'البريد الإلكتروني (اختياري)' : 'Email (optional)'}</span>
-            <input id="leadEmail" name="email" type="email" autocomplete="email"
-                   placeholder="name@example.com">
+            <input id="leadEmail" name="email" type="email" autocomplete="email">
           </label>
 
           <label>
-            <span>${lang === 'ar' ? 'أفضل وسيلة تواصل' : 'Preferred contact'}</span>
-            <select id="leadContactPreference" required>
-              <option value="whatsapp">${lang === 'ar' ? 'WhatsApp' : 'WhatsApp'}</option>
-              <option value="phone">${lang === 'ar' ? 'مكالمة هاتفية' : 'Phone call'}</option>
-              <option value="email">${lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</option>
+            <span>${lang === 'ar' ? 'طريقة التواصل المفضلة' : 'Preferred contact'}</span>
+            <select id="leadPreferredContact" name="preferred_contact">
+              <option value="whatsapp">${lang === 'ar' ? 'واتساب' : 'WhatsApp'}</option>
+              <option value="phone">${lang === 'ar' ? 'اتصال هاتفي' : 'Phone call'}</option>
+              <option value="email">${lang === 'ar' ? 'بريد إلكتروني' : 'Email'}</option>
             </select>
           </label>
         </div>
 
-        <label class="consent-row">
+        <label class="lead-consent">
           <input id="leadConsent" type="checkbox" required>
           <span>${lang === 'ar'
-            ? 'أوافق على أن تستخدم JB بياناتي ومتطلبات البحث للتواصل معي بخصوص خيارات عقارية مناسبة. يمكنني طلب إيقاف التواصل في أي وقت.'
-            : 'I agree that JB may use my contact details and search requirements to follow up about relevant property options. I can opt out at any time.'}</span>
+            ? 'أوافق على استخدام بياناتي للتواصل معي بخصوص هذا البحث العقاري.'
+            : 'I agree that JB may use my details to contact me about this property search.'}</span>
         </label>
 
-        <button class="btn btn-gold" type="submit">
-          ${lang === 'ar' ? 'احفظ بحثي واعرض القائمة الكاملة' : 'Save my search & show full shortlist'}
-        </button>
-
-        <p id="leadCaptureStatus" class="lead-capture-status" aria-live="polite"></p>
+        <div class="lead-capture-actions">
+          <button class="btn btn-gold" type="submit">
+            ${lang === 'ar' ? 'أرسل لي القائمة الكاملة' : 'Send My Full Shortlist'}
+          </button>
+          <span id="leadCaptureStatus" class="lead-capture-status"></span>
+        </div>
       </form>
     </div>
   `;
 
-  if (shouldScroll) result.scrollIntoView({behavior:'smooth', block:'nearest'});
+  if (shouldScroll) {
+    result.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
 }
 
 async function submitLeadCapture(event) {
