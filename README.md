@@ -1,36 +1,34 @@
-# JB Real Estate Platform — V1 Prototype
+JB PRODUCTION FRONTEND V1
+=========================
 
-This is the first static, bilingual prototype for JB Real Estate Group.
+WHAT CHANGED
+- No visual redesign.
+- Project catalogue now reads ONLY public.jb_public_projects_v1.
+- Manual-review / QA-review projects are automatically excluded by backend.
+- Project details use RPC jb_get_project_details_v1.
+- Developer details use RPC jb_get_developer_details_v1.
+- Compare refreshes via RPC jb_compare_projects_v1.
+- Property Finder uses RPC jb_search_projects_v1.
+- Filter metadata is loaded via RPC jb_get_filter_options_v1.
+- Existing lead_capture_submissions flow is preserved unchanged.
 
-## What is included
-- JB navy/gold visual direction.
-- Arabic/English language switch.
-- Property Finder prototype.
-- Projects section.
-- Developers directory placeholder.
-- Comparison engine UI placeholder.
-- International buyer section.
-- Lead-generation journey placeholder.
-- Responsive mobile layout.
-- Architecture ready to connect to a database/CMS later.
+UPLOAD
+1. Keep your existing assets/ and style.css.
+2. Replace the deployed index.html with this index.html.
+3. Replace the deployed script.js with this script.js.
+4. Do not change Supabase SQL during this step.
+5. Deploy to Cloudflare Pages.
+6. Hard refresh the website (Ctrl+F5).
 
-## Important
-This V1 contains **demo/placeholder market data only**. Do not publish project prices, payment plans, delivery dates or developer claims until they are connected to verified sources.
+SMOKE TEST
+- Project count should reflect only production-safe projects.
+- Open a project profile.
+- Open a developer profile.
+- Add 2 projects to Compare.
+- Use Property Finder for New Cairo + Villa.
+- Test Arabic / English.
+- Submit a lead only after the read-layer tests pass.
 
-## Free publishing options
-1. GitHub Pages — upload these files to a repository and enable Pages.
-2. Cloudflare Pages — connect the repository and deploy as a static site.
-
-No paid hosting is required for this static prototype.
-
-## Next development phase
-- Supabase database.
-- Admin dashboard/CMS.
-- Developer and project records.
-- Source + last-updated fields.
-- Real comparison engine.
-- Lead database and qualification.
-- WhatsApp lead routing.
-- SEO pages for Arabic and English.
-- Automated monitoring/change detection after the data model is stable.
-- Future modules: Land, Commercial, Resale, Investment Opportunities, Client Portal.
+ROLLBACK
+If needed, restore the previous index.html + script.js only.
+Database is not modified by these frontend files.
