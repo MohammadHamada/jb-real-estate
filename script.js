@@ -1,4 +1,4 @@
-// JB REAL ESTATE — PRODUCTION FRONTEND V1.1 — CLASSIC FINDER DISPLAY
+// JB REAL ESTATE — PRODUCTION FRONTEND V1.2 — RICH MATCH RESULTS
 // JB REAL ESTATE V2.8 - Reliable Property Finder button binding
 /* =========================================================
    JB REAL ESTATE
@@ -1571,6 +1571,215 @@ function projectMatchesUnitType(project, selectedType) {
   return false;
 }
 
+
+function finderBudgetRange(value) {
+  return {
+    under5: [0, 5000000],
+    '5to10': [5000000, 10000000],
+    '10to20': [10000000, 20000000],
+    '20plus': [20000000, Infinity]
+  }[value] || null;
+}
+
+function finderProjectPrice(project) {
+  const price = Number(
+    project.display_starting_price ??
+    project.starting_price ??
+    0
+  );
+
+  if (!price) {
+    return { price: null, sourceClass: 'unavailable' };
+  }
+
+  if (
+    project.price_evidence_type === 'OFFICIAL_PRICE' ||
+    project.official_starting_price
+  ) {
+    return { price, sourceClass: 'official' };
+  }
+
+  return { price, sourceClass: 'market_reference' };
+}
+
+function finderDeliveryYear(project) {
+  if (project.completion_year) return Number(project.completion_year);
+
+  if (project.delivery_date) {
+    const year = new Date(project.delivery_date).getFullYear();
+    return Number.isFinite(year) ? year : null;
+  }
+
+  return null;
+}
+
+function finderMatchDecorate(project, values) {
+  let score = 0;
+  const reasons = [];
+  const gaps = [];
+
+  if (values.location) {
+    const loc = `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+
+    if (loc.includes(values.location.toLowerCase())) {
+      score += 30;
+      reasons.push(lang === 'ar' ? '✓ الموقع مطابق' : '✓ Location matches');
+    }
+  } else {
+    score += 15;
+  }
+
+  if (values.type) {
+    if (projectMatchesUnitType(project, values.type)) {
+      score += 25;
+      reasons.push(lang === 'ar' ? '✓ نوع الوحدة مطابق' : '✓ Unit type matches');
+    }
+  } else {
+    score += 12;
+  }
+
+  const pricing = finderProjectPrice(project);
+  const range = finderBudgetRange(values.budget);
+
+  if (values.budget && range) {
+    if (pricing.price) {
+      if (pricing.price >= range[0] && pricing.price <= range[1]) {
+        score += pricing.sourceClass === 'official' ? 20 : 17;
+
+        reasons.push(
+          pricing.sourceClass === 'official'
+            ? (lang === 'ar'
+                ? '✓ السعر الرسمي داخل الميزانية'
+                : '✓ Official price fits budget')
+            : (lang === 'ar'
+                ? '✓ المرجع السوقي داخل الميزانية'
+                : '✓ Market reference fits budget')
+        );
+      }
+    } else {
+      gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
+    }
+  } else if (pricing.price) {
+    score += 10;
+  } else {
+    score += 4;
+    gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
+  }
+
+  if (values.delivery) {
+    const y = finderDeliveryYear(project);
+    const currentYear = new Date().getFullYear();
+
+    if (y) {
+      let ok = false;
+
+      if (values.delivery === 'Ready') {
+        ok = y <= currentYear;
+      } else if (values.delivery === '1-3') {
+        ok = y > currentYear && y <= currentYear + 3;
+      } else if (values.delivery === '3plus') {
+        ok = y > currentYear + 3;
+      }
+
+      if (ok) {
+        score += 10;
+        reasons.push(lang === 'ar' ? '✓ التسليم متوافق' : '✓ Delivery matches');
+      }
+    } else {
+      gaps.push(lang === 'ar'
+        ? 'موعد التسليم قيد التحقق'
+        : 'Delivery under verification');
+    }
+  } else {
+    score += 5;
+  }
+
+  const projectType = String(project.project_type || '').toLowerCase();
+
+  if (values.purpose === 'Investment') {
+    if (projectType) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ نوع المشروع مناسب للتقييم الاستثماري'
+        : '✓ Project type is investment-relevant');
+    }
+  } else if (values.purpose === 'Personal use') {
+    if (
+      projectType.includes('residential') ||
+      projectType.includes('coastal') ||
+      projectType.includes('mixed')
+    ) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ مناسب للاستخدام الشخصي'
+        : '✓ Suitable for personal use');
+    }
+  } else if (values.purpose === 'Both') {
+    score += 5;
+  } else {
+    score += 3;
+  }
+
+  if (project.verification_status === 'verified') {
+    score += 5;
+    reasons.push(lang === 'ar' ? '✓ مشروع موثّق' : '✓ Verified project');
+  }
+
+  if (project.production_status === 'PRODUCTION_READY') {
+    score += 5;
+  }
+
+  if (values.payment === 'low-down') {
+    if (
+      project.min_down_payment_percentage !== null &&
+      project.min_down_payment_percentage !== undefined &&
+      Number(project.min_down_payment_percentage) <= 10
+    ) {
+      score += 5;
+      reasons.push(lang === 'ar' ? '✓ مقدم منخفض' : '✓ Low down payment');
+    } else if (
+      project.min_down_payment_percentage === null ||
+      project.min_down_payment_percentage === undefined
+    ) {
+      gaps.push(lang === 'ar'
+        ? 'بيانات المقدم قيد التحقق'
+        : 'Down payment under verification');
+    }
+  } else if (values.payment === 'long-plan') {
+    if (Number(project.max_installment_years || 0) >= 7) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ فترة سداد طويلة'
+        : '✓ Long payment plan');
+    } else if (!project.max_installment_years) {
+      gaps.push(lang === 'ar'
+        ? 'مدة السداد قيد التحقق'
+        : 'Payment term under verification');
+    }
+  }
+
+  return {
+    score: Math.min(100, Math.max(0, Math.round(score))),
+    reasons,
+    gaps
+  };
+}
+
+function enrichFinderMatches(list, values) {
+  return list
+    .map(project => ({
+      ...project,
+      _match: finderMatchDecorate(project, values)
+    }))
+    .sort((a, b) => {
+      const aKnown = finderProjectPrice(a).price ? 1 : 0;
+      const bKnown = finderProjectPrice(b).price ? 1 : 0;
+
+      if (aKnown !== bKnown) return bKnown - aKnown;
+      return (b._match?.score || 0) - (a._match?.score || 0);
+    });
+}
+
 function finderApiParams(values) {
   const typeAliases = normalizeUnitType(values.type || '');
   const primaryType =
@@ -1578,29 +1787,14 @@ function finderApiParams(values) {
       ? null
       : (typeAliases[0] || null);
 
-  const budgetMaxMap = {
-    under5: 5000000,
-    '5to10': 10000000,
-    '10to20': 20000000
-  };
-
-  const paymentMaxMap = {
-    'low-down': 10
-  };
-
-  const currentYear = new Date().getFullYear();
-
-  const deliveryMaxMap = {
-    Ready: currentYear,
-    '1-3': currentYear + 3
-  };
-
+  // Keep unknown-price / unknown-delivery projects available so they can
+  // appear in the Potential Matches group instead of disappearing.
   return {
     p_location: values.location || null,
-    p_budget_max: budgetMaxMap[values.budget] || null,
+    p_budget_max: null,
     p_property_type: primaryType,
-    p_delivery_year_max: deliveryMaxMap[values.delivery] || null,
-    p_down_payment_max: paymentMaxMap[values.payment] || null,
+    p_delivery_year_max: null,
+    p_down_payment_max: null,
     p_only_ready: false,
     p_limit: 100,
     p_offset: 0
@@ -1609,27 +1803,63 @@ function finderApiParams(values) {
 
 function postFilterFinderResults(list, values) {
   const currentYear = new Date().getFullYear();
+  const range = finderBudgetRange(values.budget);
 
   return list.filter(project => {
-    const price = Number(project.display_starting_price ?? project.starting_price ?? 0);
-    const deliveryYear = Number(
-      project.completion_year ||
-      (project.delivery_date ? new Date(project.delivery_date).getFullYear() : 0)
-    );
+    const pricing = finderProjectPrice(project);
+    const deliveryYear = finderDeliveryYear(project);
 
-    if (values.budget === '5to10' && price && price < 5000000) return false;
-    if (values.budget === '10to20' && price && price < 10000000) return false;
-    if (values.budget === '20plus' && (!price || price < 20000000)) return false;
+    // Known price outside budget = exclude.
+    // Unknown price = keep as potential match.
+    if (range && pricing.price) {
+      if (pricing.price < range[0] || pricing.price > range[1]) {
+        return false;
+      }
+    }
 
-    if (values.delivery === '1-3' && deliveryYear && deliveryYear <= currentYear) return false;
-    if (values.delivery === '3plus' && (!deliveryYear || deliveryYear <= currentYear + 3)) return false;
+    // Known delivery conflict = exclude.
+    // Unknown delivery = keep and mark for verification.
+    if (values.delivery && deliveryYear) {
+      if (values.delivery === 'Ready' && deliveryYear > currentYear) {
+        return false;
+      }
+
+      if (
+        values.delivery === '1-3' &&
+        (deliveryYear <= currentYear || deliveryYear > currentYear + 3)
+      ) {
+        return false;
+      }
+
+      if (
+        values.delivery === '3plus' &&
+        deliveryYear <= currentYear + 3
+      ) {
+        return false;
+      }
+    }
 
     if (
       values.payment === 'long-plan' &&
-      Number(project.max_installment_years || 0) < 7
-    ) return false;
+      project.max_installment_years &&
+      Number(project.max_installment_years) < 7
+    ) {
+      return false;
+    }
 
-    if (values.type === 'Commercial' && !projectMatchesUnitType(project, 'Commercial')) {
+    if (
+      values.payment === 'low-down' &&
+      project.min_down_payment_percentage !== null &&
+      project.min_down_payment_percentage !== undefined &&
+      Number(project.min_down_payment_percentage) > 10
+    ) {
+      return false;
+    }
+
+    if (
+      values.type === 'Commercial' &&
+      !projectMatchesUnitType(project, 'Commercial')
+    ) {
       return false;
     }
 
@@ -1668,31 +1898,68 @@ async function shortlistProjects(values) {
       })
       .filter(Boolean);
 
-    return postFilterFinderResults(mapped, values);
+    return enrichFinderMatches(postFilterFinderResults(mapped, values), values);
 
   } catch (error) {
     console.warn('Finder RPC fallback:', error);
 
     // Safe fallback uses only the already production-filtered catalogue.
-    return postFilterFinderResults(
-      projects.filter(project => {
-        const locationMatch = !values.location || (() => {
-          const location =
-            `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
-          return location.includes(values.location.toLowerCase());
-        })();
+    return enrichFinderMatches(
+      postFilterFinderResults(
+        projects.filter(project => {
+          const locationMatch = !values.location || (() => {
+            const location =
+              `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+            return location.includes(values.location.toLowerCase());
+          })();
 
-        const unitTypeMatch = projectMatchesUnitType(project, values.type);
-        return locationMatch && unitTypeMatch;
-      }),
+          const unitTypeMatch = projectMatchesUnitType(project, values.type);
+          return locationMatch && unitTypeMatch;
+        }),
+        values
+      ),
       values
     );
   }
 }
 
 function shortlistItem(project) {
+  const match = project._match || {
+    score: 0,
+    reasons: [],
+    gaps: []
+  };
+
+  const pricing = finderProjectPrice(project);
+
+  const priceLabel = !pricing.price
+    ? (lang === 'ar'
+        ? 'السعر قيد التحقق'
+        : 'Price under verification')
+    : pricing.sourceClass === 'official'
+      ? (lang === 'ar'
+          ? `سعر رسمي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Official price: ${formatMoney(pricing.price, project.currency || 'EGP')}`)
+      : (lang === 'ar'
+          ? `مرجع سوقي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Market reference: ${formatMoney(pricing.price, project.currency || 'EGP')}`);
+
+  const priceClass = !pricing.price
+    ? 'price-unknown'
+    : pricing.sourceClass === 'official'
+      ? 'price-official'
+      : 'price-market';
+
   return `
-    <button class="finder-shortlist-item" type="button" data-project-profile="${project.id}">
+    <button
+      class="finder-shortlist-item matching-card ${
+        pricing.price
+          ? 'confirmed-match-card'
+          : 'potential-match-card'
+      }"
+      type="button"
+      data-project-profile="${project.id}">
+
       <span class="finder-shortlist-thumb">
         ${
           project.cover_image_url
@@ -1700,9 +1967,37 @@ function shortlistItem(project) {
             : `<b>${projectInitials(project)}</b>`
         }
       </span>
+
       <span class="finder-shortlist-copy">
-        <strong>${escapeHtml(projectName(project))}</strong>
-        <small>${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}</small>
+        <span class="matching-card-title">
+          <strong class="match-project-name">
+            ${escapeHtml(projectName(project))}
+          </strong>
+
+          <b class="match-score">
+            ${match.score}% ${lang === 'ar' ? 'تطابق' : 'Match'}
+          </b>
+        </span>
+
+        <small class="match-meta">
+          ${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}
+        </small>
+
+        <strong class="match-price ${priceClass}">
+          ${escapeHtml(priceLabel)}
+        </strong>
+
+        <span class="match-reasons">
+          ${match.reasons
+            .slice(0, 4)
+            .map(reason => `<em class="match-positive">${escapeHtml(reason)}</em>`)
+            .join('')}
+
+          ${match.gaps
+            .slice(0, 2)
+            .map(gap => `<em class="match-gap">○ ${escapeHtml(gap)}</em>`)
+            .join('')}
+        </span>
       </span>
     </button>
   `;
@@ -1726,20 +2021,35 @@ async function renderFinderPreview(values, shouldScroll = true) {
   currentShortlist = await shortlistProjects(values);
   currentSearchProfile = {...values, readiness};
 
-  const preview = currentShortlist.slice(0, 3);
+  const confirmedMatches = currentShortlist.filter(
+    project => Boolean(finderProjectPrice(project).price)
+  );
+
+  const potentialMatches = currentShortlist.filter(
+    project => !finderProjectPrice(project).price
+  );
+
+  const confirmedPreview = confirmedMatches.slice(0, 3);
+  const remainingPreviewSlots = Math.max(0, 3 - confirmedPreview.length);
+  const potentialPreview = potentialMatches.slice(0, remainingPreviewSlots);
+
+  const shownCount = confirmedPreview.length + potentialPreview.length;
+  const hiddenCount = Math.max(0, currentShortlist.length - shownCount);
 
   result.hidden = false;
+
   result.innerHTML = `
-    <div class="finder-result-content">
+    <div class="finder-result-content finder-rich-results">
       <div class="finder-result-head">
         <div>
           <span class="finder-result-label">
             ${lang === 'ar' ? 'نتيجة أولية من JB' : 'YOUR JB PREVIEW'}
           </span>
+
           <h3>
             ${lang === 'ar'
-              ? 'هذه بداية قائمتك المختصرة'
-              : 'Here is the start of your shortlist'}
+              ? 'أفضل النتائج المتاحة حاليًا'
+              : 'Your best available matches'}
           </h3>
         </div>
 
@@ -1749,30 +2059,72 @@ async function renderFinderPreview(values, shouldScroll = true) {
         </div>
       </div>
 
-      <p>
-        ${lang === 'ar'
-          ? 'نعرض نتائج أولية مطابقة لاحتياجاتك من المشروعات المتاحة في قاعدة بيانات JB، بدون طلب بيانات شخصية. للحصول على القائمة الكاملة وحفظ متطلباتك ومتابعة مستشار JB، يمكنك ترك وسيلة تواصل.'
-          : 'We show an initial shortlist matching your requirements from the projects available in the JB database, without asking for personal details. To receive the full shortlist, save your requirements and optionally speak with a JB advisor, leave your preferred contact details.'}
+      <p class="finder-result-copy">
+        ${
+          lang === 'ar'
+            ? 'نرتب المشروعات وفق متطلباتك الحالية. يظهر السعر الرسمي أولًا، ثم المرجع السوقي الموثق عند غياب السعر الرسمي. المشروعات التي تناسب الموقع ونوع الوحدة ولكن ما زال سعرها غير موثق تظهر بشكل منفصل حتى لا نفقد خيارًا محتملًا.'
+            : 'We rank projects using your current requirements. Official pricing is shown first, followed by verified market references where no official price is available. Projects that fit location and unit type but still need price verification are shown separately so a potentially suitable option is not lost.'
+        }
       </p>
 
-      <div class="finder-shortlist">
-        ${
-          preview.length
-            ? preview.map(shortlistItem).join('')
-            : `<div class="data-empty">${
-                lang === 'ar'
-                  ? 'لا توجد نتائج منشورة مطابقة لهذه المتطلبات حاليًا.'
-                  : 'No published projects currently match these requirements.'
-              }</div>`
-        }
-      </div>
+      ${
+        confirmedPreview.length
+          ? `
+            <section class="match-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar' ? 'أفضل التطابقات' : 'Best Matches'}</strong>
+                <span>${lang === 'ar'
+                  ? 'السعر معروف ومتوافق مع معايير البحث المختارة'
+                  : 'Known price and budget-aligned'}</span>
+              </div>
+
+              <div class="finder-shortlist rich-finder-list">
+                ${confirmedPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
 
       ${
-        currentShortlist.length > 3
+        potentialPreview.length
+          ? `
+            <section class="match-group potential-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar'
+                  ? 'خيارات محتملة — تحتاج تحقق السعر'
+                  : 'Potential Matches — Price Verification Needed'}</strong>
+
+                <span>${lang === 'ar'
+                  ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي يحتاج تحققًا إضافيًا'
+                  : 'Location and unit type fit, but current price still needs verification'}</span>
+              </div>
+
+              <div class="finder-shortlist rich-finder-list">
+                ${potentialPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
+
+      ${
+        !shownCount
+          ? `<div class="data-empty">${
+              lang === 'ar'
+                ? 'لا توجد نتائج منشورة مطابقة لهذه المتطلبات حاليًا.'
+                : 'No published projects currently match these requirements.'
+            }</div>`
+          : ''
+      }
+
+      ${
+        hiddenCount > 0
           ? `<div class="shortlist-locked">
               <strong>${lang === 'ar'
-                ? `هناك ${currentShortlist.length - 3} نتيجة إضافية`
-                : `${currentShortlist.length - 3} more results available`}</strong>
+                ? `هناك ${hiddenCount} نتيجة إضافية`
+                : `${hiddenCount} more results available`}</strong>
+
               <span>${lang === 'ar'
                 ? 'أدخل بيانات التواصل للحصول على القائمة الكاملة وحفظ ملف البحث.'
                 : 'Add your contact details to unlock the full shortlist and save this search.'}</span>
@@ -1806,7 +2158,7 @@ async function renderFinderPreview(values, shouldScroll = true) {
 
           <label>
             <span>${lang === 'ar' ? 'طريقة التواصل المفضلة' : 'Preferred contact'}</span>
-            <select id="leadPreferredContact" name="preferred_contact">
+            <select id="leadContactPreference" name="preferred_contact">
               <option value="whatsapp">${lang === 'ar' ? 'واتساب' : 'WhatsApp'}</option>
               <option value="phone">${lang === 'ar' ? 'اتصال هاتفي' : 'Phone call'}</option>
               <option value="email">${lang === 'ar' ? 'بريد إلكتروني' : 'Email'}</option>
@@ -1814,7 +2166,7 @@ async function renderFinderPreview(values, shouldScroll = true) {
           </label>
         </div>
 
-        <label class="lead-consent">
+        <label class="lead-consent consent-row">
           <input id="leadConsent" type="checkbox" required>
           <span>${lang === 'ar'
             ? 'أوافق على استخدام بياناتي للتواصل معي بخصوص هذا البحث العقاري.'
@@ -1825,7 +2177,7 @@ async function renderFinderPreview(values, shouldScroll = true) {
           <button class="btn btn-gold" type="submit">
             ${lang === 'ar' ? 'أرسل لي القائمة الكاملة' : 'Send My Full Shortlist'}
           </button>
-          <span id="leadCaptureStatus" class="lead-capture-status"></span>
+          <span id="leadCaptureStatus" class="lead-capture-status" aria-live="polite"></span>
         </div>
       </form>
     </div>
@@ -1839,19 +2191,33 @@ async function renderFinderPreview(values, shouldScroll = true) {
 async function submitLeadCapture(event) {
   event.preventDefault();
 
-  const status = document.getElementById('leadCaptureStatus');
-  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+  const form =
+    event.target?.closest?.('#leadCaptureForm') ||
+    event.target;
+
+  const status =
+    form?.querySelector?.('#leadCaptureStatus') ||
+    document.getElementById('leadCaptureStatus');
+
+  const submitButton =
+    form?.querySelector?.('button[type="submit"]') ||
+    null;
+
   const name = document.getElementById('leadName')?.value.trim() || '';
   const phone = document.getElementById('leadPhone')?.value.trim() || '';
   const email = document.getElementById('leadEmail')?.value.trim() || '';
-  const preferred = document.getElementById('leadContactPreference')?.value || 'whatsapp';
+  const preferred =
+    document.getElementById('leadContactPreference')?.value || 'whatsapp';
   const consent = Boolean(document.getElementById('leadConsent')?.checked);
 
   if (!name || !phone || !consent || !currentSearchProfile) return;
 
   if (submitButton) submitButton.disabled = true;
+
   if (status) {
-    status.textContent = lang === 'ar' ? 'جارٍ حفظ طلبك...' : 'Saving your request...';
+    status.textContent = lang === 'ar'
+      ? 'جارٍ حفظ طلبك...'
+      : 'Saving your request...';
   }
 
   try {
@@ -1861,11 +2227,12 @@ async function submitLeadCapture(event) {
       email: email || null,
       preferred_contact: preferred,
       consent_to_contact: consent,
-      consent_text_version: 'jb-web-v2-2026-08-14',
+      consent_text_version: 'jb-web-production-v1-2-2026-08-23',
       source: 'website_property_finder',
       language: lang,
       search_profile: currentSearchProfile,
-      matched_project_ids: currentShortlist.slice(0, 20).map(project => project.id),
+      matched_project_ids:
+        currentShortlist.slice(0, 20).map(project => project.id),
       page_path: window.location.pathname,
       referrer: document.referrer || null,
       user_agent: navigator.userAgent || null
@@ -1873,40 +2240,109 @@ async function submitLeadCapture(event) {
 
     const fullList = currentShortlist.slice(0, 10);
 
-    event.currentTarget.innerHTML = `
-      <div class="lead-success">
-        <strong>${lang === 'ar' ? 'تم حفظ بحثك بنجاح.' : 'Your search has been saved.'}</strong>
-        <span>${lang === 'ar'
-          ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب اختيارك.'
-          : 'You can now review the full shortlist. JB can follow up using your preferred channel.'}</span>
-      </div>
-    `;
+    if (form) {
+      form.innerHTML = `
+        <div class="lead-success">
+          <strong>${lang === 'ar'
+            ? 'تم حفظ بحثك بنجاح.'
+            : 'Your search has been saved.'}</strong>
+          <span>${lang === 'ar'
+            ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب وسيلة التواصل التي اخترتها.'
+            : 'You can now review the full shortlist. JB can follow up using your preferred contact method.'}</span>
+        </div>
+      `;
+    }
 
-    const shortlistContainer = document.querySelector('#finderResult .finder-shortlist');
-    const locked = document.querySelector('#finderResult .shortlist-locked');
+    const resultRoot =
+      document.querySelector('#finderResult .finder-result-content');
 
-    if (shortlistContainer) {
-      shortlistContainer.innerHTML = fullList.length
-        ? fullList.map(shortlistItem).join('')
-        : shortlistContainer.innerHTML;
+    const locked =
+      document.querySelector('#finderResult .shortlist-locked');
+
+    if (resultRoot && fullList.length) {
+      const confirmed = fullList.filter(
+        project => Boolean(finderProjectPrice(project).price)
+      );
+
+      const potential = fullList.filter(
+        project => !finderProjectPrice(project).price
+      );
+
+      resultRoot.querySelectorAll('.match-group').forEach(group => group.remove());
+
+      const groupsHtml = `
+        ${
+          confirmed.length
+            ? `
+              <section class="match-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar' ? 'أفضل التطابقات' : 'Best Matches'}</strong>
+                  <span>${lang === 'ar'
+                    ? 'السعر معروف ومتوافق مع معايير البحث المختارة'
+                    : 'Known price and budget-aligned'}</span>
+                </div>
+
+                <div class="finder-shortlist rich-finder-list">
+                  ${confirmed.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+
+        ${
+          potential.length
+            ? `
+              <section class="match-group potential-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar'
+                    ? 'خيارات محتملة — تحتاج تحقق السعر'
+                    : 'Potential Matches — Price Verification Needed'}</strong>
+
+                  <span>${lang === 'ar'
+                    ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي يحتاج تحققًا إضافيًا'
+                    : 'Location and unit type fit, but current price still needs verification'}</span>
+                </div>
+
+                <div class="finder-shortlist rich-finder-list">
+                  ${potential.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+      `;
+
+      const resultCopy = resultRoot.querySelector('.finder-result-copy');
+      const insertPoint = locked || form;
+
+      if (insertPoint) {
+        insertPoint.insertAdjacentHTML('beforebegin', groupsHtml);
+      } else if (resultCopy) {
+        resultCopy.insertAdjacentHTML('afterend', groupsHtml);
+      } else {
+        resultRoot.insertAdjacentHTML('beforeend', groupsHtml);
+      }
     }
 
     if (locked) locked.remove();
 
   } catch (error) {
     console.error('Lead capture failed:', error);
+
     if (status) {
       status.textContent = lang === 'ar'
         ? 'تعذر حفظ بيانات التواصل الآن. حاول مرة أخرى بعد قليل.'
         : 'We could not save your contact details right now. Please try again.';
     }
+
     if (submitButton) submitButton.disabled = false;
   }
 }
 
 let finderBusy = false;
 
-function runFinder(event) {
+async function runFinder(event) {
   if (event) event.preventDefault();
   if (finderBusy) return;
 
@@ -1921,7 +2357,7 @@ function runFinder(event) {
       button.textContent = lang === 'ar' ? 'جارٍ إعداد النتائج...' : 'Building matches...';
     }
 
-    renderFinderPreview(getFinderValues(), true);
+    await renderFinderPreview(getFinderValues(), true);
   } catch (error) {
     console.error('Finder failed:', error);
 
