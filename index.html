@@ -10,6 +10,224 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260814-v28">
+
+<style id="jb-rich-finder-v12">
+#finderResult .finder-result-copy{
+  font-size:17px !important;
+  line-height:1.8 !important;
+  font-weight:600 !important;
+}
+
+#finderResult .match-group{
+  margin-top:28px;
+}
+
+#finderResult .match-group-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:14px;
+}
+
+#finderResult .match-group-head strong{
+  font-size:21px !important;
+  line-height:1.3 !important;
+  font-weight:900 !important;
+  color:#ffffff !important;
+}
+
+#finderResult .match-group-head span{
+  display:block;
+  font-size:15px !important;
+  line-height:1.55 !important;
+  font-weight:700 !important;
+  color:#ffffff !important;
+  opacity:.94;
+}
+
+#finderResult .rich-finder-list{
+  display:grid;
+  gap:12px;
+}
+
+#finderResult .matching-card{
+  width:100%;
+  min-height:170px;
+  display:flex !important;
+  align-items:flex-start !important;
+  gap:14px !important;
+  padding:22px !important;
+  text-align:left;
+  border:1px solid rgba(235,190,55,.48) !important;
+  border-radius:11px !important;
+  background:rgba(255,255,255,.075) !important;
+  color:#ffffff !important;
+}
+
+html[dir="rtl"] #finderResult .matching-card{
+  text-align:right;
+}
+
+#finderResult .potential-group .matching-card{
+  border-style:dashed !important;
+  opacity:.98;
+}
+
+#finderResult .finder-shortlist-thumb{
+  width:48px !important;
+  min-width:48px !important;
+  height:48px !important;
+  border-radius:9px !important;
+  overflow:hidden;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:rgba(0,45,85,.55) !important;
+  color:#fff !important;
+  font-weight:900 !important;
+}
+
+#finderResult .finder-shortlist-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#finderResult .finder-shortlist-copy{
+  flex:1;
+  min-width:0;
+}
+
+#finderResult .matching-card-title{
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+}
+
+#finderResult .match-project-name{
+  display:block;
+  font-size:20px !important;
+  line-height:1.3 !important;
+  font-weight:900 !important;
+  color:#f6c928 !important;
+}
+
+#finderResult .match-score{
+  flex:0 0 auto;
+  font-size:17px !important;
+  line-height:1.3 !important;
+  font-weight:900 !important;
+  color:#f6c928 !important;
+}
+
+#finderResult .match-meta{
+  display:block !important;
+  margin-top:8px !important;
+  font-size:15px !important;
+  line-height:1.5 !important;
+  font-weight:800 !important;
+  color:#ffffff !important;
+}
+
+#finderResult .match-price{
+  display:block !important;
+  margin-top:10px !important;
+  font-size:16px !important;
+  line-height:1.5 !important;
+  font-weight:900 !important;
+}
+
+#finderResult .price-official{
+  color:#ffffff !important;
+}
+
+#finderResult .price-market{
+  color:#f6c928 !important;
+}
+
+#finderResult .price-unknown{
+  color:#ffffff !important;
+}
+
+#finderResult .match-reasons{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px 10px !important;
+  margin-top:13px !important;
+}
+
+#finderResult .match-reasons em{
+  display:inline-flex !important;
+  align-items:center !important;
+  padding:5px 9px !important;
+  border:1px solid rgba(255,255,255,.20) !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.045) !important;
+  color:#ffffff !important;
+  font-size:14px !important;
+  line-height:1.35 !important;
+  font-weight:750 !important;
+  font-style:normal !important;
+}
+
+#finderResult .shortlist-locked strong{
+  font-size:17px !important;
+  font-weight:900 !important;
+}
+
+#finderResult .shortlist-locked span{
+  font-size:15px !important;
+  line-height:1.55 !important;
+  font-weight:650 !important;
+}
+
+html[lang="ar"] #finderResult .finder-rich-results,
+html[lang="ar"] #finderResult .matching-card,
+html[lang="ar"] #finderResult .match-group-head{
+  font-family:"Cairo",sans-serif !important;
+}
+
+html[lang="en"] #finderResult .finder-rich-results,
+html[lang="en"] #finderResult .matching-card,
+html[lang="en"] #finderResult .match-group-head{
+  font-family:"Poppins",sans-serif !important;
+}
+
+@media(max-width:700px){
+  #finderResult .match-group-head{
+    flex-direction:column;
+    gap:5px;
+  }
+
+  #finderResult .match-group-head strong{
+    font-size:18px !important;
+  }
+
+  #finderResult .matching-card{
+    min-height:0;
+    padding:17px !important;
+  }
+
+  #finderResult .matching-card-title{
+    flex-direction:column;
+    gap:4px !important;
+  }
+
+  #finderResult .match-project-name{
+    font-size:18px !important;
+  }
+
+  #finderResult .match-score,
+  #finderResult .match-price,
+  #finderResult .match-meta,
+  #finderResult .match-reasons em{
+    font-size:13.5px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -456,7 +674,7 @@
   </div>
 </footer>
 
-<script src="script.js?v=20260823-production-v1-1-classic-finder"></script>
+<script src="script.js?v=20260823-production-v1-2-rich-results"></script>
 
 </body>
 </html>
