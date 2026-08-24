@@ -2424,3 +2424,29 @@ html[lang="en"] .finder-result-copy{
     gap:8px;
   }
 }
+/* Fix contact-method labels visibility inside preference panel */
+.preference-panel{
+  background: #f3f0ea;
+  border: 1px solid rgba(214, 174, 53, 0.35);
+}
+
+.preference-panel > strong{
+  color: #143a5a !important;
+}
+
+.contact-methods label{
+  color: #143a5a !important;
+  font-weight: 700;
+}
+
+.contact-methods label span{
+  color: #143a5a !important;
+}
+
+.lead-inline-check{
+  color: #143a5a !important;
+}
+
+.lead-inline-check span{
+  color: #143a5a !important;
+}
