@@ -1,2426 +1,2596 @@
+// JB REAL ESTATE — PRODUCTION FRONTEND V1.3 — HARDENED LEAD RPC
+// JB REAL ESTATE V2.8 - Reliable Property Finder button binding
 /* =========================================================
    JB REAL ESTATE
    Dynamic Website V1
+   Supabase REST + Finder V2 + Developers + Projects + Compare
    ========================================================= */
 
-:root{
-  --navy:#134670;
-  --navy2:#134670;
-  --gold:#D4AF37;
-  --gold2:#E7C45A;
-  --white:#fff;
-  --ink:#134670;
-  --muted:#667085;
-  --line:#e6e8ec;
-  --soft:#f5f7fa;
-  --radius:20px;
-  --shadow:0 18px 50px rgba(13,27,42,.12);
+const SUPABASE_URL = "https://cmjeijjkdztlvhqzcjrg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_foGnQkjteOAQ7XL6SBqAVA_fQACuQ7a";
+const SUPABASE_REST = `${SUPABASE_URL}/rest/v1`;
+
+const translations = {
+  en: {
+    'nav.properties':'Properties',
+    'nav.projects':'Projects',
+    'nav.developers':'Developers',
+    'nav.compare':'Compare',
+    'nav.investment':'Investment',
+    'nav.about':'About JB',
+    'nav.cta':'Find My Property',
+
+    'hero.eyebrow':'JB REAL ESTATE GROUP',
+    'hero.title':'Find. Compare. Decide. Invest.',
+    'hero.text':'Explore opportunities across Egypt, compare developers and projects, and get personalized guidance before you buy.',
+    'hero.primary':'Find My Property',
+    'hero.secondary':'Compare Projects',
+    'hero.note':'One market. Multiple options. One trusted partner.',
+
+    'finder.eyebrow':'PROPERTY FINDER',
+    'finder.title':'Tell us what you are looking for.',
+    'finder.text':'Start with your priorities. JB will use them to build a focused shortlist.',
+    'finder.button':'Find My Best Matches',
+    'finder.privacy':'Your search is private. Contact details are only requested if you want the full shortlist or a JB advisor to follow up.',
+
+
+    'fields.location':'Location',
+    'fields.budget':'Budget',
+    'fields.type':'Property type',
+    'fields.purpose':'Purpose',
+    'fields.delivery':'Delivery',
+    'fields.payment':'Payment preference',
+    'fields.bedrooms':'Bedrooms',
+    'fields.timeline':'Buying timeline',
+
+    'options.anyLocation':'Any location',
+    'options.northCoast':'North Coast',
+    'options.newCairo':'New Cairo',
+    'options.newCapital':'New Capital',
+    'options.ainSokhna':'Ain Sokhna',
+    'options.sheikhZayed':'Sheikh Zayed',
+
+    'options.anyBudget':'Any budget',
+    'options.under5':'Under EGP 5M',
+    'options.5to10':'EGP 5M–10M',
+    'options.10to20':'EGP 10M–20M',
+    'options.20plus':'EGP 20M+',
+
+    'options.anyType':'Any type',
+    'options.apartment':'Apartment',
+    'options.chalet':'Chalet',
+    'options.villa':'Villa',
+    'options.twin':'Twin House',
+    'options.commercial':'Commercial',
+
+    'options.anyPurpose':'Any purpose',
+    'options.investment':'Investment',
+    'options.personal':'Personal use',
+    'options.both':'Both',
+
+    'options.anyDelivery':'Any delivery',
+    'options.ready':'Ready',
+    'options.1to3':'1–3 years',
+    'options.3plus':'3+ years',
+
+    'options.anyPayment':'No preference',
+    'options.lowDown':'Lower down payment',
+    'options.longPlan':'Longer payment plan',
+    'options.cash':'Cash / strong upfront payment',
+
+    'options.anyBedrooms':'No preference',
+    'options.1to2':'1–2 bedrooms',
+    'options.3bed':'3 bedrooms',
+    'options.4plus':'4+ bedrooms',
+
+    'options.anyTimeline':'Just exploring',
+    'options.now':'Ready to buy now',
+    'options.3months':'Within 3 months',
+    'options.6months':'Within 6 months',
+    'options.later':'6+ months',
+
+    'value.eyebrow':'WHY JB',
+    'value.title':'We are not here to show you one property. We help you understand your options.',
+    'value.text':'JB is being built as a real estate intelligence, advisory and brokerage platform: discover the market, compare alternatives, make a better-informed decision, then complete your purchase with JB.',
+    'value.link':'See how comparison works →',
+    'value.card1.title':'Multiple Options',
+    'value.card1.text':'Compare opportunities instead of relying on a single sales pitch.',
+    'value.card2.title':'Clear Sources',
+    'value.card2.text':'Track the source and freshness of important project information.',
+    'value.card3.title':'Personal Guidance',
+    'value.card3.text':'Move from search to a focused shortlist and advisor conversation.',
+    'value.card4.title':'Purchase Support',
+    'value.card4.text':'Keep the relationship with JB through the buying journey.',
+
+    'projects.eyebrow':'EXPLORE',
+    'projects.title':'Projects',
+    'projects.link':'Find my best options →',
+
+    'developers.eyebrow':'MARKET DIRECTORY',
+    'developers.title':'Explore Developers',
+    'developers.text':'Browse verified developer profiles and explore their published projects.',
+    'developers.search':'Search developer...',
+    'developers.searchBtn':'Search',
+
+    'compare.eyebrow':'COMPARE BEFORE YOU BUY',
+    'compare.title':'One market. Clearer decisions.',
+    'compare.text':'Select up to three projects and compare the verified data currently available.',
+
+    'intl.eyebrow':'INTERNATIONAL BUYERS',
+    'intl.title':'Invest in Egypt with a clearer view of the market.',
+    'intl.text':'JB will provide English-first discovery, project comparison and buyer guidance for international clients interested in Egypt.',
+    'intl.li1':'Arabic + English from V1',
+    'intl.li2':'Investment-focused property search',
+    'intl.li3':'Transparent sources and update dates',
+    'intl.li4':'Personalized consultation',
+    'intl.button':'Request a consultation',
+    'intl.boxTitle':'Built for local and international buyers',
+    'intl.boxText':'The data model is designed to support multiple languages, currencies and future market modules such as land and commercial opportunities.',
+
+    'cta.eyebrow':'READY TO START?',
+    'cta.title':'Tell JB what you want to buy.',
+    'cta.text':'We will turn your requirements into a focused property shortlist.',
+    'cta.button':'Build My Shortlist',
+
+    'footer.contact':'Contact',
+    'footer.social':'Social',
+    'footer.demo':'Live market database connected to Supabase.'
+  },
+
+  ar: {
+    'nav.properties':'العقارات',
+    'nav.projects':'المشروعات',
+    'nav.developers':'المطورون',
+    'nav.compare':'مقارنة',
+    'nav.investment':'الاستثمار',
+    'nav.about':'عن JB',
+    'nav.cta':'ابحث عن عقارك',
+
+    'hero.eyebrow':'مجموعة JB للعقارات',
+    'hero.title':'ابحث. قارن. اختر. استثمر.',
+    'hero.text':'اكتشف الفرص العقارية في مصر، وقارن بين المطورين والمشروعات، واحصل على توجيه يناسب احتياجاتك قبل الشراء.',
+    'hero.primary':'ابحث عن عقارك',
+    'hero.secondary':'قارن المشروعات',
+    'hero.note':'سوق واحد. خيارات متعددة. شريك واحد تثق به.',
+
+    'finder.eyebrow':'الباحث العقاري',
+    'finder.title':'قل لنا ماذا تبحث عنه.',
+    'finder.text':'ابدأ باحتياجاتك، وستستخدمها JB لبناء قائمة مختصرة تناسبك.',
+    'finder.button':'اعرض أفضل الخيارات المناسبة لي',
+    'finder.privacy':'بحثك خاص. نطلب بيانات التواصل فقط إذا أردت القائمة الكاملة أو متابعة مستشار JB معك.',
+
+
+    'fields.location':'الموقع',
+    'fields.budget':'الميزانية',
+    'fields.type':'نوع العقار',
+    'fields.purpose':'الهدف من الشراء',
+    'fields.delivery':'موعد التسليم',
+    'fields.payment':'تفضيل السداد',
+    'fields.bedrooms':'عدد غرف النوم',
+    'fields.timeline':'موعد الشراء',
+
+    'options.anyLocation':'أي موقع',
+    'options.northCoast':'الساحل الشمالي',
+    'options.newCairo':'القاهرة الجديدة',
+    'options.newCapital':'العاصمة الإدارية الجديدة',
+    'options.ainSokhna':'العين السخنة',
+    'options.sheikhZayed':'الشيخ زايد',
+
+    'options.anyBudget':'أي ميزانية',
+    'options.under5':'أقل من 5 مليون جنيه',
+    'options.5to10':'من 5 إلى 10 مليون جنيه',
+    'options.10to20':'من 10 إلى 20 مليون جنيه',
+    'options.20plus':'20 مليون جنيه فأكثر',
+
+    'options.anyType':'أي نوع',
+    'options.apartment':'شقة',
+    'options.chalet':'شاليه',
+    'options.villa':'فيلا',
+    'options.twin':'توين هاوس',
+    'options.commercial':'تجاري',
+
+    'options.anyPurpose':'أي هدف',
+    'options.investment':'استثمار',
+    'options.personal':'استخدام شخصي',
+    'options.both':'استثمار واستخدام شخصي',
+
+    'options.anyDelivery':'أي موعد للتسليم',
+    'options.ready':'جاهز للتسليم',
+    'options.1to3':'من سنة إلى 3 سنوات',
+    'options.3plus':'أكثر من 3 سنوات',
+
+    'options.anyPayment':'لا يوجد تفضيل',
+    'options.lowDown':'مقدم أقل',
+    'options.longPlan':'فترة سداد أطول',
+    'options.cash':'كاش / مقدم كبير',
+
+    'options.anyBedrooms':'لا يوجد تفضيل',
+    'options.1to2':'غرفة إلى غرفتين',
+    'options.3bed':'3 غرف',
+    'options.4plus':'4 غرف فأكثر',
+
+    'options.anyTimeline':'ما زلت أستكشف السوق',
+    'options.now':'جاهز للشراء الآن',
+    'options.3months':'خلال 3 أشهر',
+    'options.6months':'خلال 6 أشهر',
+    'options.later':'بعد 6 أشهر',
+
+    'value.eyebrow':'لماذا JB؟',
+    'value.title':'لسنا هنا لنعرض عليك عقارًا واحدًا. نحن نساعدك على فهم اختياراتك.',
+    'value.text':'نبني JB كمنصة للذكاء والاستشارات والوساطة العقارية: اكتشف السوق، قارن البدائل، اتخذ قرارًا أكثر وعيًا، ثم أكمل عملية الشراء من خلال JB.',
+    'value.link':'شاهد كيف تعمل المقارنة ←',
+    'value.card1.title':'خيارات متعددة',
+    'value.card1.text':'قارن الفرص بدل الاعتماد على عرض بيع واحد.',
+    'value.card2.title':'مصادر واضحة',
+    'value.card2.text':'تعرف على مصدر المعلومات ومدى حداثتها.',
+    'value.card3.title':'توجيه شخصي',
+    'value.card3.text':'انتقل من البحث إلى قائمة مختصرة وحوار مع مستشار.',
+    'value.card4.title':'دعم أثناء الشراء',
+    'value.card4.text':'تستمر علاقتك مع JB خلال رحلة الشراء.',
+
+    'projects.eyebrow':'اكتشف',
+    'projects.title':'المشروعات',
+    'projects.link':'ابحث عن أفضل الخيارات ←',
+
+    'developers.eyebrow':'دليل السوق',
+    'developers.title':'اكتشف المطورين',
+    'developers.text':'تصفح ملفات المطورين الموثقة واستكشف مشروعاتهم المنشورة.',
+    'developers.search':'ابحث عن مطور...',
+    'developers.searchBtn':'بحث',
+
+    'compare.eyebrow':'قارن قبل أن تشتري',
+    'compare.title':'سوق واحد. قرارات أوضح.',
+    'compare.text':'اختر حتى 3 مشروعات وقارن البيانات الموثقة المتاحة حاليًا.',
+
+    'intl.eyebrow':'للمشترين الدوليين',
+    'intl.title':'استثمر في مصر برؤية أوضح للسوق.',
+    'intl.text':'ستوفر JB تجربة اكتشاف ومقارنة وإرشاد باللغة الإنجليزية للعملاء الدوليين المهتمين بالسوق المصري.',
+    'intl.li1':'العربية + الإنجليزية من الإصدار الأول',
+    'intl.li2':'بحث عقاري يركز على الاستثمار',
+    'intl.li3':'مصادر واضحة وتواريخ تحديث',
+    'intl.li4':'استشارة شخصية',
+    'intl.button':'اطلب استشارة',
+    'intl.boxTitle':'مصمم للعملاء المحليين والدوليين',
+    'intl.boxText':'تم تصميم نموذج البيانات لدعم اللغات والعملات المتعددة وإضافة وحدات مستقبلية مثل الأراضي والعقارات التجارية.',
+
+    'cta.eyebrow':'جاهز للبدء؟',
+    'cta.title':'قل لـ JB ماذا تريد أن تشتري.',
+    'cta.text':'سنحوّل احتياجاتك إلى قائمة مختصرة من الخيارات العقارية.',
+    'cta.button':'أنشئ قائمتي المختصرة',
+
+    'footer.contact':'تواصل معنا',
+    'footer.social':'تابعنا',
+    'footer.demo':'قاعدة بيانات السوق الحية متصلة بـ Supabase.'
+  }
+};
+
+
+let lang = localStorage.getItem('jbLanguage') || 'en';
+if (!['en','ar'].includes(lang)) lang = 'en';
+
+let developers = [];
+let projects = [];
+let filteredDevelopers = [];
+let comparison = [];
+let projectPropertyTypeMap = new Map();
+let filterOptions = null;
+let productionApiOnline = false;
+
+let visibleProjects = 9;
+const PROJECT_PAGE_SIZE = 9;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function apiHeaders() {
+  return {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`
+  };
 }
 
-*{box-sizing:border-box}
+async function supabaseGet(path) {
+  const response = await fetch(`${SUPABASE_REST}/${path}`, {
+    headers: apiHeaders()
+  });
 
-html{scroll-behavior:smooth}
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase ${response.status}: ${errorText}`);
+  }
 
-body{
-  margin:0;
-  color:var(--ink);
-  background:#fff;
-  font-family:Poppins,Cairo,sans-serif;
-  line-height:1.65;
+  return response.json();
 }
 
-body[dir="rtl"]{font-family:Cairo,Poppins,sans-serif}
-body.modal-open{overflow:hidden}
 
-.container{width:min(1160px,92%);margin:auto}
+async function supabaseRpc(functionName, payload = {}) {
+  const response = await fetch(`${SUPABASE_REST}/rpc/${functionName}`, {
+    method: 'POST',
+    headers: {
+      ...apiHeaders(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload || {})
+  });
 
-.site-header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(7,19,33,.96);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(212,175,55,.2);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase RPC ${response.status}: ${errorText}`);
+  }
+
+  if (response.status === 204) return null;
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
-.nav-wrap{
-  min-height:82px;
-  display:flex;
-  align-items:center;
-  gap:26px;
+
+async function supabasePost(path, payload) {
+  const response = await fetch(`${SUPABASE_REST}/${path}`, {
+    method: 'POST',
+    headers: {
+      ...apiHeaders(),
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Supabase POST failed: ${response.status}`);
+  }
+
+  return true;
 }
 
-.brand img{
-  width:82px;
-  height:58px;
-  object-fit:contain;
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
-.main-nav{
-  display:flex;
-  gap:22px;
-  flex:1;
-  justify-content:center;
+function formatMoney(value, currency = 'EGP') {
+  if (value === null || value === undefined || value === '') {
+    return lang === 'ar' ? 'غير متاح حاليًا' : 'Not currently available';
+  }
+
+  try {
+    return new Intl.NumberFormat(lang === 'ar' ? 'ar-EG' : 'en-EG', {
+      style: 'currency',
+      currency: currency || 'EGP',
+      maximumFractionDigits: 0
+    }).format(Number(value));
+  } catch {
+    return `${Number(value).toLocaleString()} ${currency || 'EGP'}`;
+  }
 }
 
-.main-nav a,.footer a{
-  color:inherit;
-  text-decoration:none;
+function formatDate(value) {
+  if (!value) return lang === 'ar' ? 'غير متاح' : 'Not available';
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return escapeHtml(value);
+  }
+
+  return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
 }
 
-.main-nav a{
-  color:#f7f7f7;
-  font-size:14px;
+function projectName(project) {
+  return lang === 'ar'
+    ? (project.name_ar || project.name_en)
+    : (project.name_en || project.name_ar);
 }
 
-.main-nav a:hover{color:var(--gold2)}
-
-.nav-actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
+function developerName(developer) {
+  return lang === 'ar'
+    ? (developer.name_ar || developer.name_en)
+    : (developer.name_en || developer.name_ar);
 }
 
-.lang-btn{
-  border:1px solid rgba(255,255,255,.3);
-  background:transparent;
-  color:#fff;
-  border-radius:999px;
-  padding:9px 13px;
-  cursor:pointer;
-  font-family:inherit;
+function projectDeveloper(project) {
+  const developer = project.developers || {};
+
+  return lang === 'ar'
+    ? (developer.name_ar || developer.name_en || '')
+    : (developer.name_en || developer.name_ar || '');
 }
 
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:48px;
-  padding:0 20px;
-  border-radius:999px;
-  text-decoration:none;
-  font-weight:700;
-  border:1px solid transparent;
-  cursor:pointer;
-  font-family:inherit;
+function projectLocation(project) {
+  const location = project.locations || {};
+
+  if (location.area && location.city && location.area !== location.city) {
+    return `${location.area} · ${location.city}`;
+  }
+
+  return location.area || location.city || (lang === 'ar' ? 'مصر' : 'Egypt');
 }
 
-.btn-small{
-  min-height:40px;
-  padding:0 15px;
-  font-size:13px;
+function text(value, fallbackEn = 'Not available', fallbackAr = 'غير متاح') {
+  return value || (lang === 'ar' ? fallbackAr : fallbackEn);
 }
 
-.btn-gold{
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:var(--navy);
+
+/* =========================================================
+   LANGUAGE
+   ========================================================= */
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.dir = document.documentElement.dir;
+
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.dataset.i18n;
+    if (translations[lang]?.[key]) {
+      element.textContent = translations[lang][key];
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.dataset.i18nPlaceholder;
+    if (translations[lang]?.[key]) {
+      element.placeholder = translations[lang][key];
+    }
+  });
+
+  const toggle = document.getElementById('langToggle');
+  if (toggle) {
+    toggle.textContent = lang === 'en' ? 'العربية' : 'English';
+    toggle.setAttribute('aria-label',
+      lang === 'en' ? 'Switch to Arabic' : 'التحويل إلى الإنجليزية');
+  }
+
+  localStorage.setItem('jbLanguage', lang);
+
+  renderProjects();
+  renderDevelopers(filteredDevelopers.length ? filteredDevelopers : developers);
+  renderComparison();
+
+  // Re-render dynamic finder content in the selected language
+  // without losing the user's selected search criteria.
+  const finderResult = document.getElementById('finderResult');
+  if (currentSearchProfile && finderResult && !finderResult.hidden) {
+    renderFinderPreview({...currentSearchProfile}, false);
+  }
+
+  // Re-render the currently open developer/project profile in the new language.
+  const modal = document.getElementById('profileModal');
+  if (modal && !modal.hidden && modalHistory.length) {
+    const current = modalHistory[modalHistory.length - 1];
+    if (current?.type === 'developer') {
+      showDeveloperProfile(current.id, false);
+    } else if (current?.type === 'project') {
+      showProjectProfile(current.id, current.parentDeveloperId || null, false);
+    }
+  }
 }
 
-.btn-outline{
-  border-color:rgba(255,255,255,.45);
-  color:#fff;
-  background:rgba(255,255,255,.03);
+document.getElementById('langToggle')?.addEventListener('click', () => {
+  lang = lang === 'en' ? 'ar' : 'en';
+  applyLang();
+});
+
+
+/* =========================================================
+   LOAD MARKET DATA
+   ========================================================= */
+
+async function loadMarketData() {
+  try {
+    /*
+      Production V1:
+      The website no longer reads projects/developers/locations raw.
+      It consumes only the production-safe public catalogue, which
+      already excludes MANUAL_REVIEW / QA_REVIEW projects.
+    */
+
+    const [publicProjectData, options] = await Promise.all([
+      supabaseGet(
+        'jb_public_projects_v1?select=project_id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,cover_image_url,website_url,developer_id,developer_slug,developer_name_ar,developer_name_en,developer_logo_url,location_id,city,area,official_starting_price,market_starting_price,display_starting_price,currency,price_evidence_type,delivery_date,completion_year,construction_status,handover_status,property_type_slugs,property_types_en,property_types_ar,market_min_area,market_max_area,min_down_payment_percentage,max_installment_years,payment_evidence_type,readiness_score,readiness,production_status,evidence_source_count,verification_status,last_verified_at&order=name_en.asc'
+      ),
+      supabaseRpc('jb_get_filter_options_v1', {})
+    ]);
+
+    const rows = Array.isArray(publicProjectData) ? publicProjectData : [];
+    filterOptions = options || null;
+    productionApiOnline = true;
+
+    projectPropertyTypeMap = new Map();
+
+    projects = rows.map(row => {
+      const project = {
+        id: row.project_id,
+        project_id: row.project_id,
+        slug: row.slug,
+        name_ar: row.name_ar,
+        name_en: row.name_en,
+        project_type: row.project_type,
+        description_ar: row.description_ar,
+        description_en: row.description_en,
+        overview_ar: row.overview_ar,
+        overview_en: row.overview_en,
+        cover_image_url: row.cover_image_url,
+        website_url: row.website_url,
+
+        developer_id: row.developer_id,
+        location_id: row.location_id,
+
+        // Compatibility: existing UI expects starting_price.
+        // It is now the safe DISPLAY price from the production layer.
+        starting_price: row.display_starting_price,
+        official_starting_price: row.official_starting_price,
+        market_starting_price: row.market_starting_price,
+        display_starting_price: row.display_starting_price,
+        price_evidence_type: row.price_evidence_type,
+        currency: row.currency,
+
+        delivery_date: row.delivery_date,
+        completion_year: row.completion_year,
+        construction_status: row.construction_status,
+        handover_status: row.handover_status,
+
+        property_type_slugs: row.property_type_slugs || [],
+        property_types_en: row.property_types_en || [],
+        property_types_ar: row.property_types_ar || [],
+        market_min_area: row.market_min_area,
+        market_max_area: row.market_max_area,
+        min_down_payment_percentage: row.min_down_payment_percentage,
+        max_installment_years: row.max_installment_years,
+        payment_evidence_type: row.payment_evidence_type,
+
+        readiness_score: row.readiness_score,
+        readiness: row.readiness,
+        production_status: row.production_status,
+        evidence_source_count: row.evidence_source_count,
+        verification_status: row.verification_status,
+        last_verified_at: row.last_verified_at,
+
+        developers: {
+          id: row.developer_id,
+          slug: row.developer_slug,
+          name_ar: row.developer_name_ar,
+          name_en: row.developer_name_en,
+          logo_url: row.developer_logo_url
+        },
+
+        locations: {
+          id: row.location_id,
+          city: row.city,
+          area: row.area
+        }
+      };
+
+      projectPropertyTypeMap.set(
+        project.id,
+        (project.property_type_slugs || []).map((slug, index) => ({
+          slug,
+          name_en: project.property_types_en?.[index] || slug,
+          name_ar: project.property_types_ar?.[index] || slug
+        }))
+      );
+
+      return project;
+    });
+
+    const developerMap = new Map();
+
+    projects.forEach(project => {
+      const d = project.developers;
+      if (!d?.id || developerMap.has(d.id)) return;
+      developerMap.set(d.id, {
+        id: d.id,
+        slug: d.slug,
+        name_ar: d.name_ar,
+        name_en: d.name_en,
+        logo_url: d.logo_url,
+        verification_status: 'verified'
+      });
+    });
+
+    developers = [...developerMap.values()].sort((a, b) =>
+      String(a.name_en || a.name_ar || '').localeCompare(
+        String(b.name_en || b.name_ar || '')
+      )
+    );
+
+    filteredDevelopers = [...developers];
+
+    renderDevelopers(filteredDevelopers);
+    renderProjects();
+    renderComparison();
+
+  } catch (error) {
+    productionApiOnline = false;
+    console.error('JB production data connection failed:', error);
+
+    const projectsGrid = document.getElementById('projectsGrid');
+    const developerRow = document.getElementById('developerRow');
+    const projectCount = document.getElementById('projectCount');
+    const developerCount = document.getElementById('developerCount');
+
+    if (projectCount) {
+      projectCount.textContent = lang === 'ar'
+        ? 'تعذر الاتصال ببيانات الإنتاج'
+        : 'Production data connection error';
+    }
+
+    if (developerCount) {
+      developerCount.textContent = lang === 'ar'
+        ? 'تعذر الاتصال بدليل المطورين'
+        : 'Developer directory connection error';
+    }
+
+    if (projectsGrid) {
+      projectsGrid.innerHTML = `
+        <div class="data-error">
+          <strong>${lang === 'ar' ? 'تعذر تحميل المشروعات.' : 'Projects could not be loaded.'}</strong>
+          <br>
+          <small>${escapeHtml(error.message || String(error))}</small>
+        </div>
+      `;
+    }
+
+    if (developerRow) {
+      developerRow.innerHTML = `
+        <div class="data-error">
+          <strong>${lang === 'ar' ? 'تعذر تحميل دليل المطورين.' : 'The developer directory could not be loaded.'}</strong>
+          <br>
+          <small>${escapeHtml(error.message || String(error))}</small>
+        </div>
+      `;
+    }
+  }
 }
 
-.btn-outline-dark{
-  border-color:var(--navy);
-  color:var(--navy);
-  background:#fff;
+
+
+function projectInitials(project) {
+  const value = projectName(project)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
+
+  return escapeHtml(value || 'RE');
 }
 
-.btn-navy{
-  background:var(--navy);
-  color:#fff;
+function projectVisual(project) {
+  if (project.cover_image_url) {
+    return `
+      <div class="project-image dynamic-project-image has-photo"
+           style="background-image:
+             linear-gradient(180deg,rgba(6,23,38,.05),rgba(6,23,38,.58)),
+             url('${escapeHtml(project.cover_image_url)}')">
+        <span class="project-image-location">${escapeHtml(projectLocation(project))}</span>
+      </div>
+    `;
+  }
+
+  const developer = project.developers || {};
+  const logo = developer.logo_url
+    ? `<img class="project-fallback-logo" src="${escapeHtml(developer.logo_url)}" alt="${escapeHtml(projectDeveloper(project))} logo" loading="lazy">`
+    : '';
+
+  return `
+    <div class="project-image dynamic-project-image project-image-fallback" data-project-kind="${escapeHtml(project.project_type || 'Residential')}">
+      ${logo}
+      <span class="project-fallback-initials">${projectInitials(project)}</span>
+      <span class="project-fallback-name">${escapeHtml(projectName(project))}</span>
+      <small>${escapeHtml(projectLocation(project))}</small>
+    </div>
+  `;
 }
 
-.hero{
-  min-height:720px;
-  display:flex;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 80% 30%,rgba(212,175,55,.16),transparent 35%),
-    linear-gradient(135deg,var(--navy2),var(--navy));
+function availabilityPrice(project) {
+  if (project.starting_price) return formatMoney(project.starting_price, project.currency);
+
+  return lang === 'ar'
+    ? 'تحقق من السعر الحالي مع JB'
+    : 'Verify current price with JB';
 }
 
-.hero:after{
-  content:"";
-  position:absolute;
-  right:-120px;
-  bottom:-160px;
-  width:600px;
-  height:600px;
-  border:1px solid rgba(212,175,55,.35);
-  border-radius:50%;
-  box-shadow:
-    0 0 0 28px rgba(212,175,55,.06),
-    0 0 0 58px rgba(212,175,55,.03);
+function availabilityDelivery(project) {
+  if (project.delivery_date) return formatDate(project.delivery_date);
+
+  if (project.completion_year) {
+    return lang === 'ar'
+      ? `سنة ${project.completion_year}`
+      : `Year ${project.completion_year}`;
+  }
+
+  return lang === 'ar'
+    ? 'يتم التحقق من موعد التسليم'
+    : 'Delivery under verification';
 }
 
-.hero-overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
-    90deg,
-    rgba(7,19,33,.95) 0%,
-    rgba(7,19,33,.8) 48%,
-    rgba(7,19,33,.35) 100%
+/* =========================================================
+   PROJECTS
+   ========================================================= */
+
+function projectCard(project) {
+  const name = escapeHtml(projectName(project));
+  const developer = escapeHtml(projectDeveloper(project));
+  const location = escapeHtml(projectLocation(project));
+  const type = escapeHtml(text(project.project_type));
+  const price = escapeHtml(availabilityPrice(project));
+  const selected = comparison.some(item => item.id === project.id);
+
+  return `
+    <article class="project-card dynamic-project-card">
+
+      ${projectVisual(project)}
+
+      <div class="card-body">
+
+        <div class="project-card-topline">
+          <span class="tag">
+            ${project.verification_status === 'verified'
+              ? (lang === 'ar' ? 'موثّق' : 'VERIFIED')
+              : (lang === 'ar' ? 'بيانات السوق' : 'MARKET DATA')}
+          </span>
+
+          <span class="project-location">${location}</span>
+        </div>
+
+        <h3>${name}</h3>
+
+        <p class="project-developer">${developer}</p>
+
+        <div class="project-meta">
+          <span>${type}</span>
+          <span class="project-price">${price}</span>
+        </div>
+
+        <div class="project-card-actions">
+
+          <button
+            class="text-link project-profile-btn"
+            type="button"
+            data-project-profile="${project.id}">
+            ${lang === 'ar' ? 'عرض المشروع ←' : 'View project →'}
+          </button>
+
+          <button
+            class="compare-chip ${selected ? 'is-selected' : ''}"
+            type="button"
+            data-project-compare="${project.id}">
+            ${selected
+              ? (lang === 'ar' ? '✓ تمت الإضافة' : '✓ Added')
+              : (lang === 'ar' ? '+ مقارنة' : '+ Compare')}
+          </button>
+
+        </div>
+
+      </div>
+    </article>
+  `;
+}
+
+function renderProjects(list = projects) {
+  const grid = document.getElementById('projectsGrid');
+  const count = document.getElementById('projectCount');
+  const loadMore = document.getElementById('loadMoreProjects');
+
+  if (!grid) return;
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="data-empty">
+        ${lang === 'ar' ? 'لا توجد مشروعات مطابقة.' : 'No matching projects found.'}
+      </div>
+    `;
+
+    if (count) count.textContent = lang === 'ar' ? '0 مشروع' : '0 projects';
+    if (loadMore) loadMore.hidden = true;
+    return;
+  }
+
+  const visible = list.slice(0, visibleProjects);
+
+  grid.innerHTML = visible.map(projectCard).join('');
+
+  if (count) {
+    count.textContent =
+      lang === 'ar'
+        ? `${list.length} مشروعًا منشورًا`
+        : `${list.length} published projects`;
+  }
+
+  if (loadMore) {
+    loadMore.hidden = visibleProjects >= list.length;
+    loadMore.textContent =
+      lang === 'ar' ? 'عرض المزيد من المشروعات' : 'Load more projects';
+  }
+}
+
+document.getElementById('loadMoreProjects')?.addEventListener('click', () => {
+  visibleProjects += PROJECT_PAGE_SIZE;
+  renderProjects();
+});
+
+
+/* =========================================================
+   DEVELOPERS
+   ========================================================= */
+
+function renderDevelopers(list) {
+  const row = document.getElementById('developerRow');
+  const count = document.getElementById('developerCount');
+
+  if (!row) return;
+
+  if (!list.length) {
+    row.innerHTML = `
+      <div class="data-empty">
+        ${lang === 'ar' ? 'لم يتم العثور على مطور.' : 'No developer found.'}
+      </div>
+    `;
+
+    if (count) count.textContent = lang === 'ar' ? '0 مطور' : '0 developers';
+
+    return;
+  }
+
+  row.innerHTML = list.map(developer => `
+    <button
+      class="developer-pill developer-pill-button"
+      type="button"
+      data-developer-profile="${developer.id}">
+
+      ${escapeHtml(developerName(developer))}
+
+      <span>
+        ${lang === 'ar' ? 'عرض الملف' : 'Profile'}
+      </span>
+
+    </button>
+  `).join('');
+
+  if (count) {
+    count.textContent =
+      lang === 'ar'
+        ? `${list.length} مطورًا موثقًا`
+        : `${list.length} verified developers`;
+  }
+}
+
+function searchDevelopers() {
+  const query =
+    document.getElementById('developerSearch')?.value
+      .trim()
+      .toLowerCase() || '';
+
+  filteredDevelopers = developers.filter(developer => {
+    return [
+      developer.name_en,
+      developer.name_ar,
+      developer.slug
+    ]
+      .filter(Boolean)
+      .some(value => String(value).toLowerCase().includes(query));
+  });
+
+  renderDevelopers(filteredDevelopers);
+}
+
+document.getElementById('developerSearchBtn')?.addEventListener('click', searchDevelopers);
+
+document.getElementById('developerSearch')?.addEventListener('input', searchDevelopers);
+
+
+/* =========================================================
+   PROFILES / NAVIGATION
+   ========================================================= */
+
+let modalHistory = [];
+
+function openModal(html, state = null, pushHistory = true) {
+  const modal = document.getElementById('profileModal');
+  const content = document.getElementById('profileModalContent');
+
+  if (!modal || !content) return;
+
+  if (pushHistory && state) {
+    const current = modalHistory[modalHistory.length - 1];
+    const sameState = current &&
+      current.type === state.type &&
+      current.id === state.id;
+
+    if (!sameState) modalHistory.push(state);
+  }
+
+  content.innerHTML = html;
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+
+  const card = modal.querySelector('.profile-modal-card');
+  if (card) card.scrollTop = 0;
+}
+
+function closeModal() {
+  const modal = document.getElementById('profileModal');
+  if (!modal) return;
+
+  modal.hidden = true;
+  document.body.classList.remove('modal-open');
+  modalHistory = [];
+}
+
+function modalBack() {
+  if (modalHistory.length <= 1) {
+    closeModal();
+    return;
+  }
+
+  modalHistory.pop();
+  const previous = modalHistory[modalHistory.length - 1];
+
+  if (!previous) {
+    closeModal();
+  } else if (previous.type === 'developer') {
+    showDeveloperProfile(previous.id, false);
+  } else if (previous.type === 'project') {
+    showProjectProfile(previous.id, previous.parentDeveloperId || null, false);
+  }
+}
+
+document.getElementById('profileModalClose')?.addEventListener('click', closeModal);
+document.querySelector('[data-close-modal]')?.addEventListener('click', closeModal);
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeModal();
+});
+
+function developerLogo(developer) {
+  return developer?.logo_url
+    ? `<img class="profile-developer-logo" src="${escapeHtml(developer.logo_url)}" alt="${escapeHtml(developerName(developer))} logo" loading="lazy">`
+    : `<div class="profile-developer-monogram">${escapeHtml((developerName(developer) || 'D').slice(0,2).toUpperCase())}</div>`;
+}
+
+async function showDeveloperProfile(id, pushHistory = true) {
+  const localDeveloper = developers.find(item => item.id === id);
+  if (!localDeveloper) return;
+
+  openModal(`
+    <div class="data-empty">
+      ${lang === 'ar' ? 'جارٍ تحميل ملف المطور...' : 'Loading developer profile...'}
+    </div>
+  `, { type: 'developer', id }, pushHistory);
+
+  let payload = null;
+
+  try {
+    payload = await supabaseRpc('jb_get_developer_details_v1', {
+      p_slug: localDeveloper.slug
+    });
+  } catch (error) {
+    console.warn('Developer RPC fallback:', error);
+  }
+
+  const developer = payload?.developer
+    ? {...localDeveloper, ...payload.developer}
+    : localDeveloper;
+
+  const relatedProjects = payload?.projects?.length
+    ? payload.projects
+        .map(item => projects.find(project => project.slug === item.slug))
+        .filter(Boolean)
+    : projects.filter(project => project.developer_id === id);
+
+  const description =
+    lang === 'ar'
+      ? (developer.description_ar || developer.short_description_ar || developer.description_en || '')
+      : (developer.description_en || developer.short_description_en || developer.description_ar || '');
+
+  openModal(`
+    <div class="profile-brand-row">
+      ${developerLogo(developer)}
+      <div class="profile-heading">
+        <span class="eyebrow dark">${lang === 'ar' ? 'ملف المطور' : 'DEVELOPER PROFILE'}</span>
+        <h2 id="profileModalTitle">${escapeHtml(developerName(developer))}</h2>
+        <p>${escapeHtml(description || (
+          lang === 'ar'
+            ? 'ملف مطور موثق ضمن قاعدة بيانات JB.'
+            : 'Verified developer profile in the JB Market Database.'
+        ))}</p>
+      </div>
+    </div>
+
+    <div class="profile-facts">
+      <div>
+        <span>${lang === 'ar' ? 'سنة التأسيس' : 'Founded'}</span>
+        <strong>${escapeHtml(developer.founded_year || '—')}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'المشروعات المتاحة' : 'Available projects'}</span>
+        <strong>${relatedProjects.length}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'حالة التحقق' : 'Verification'}</span>
+        <strong>${escapeHtml(developer.verification_status || '—')}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'آخر تحقق' : 'Last verified'}</span>
+        <strong>${formatDate(developer.last_verified_at)}</strong>
+      </div>
+    </div>
+
+    <h3 class="profile-subtitle">${lang === 'ar' ? 'مشروعات المطور' : 'Developer projects'}</h3>
+
+    <div class="profile-project-list">
+      ${
+        relatedProjects.length
+          ? relatedProjects.map(project => `
+              <button
+                class="profile-project-link"
+                type="button"
+                data-project-profile="${project.id}"
+                data-parent-developer="${developer.id}">
+                <span>${escapeHtml(projectName(project))}</span>
+                <small>${escapeHtml(projectLocation(project))}</small>
+              </button>
+            `).join('')
+          : `<p>${lang === 'ar' ? 'لا توجد مشروعات متاحة حاليًا.' : 'No available projects yet.'}</p>`
+      }
+    </div>
+
+    ${
+      developer.website_url
+        ? `<a class="btn btn-navy profile-source-link"
+              href="${escapeHtml(developer.website_url)}"
+              target="_blank" rel="noopener">
+              ${lang === 'ar' ? 'الموقع الرسمي للمطور' : 'Official developer website'}
+           </a>`
+        : ''
+    }
+  `, { type: 'developer', id }, false);
+}
+
+async function showProjectProfile(id, parentDeveloperId = null, pushHistory = true) {
+  const localProject = projects.find(item => item.id === id);
+  if (!localProject) return;
+
+  openModal(`
+    <div class="data-empty">
+      ${lang === 'ar' ? 'جارٍ تحميل بيانات المشروع...' : 'Loading project data...'}
+    </div>
+  `, {
+    type: 'project',
+    id,
+    parentDeveloperId: parentDeveloperId || localProject.developer_id
+  }, pushHistory);
+
+  let payload = null;
+
+  try {
+    payload = await supabaseRpc('jb_get_project_details_v1', {
+      p_slug: localProject.slug
+    });
+  } catch (error) {
+    console.warn('Project RPC fallback:', error);
+  }
+
+  const project = {
+    ...localProject,
+    ...(payload?.project || {}),
+    starting_price:
+      payload?.pricing?.display_starting_price ??
+      localProject.starting_price,
+    official_starting_price:
+      payload?.pricing?.official_starting_price ??
+      localProject.official_starting_price,
+    market_starting_price:
+      payload?.pricing?.market_starting_price ??
+      localProject.market_starting_price,
+    price_evidence_type:
+      payload?.pricing?.evidence_type ??
+      localProject.price_evidence_type,
+    currency:
+      payload?.pricing?.currency ??
+      localProject.currency,
+    delivery_date:
+      payload?.delivery?.delivery_date ??
+      localProject.delivery_date,
+    completion_year:
+      payload?.delivery?.completion_year ??
+      localProject.completion_year,
+    construction_status:
+      payload?.delivery?.construction_status ??
+      localProject.construction_status,
+    handover_status:
+      payload?.delivery?.handover_status ??
+      localProject.handover_status,
+    min_down_payment_percentage:
+      payload?.payment?.min_down_payment_percentage ??
+      localProject.min_down_payment_percentage,
+    max_installment_years:
+      payload?.payment?.max_installment_years ??
+      localProject.max_installment_years,
+    payment_evidence_type:
+      payload?.payment?.evidence_type ??
+      localProject.payment_evidence_type,
+    market_min_area:
+      payload?.area?.market_min_area ??
+      localProject.market_min_area,
+    market_max_area:
+      payload?.area?.market_max_area ??
+      localProject.market_max_area,
+    developers: payload?.developer
+      ? {
+          id: payload.developer.id,
+          slug: payload.developer.slug,
+          name_ar: payload.developer.name_ar,
+          name_en: payload.developer.name_en,
+          logo_url: payload.developer.logo_url
+        }
+      : localProject.developers,
+    locations: payload?.location
+      ? {
+          id: payload.location.id,
+          city: payload.location.city,
+          area: payload.location.area
+        }
+      : localProject.locations
+  };
+
+  const developer = developers.find(item => item.id === project.developer_id) ||
+                    project.developers;
+
+  const description =
+    lang === 'ar'
+      ? (project.description_ar || project.overview_ar || project.description_en || project.overview_en || '')
+      : (project.description_en || project.overview_en || project.description_ar || project.overview_ar || '');
+
+  const backDeveloperId = parentDeveloperId || project.developer_id;
+
+  const areaText =
+    project.market_min_area || project.market_max_area
+      ? `${project.market_min_area ?? '—'}–${project.market_max_area ?? project.market_min_area ?? '—'} m²`
+      : (lang === 'ar' ? 'قيد التحقق' : 'Under verification');
+
+  const paymentText =
+    project.min_down_payment_percentage !== null &&
+    project.min_down_payment_percentage !== undefined
+      ? `${project.min_down_payment_percentage}% ${
+          project.max_installment_years
+            ? (lang === 'ar'
+                ? `· حتى ${project.max_installment_years} سنة`
+                : `· up to ${project.max_installment_years} years`)
+            : ''
+        }`
+      : (lang === 'ar' ? 'قيد التحقق' : 'Under verification');
+
+  const priceEvidence =
+    project.price_evidence_type === 'OFFICIAL_PRICE'
+      ? (lang === 'ar' ? 'سعر رسمي' : 'Official price')
+      : project.price_evidence_type === 'MARKET_REFERENCE'
+        ? (lang === 'ar' ? 'مرجع سوقي' : 'Market reference')
+        : (lang === 'ar' ? 'قيد التحقق' : 'Under verification');
+
+  openModal(`
+    <div class="profile-nav-row">
+      <button class="profile-back" type="button" data-modal-back>
+        ${lang === 'ar'
+          ? `→ العودة إلى ${escapeHtml(developer ? developerName(developer) : 'المطور')}`
+          : `← Back to ${escapeHtml(developer ? developerName(developer) : 'developer')}`}
+      </button>
+      <span class="profile-breadcrumb">${escapeHtml(projectDeveloper(project))} / ${escapeHtml(projectName(project))}</span>
+    </div>
+
+    <div class="profile-project-hero">
+      ${projectVisual(project)}
+    </div>
+
+    <div class="profile-heading">
+      <span class="eyebrow dark">${lang === 'ar' ? 'ملف المشروع' : 'PROJECT PROFILE'}</span>
+      <h2 id="profileModalTitle">${escapeHtml(projectName(project))}</h2>
+      <button class="profile-developer-button" type="button" data-developer-profile="${project.developer_id}">
+        ${developer?.logo_url ? `<img src="${escapeHtml(developer.logo_url)}" alt="" loading="lazy">` : ''}
+        <span>${escapeHtml(projectDeveloper(project))}</span>
+      </button>
+      <p>${escapeHtml(description || (
+        lang === 'ar'
+          ? 'مشروع متاح ضمن قاعدة بيانات JB الإنتاجية.'
+          : 'Available project in the JB production market database.'
+      ))}</p>
+    </div>
+
+    <div class="profile-facts">
+      <div>
+        <span>${lang === 'ar' ? 'الموقع' : 'Location'}</span>
+        <strong>${escapeHtml(projectLocation(project))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'نوع المشروع' : 'Project type'}</span>
+        <strong>${escapeHtml(text(project.project_type))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'السعر الحالي' : 'Current price'}</span>
+        <strong>${escapeHtml(availabilityPrice(project))}</strong>
+        <small>${escapeHtml(priceEvidence)}</small>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'التسليم' : 'Delivery'}</span>
+        <strong>${escapeHtml(availabilityDelivery(project))}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'المساحات المرصودة' : 'Observed areas'}</span>
+        <strong>${escapeHtml(areaText)}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'السداد' : 'Payment'}</span>
+        <strong>${escapeHtml(paymentText)}</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'درجة جاهزية البيانات' : 'Data readiness'}</span>
+        <strong>${escapeHtml(String(project.readiness_score ?? payload?.quality?.readiness_score ?? '—'))}/100</strong>
+      </div>
+      <div>
+        <span>${lang === 'ar' ? 'حالة الإنتاج' : 'Production status'}</span>
+        <strong>${escapeHtml(project.production_status || payload?.quality?.production_status || '—')}</strong>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-gold" type="button" data-project-compare="${project.id}">
+        ${comparison.some(item => item.id === project.id)
+          ? (lang === 'ar' ? '✓ موجود في المقارنة' : '✓ In comparison')
+          : (lang === 'ar' ? 'أضف للمقارنة' : 'Add to comparison')}
+      </button>
+
+      <a class="btn btn-outline-dark" href="#finder" data-project-consult="${project.id}">
+        ${lang === 'ar' ? 'اطلب استشارة من JB' : 'Ask JB about this project'}
+      </a>
+
+      ${
+        project.website_url
+          ? `<a class="btn btn-navy"
+                href="${escapeHtml(project.website_url)}"
+                target="_blank" rel="noopener">
+                ${lang === 'ar' ? 'المصدر الرسمي' : 'Official source'}
+             </a>`
+          : ''
+      }
+    </div>
+  `, {
+    type: 'project',
+    id,
+    parentDeveloperId: backDeveloperId
+  }, false);
+}
+
+document.addEventListener('click', event => {
+  const backButton = event.target.closest('[data-modal-back]');
+  const developerButton = event.target.closest('[data-developer-profile]');
+  const projectButton = event.target.closest('[data-project-profile]');
+  const compareButton = event.target.closest('[data-project-compare]');
+  const consultButton = event.target.closest('[data-project-consult]');
+
+  if (backButton) {
+    modalBack();
+    return;
+  }
+
+  if (developerButton) {
+    const parentState = modalHistory[modalHistory.length - 1];
+    showDeveloperProfile(developerButton.dataset.developerProfile, true);
+  }
+
+  if (projectButton) {
+    const parentDeveloperId =
+      projectButton.dataset.parentDeveloper ||
+      modalHistory.findLast?.(state => state.type === 'developer')?.id ||
+      null;
+
+    showProjectProfile(projectButton.dataset.projectProfile, parentDeveloperId, true);
+  }
+
+  if (compareButton) {
+    toggleComparison(compareButton.dataset.projectCompare);
+  }
+
+  if (consultButton) {
+    closeModal();
+    setTimeout(() => document.getElementById('finder')?.scrollIntoView({behavior:'smooth'}), 50);
+  }
+});
+
+/* =========================================================
+   COMPARISON — MAXIMUM 3 PROJECTS
+   ========================================================= */
+
+async function toggleComparison(id) {
+  const project = projects.find(item => item.id === id);
+
+  if (!project) return;
+
+  const exists = comparison.some(item => item.id === id);
+
+  if (exists) {
+    comparison = comparison.filter(item => item.id !== id);
+  } else {
+    if (comparison.length >= 3) {
+      alert(
+        lang === 'ar'
+          ? 'يمكنك مقارنة 3 مشروعات كحد أقصى.'
+          : 'You can compare a maximum of 3 projects.'
+      );
+      return;
+    }
+
+    comparison.push(project);
+  }
+
+  if (comparison.length) {
+    try {
+      const rows = await supabaseRpc('jb_compare_projects_v1', {
+        p_slugs: comparison.map(item => item.slug)
+      });
+
+      if (Array.isArray(rows) && rows.length) {
+        comparison = rows
+          .map(row => {
+            const local = projects.find(item => item.slug === row.slug);
+            return local
+              ? {
+                  ...local,
+                  starting_price: row.display_starting_price ?? local.starting_price,
+                  display_starting_price: row.display_starting_price ?? local.display_starting_price,
+                  completion_year: row.completion_year ?? local.completion_year,
+                  delivery_date: row.delivery_date ?? local.delivery_date,
+                  min_down_payment_percentage:
+                    row.min_down_payment_percentage ?? local.min_down_payment_percentage,
+                  max_installment_years:
+                    row.max_installment_years ?? local.max_installment_years,
+                  readiness_score: row.readiness_score ?? local.readiness_score,
+                  production_status: row.production_status ?? local.production_status
+                }
+              : null;
+          })
+          .filter(Boolean);
+      }
+    } catch (error) {
+      console.warn('Compare RPC fallback:', error);
+    }
+  }
+
+  renderProjects();
+  renderComparison();
+
+  const modal = document.getElementById('profileModal');
+
+  if (modal && !modal.hidden) {
+    showProjectProfile(id);
+  }
+}
+
+function renderComparison() {
+  const preview = document.getElementById('comparePreview');
+  const status = document.getElementById('compareStatus');
+  const clearButton = document.getElementById('clearComparison');
+
+  if (!preview) return;
+
+  if (!comparison.length) {
+    preview.innerHTML = `
+      <div class="compare-empty">
+        ${lang === 'ar'
+          ? 'لم تختر أي مشروعات للمقارنة بعد.'
+          : 'No projects selected yet.'}
+      </div>
+    `;
+
+    if (status) {
+      status.textContent =
+        lang === 'ar'
+          ? 'اختر حتى 3 مشروعات باستخدام زر مقارنة داخل بطاقة المشروع.'
+          : 'Select up to 3 projects using the Compare button on project cards.';
+    }
+
+    if (clearButton) clearButton.hidden = true;
+
+    return;
+  }
+
+  const columns = comparison.length;
+
+  const header = comparison
+    .map(project => `<span>${escapeHtml(projectName(project))}</span>`)
+    .join('');
+
+  const row = (labelEn, labelAr, valueGetter) => `
+    <div class="compare-row compare-row-dynamic" style="grid-template-columns:1.25fr repeat(${columns},1fr)">
+      <span class="compare-criteria">${lang === 'ar' ? labelAr : labelEn}</span>
+      ${comparison.map(project => `<span>${valueGetter(project)}</span>`).join('')}
+    </div>
+  `;
+
+  preview.innerHTML = `
+    <div class="compare-row head compare-row-dynamic"
+         style="grid-template-columns:1.25fr repeat(${columns},1fr)">
+      <span>${lang === 'ar' ? 'المعيار' : 'Criteria'}</span>
+      ${header}
+    </div>
+
+    ${row(
+      'Developer',
+      'المطور',
+      project => escapeHtml(projectDeveloper(project))
+    )}
+
+    ${row(
+      'Location',
+      'الموقع',
+      project => escapeHtml(projectLocation(project))
+    )}
+
+    ${row(
+      'Project type',
+      'نوع المشروع',
+      project => escapeHtml(text(project.project_type))
+    )}
+
+    ${row(
+      'Starting price',
+      'السعر المبدئي',
+      project => escapeHtml(formatMoney(project.display_starting_price ?? project.starting_price, project.currency))
+    )}
+
+    ${row(
+      'Delivery',
+      'التسليم',
+      project => escapeHtml(availabilityDelivery(project))
+    )}
+
+    ${row(
+      'Verification',
+      'التحقق',
+      project => escapeHtml(project.verification_status || '—')
+    )}
+  `;
+
+  if (status) {
+    status.textContent =
+      lang === 'ar'
+        ? `تم اختيار ${comparison.length} من 3 مشروعات.`
+        : `${comparison.length} of 3 projects selected.`;
+  }
+
+  if (clearButton) {
+    clearButton.hidden = false;
+    clearButton.textContent =
+      lang === 'ar' ? 'مسح المقارنة' : 'Clear comparison';
+  }
+}
+
+document.getElementById('clearComparison')?.addEventListener('click', () => {
+  comparison = [];
+  renderProjects();
+  renderComparison();
+});
+
+
+/* =========================================================
+   PROPERTY FINDER V3
+   Preliminary shortlist + consent-based lead capture
+   ========================================================= */
+
+const finderForm = document.getElementById('finderForm');
+let currentSearchProfile = null;
+let currentShortlist = [];
+
+function getFinderValues() {
+  return {
+    location: document.getElementById('location')?.value || '',
+    budget: document.getElementById('budget')?.value || '',
+    type: document.getElementById('type')?.value || '',
+    purpose: document.getElementById('purpose')?.value || '',
+    delivery: document.getElementById('delivery')?.value || '',
+    payment: document.getElementById('payment')?.value || '',
+    bedrooms: document.getElementById('bedrooms')?.value || '',
+    timeline: document.getElementById('timeline')?.value || ''
+  };
+}
+
+function calculateReadiness(values) {
+  const filled = Object.values(values).filter(Boolean).length;
+  let readiness = Math.round((filled / 8) * 60);
+
+  if (values.timeline === 'now') readiness += 25;
+  else if (values.timeline === '3months') readiness += 20;
+  else if (values.timeline === '6months') readiness += 12;
+  else if (values.timeline === 'later') readiness += 5;
+
+  if (values.budget) readiness += 10;
+  if (values.payment) readiness += 5;
+
+  return Math.min(readiness, 100);
+}
+
+function normalizeUnitType(value = '') {
+  const key = String(value).trim().toLowerCase();
+
+  const aliases = {
+    'apartment': ['apartment'],
+    'chalet': ['chalet'],
+    'villa': ['villa'],
+    'twin house': ['twin-house', 'twin house'],
+    'townhouse': ['townhouse', 'town house'],
+    'duplex': ['duplex'],
+    'commercial': ['commercial', 'office', 'clinic', 'retail', 'shop']
+  };
+
+  return aliases[key] || [key];
+}
+
+function projectMatchesUnitType(project, selectedType) {
+  if (!selectedType) return true;
+
+  const wanted = normalizeUnitType(selectedType);
+  const linkedTypes = projectPropertyTypeMap.get(project.id) || [];
+
+  const linkedValues = linkedTypes.flatMap(type => [
+    String(type.slug || '').toLowerCase(),
+    String(type.name_en || '').toLowerCase(),
+    String(type.name_ar || '').toLowerCase()
+  ]);
+
+  if (wanted.some(value => linkedValues.includes(value))) {
+    return true;
+  }
+
+  // Fallback for commercial/mixed-use projects whose detailed unit-type
+  // rows have not yet been enriched.
+  const broadProjectType = String(project.project_type || '').toLowerCase();
+
+  if (selectedType === 'Commercial') {
+    return broadProjectType.includes('commercial') ||
+           broadProjectType.includes('mixed use') ||
+           broadProjectType.includes('mixed-use') ||
+           broadProjectType.includes('medical') ||
+           broadProjectType.includes('office');
+  }
+
+  // If detailed unit data is absent, do not falsely claim a residential
+  // project matches a specific unit type.
+  return false;
+}
+
+
+function finderBudgetRange(value) {
+  return {
+    under5: [0, 5000000],
+    '5to10': [5000000, 10000000],
+    '10to20': [10000000, 20000000],
+    '20plus': [20000000, Infinity]
+  }[value] || null;
+}
+
+function finderProjectPrice(project) {
+  const price = Number(
+    project.display_starting_price ??
+    project.starting_price ??
+    0
   );
-}
 
-.hero-content{
-  position:relative;
-  z-index:2;
-  color:#fff;
-  max-width:760px;
-  padding:110px 0;
-}
-
-.eyebrow{
-  letter-spacing:.22em;
-  font-size:12px;
-  font-weight:700;
-  color:var(--gold2);
-  text-transform:uppercase;
-}
-
-.eyebrow.dark{color:#9b7a16}
-
-.hero h1{
-  font-size:clamp(42px,7vw,76px);
-  line-height:1.05;
-  margin:18px 0;
-}
-
-.hero p{
-  font-size:19px;
-  color:#e5e8ed;
-  max-width:680px;
-}
-
-.hero-actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin:30px 0;
-}
-
-.hero-note{
-  color:#d4af37;
-  font-size:13px;
-}
-
-.section{padding:92px 0}
-
-.section-head{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:25px;
-  margin-bottom:38px;
-}
-
-.section-head.center{
-  display:block;
-  text-align:center;
-  max-width:780px;
-  margin:0 auto 40px;
-}
-
-.section-head h2,.split h2{
-  font-size:clamp(30px,4vw,48px);
-  line-height:1.15;
-  margin:8px 0 12px;
-}
-
-.section-head p,.split p{
-  color:var(--muted);
-  margin:0;
-}
-
-.dynamic-count{
-  color:var(--muted);
-  margin-top:8px;
-  font-size:14px;
-}
-
-.section-action{margin-top:28px}
-
-.finder{background:var(--soft)}
-
-.finder-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  background:#fff;
-  padding:24px;
-  border-radius:24px;
-  box-shadow:var(--shadow);
-}
-
-label{
-  display:grid;
-  gap:7px;
-  font-size:13px;
-  font-weight:700;
-}
-
-select,input{
-  width:100%;
-  height:50px;
-  border:1px solid #d8dce3;
-  border-radius:12px;
-  padding:0 14px;
-  background:#fff;
-  font:inherit;
-  color:var(--ink);
-}
-
-.finder-submit{
-  width:100%;
-  align-self:end;
-}
-
-.finder-result{
-  margin-top:18px;
-  background:var(--navy);
-  color:#fff;
-  padding:24px;
-  border-radius:16px;
-}
-
-.finder-result-content{
-  display:grid;
-  gap:14px;
-}
-
-.finder-result-label{
-  color:var(--gold2);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:.14em;
-}
-
-.finder-result-content h3{
-  margin:0;
-  font-size:28px;
-}
-
-.finder-result-content p{
-  color:#cbd2db;
-  margin:0;
-}
-
-.readiness-score{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.readiness-score strong{
-  display:grid;
-  place-items:center;
-  width:86px;
-  height:86px;
-  border:2px solid var(--gold);
-  border-radius:50%;
-  color:var(--gold2);
-  font-size:24px;
-}
-
-.finder-result-next{
-  padding:14px 16px;
-  border:1px solid rgba(212,175,55,.3);
-  background:rgba(212,175,55,.08);
-  border-radius:12px;
-}
-
-.finder-shortlist{
-  display:grid;
-  gap:10px;
-  margin-top:4px;
-}
-
-.finder-shortlist-item{
-  width:100%;
-  text-align:left;
-  border:1px solid rgba(212,175,55,.25);
-  border-radius:12px;
-  background:rgba(255,255,255,.04);
-  color:#fff;
-  padding:14px 16px;
-  cursor:pointer;
-  font:inherit;
-}
-
-body[dir="rtl"] .finder-shortlist-item{text-align:right}
-
-.finder-shortlist-item strong{
-  display:block;
-  color:var(--gold2);
-}
-
-.finder-shortlist-item span{
-  display:block;
-  color:#cbd2db;
-  font-size:13px;
-  margin-top:4px;
-}
-
-.dark-section{
-  background:var(--navy);
-  color:#fff;
-}
-
-.split{
-  display:grid;
-  grid-template-columns:1.05fr .95fr;
-  gap:70px;
-  align-items:center;
-}
-
-.dark-section p{color:#cbd2db}
-
-.value-cards{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.value-cards article{
-  padding:22px;
-  border:1px solid rgba(212,175,55,.25);
-  border-radius:18px;
-  background:rgba(255,255,255,.035);
-}
-
-.value-cards b{color:var(--gold2)}
-.value-cards h3{margin:8px 0}
-.value-cards p{font-size:14px;margin:0}
-
-.text-link{
-  color:var(--gold);
-  font-weight:700;
-  text-decoration:none;
-}
-
-.dark-section .text-link{color:var(--gold2)}
-
-.cards-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
-}
-
-.dynamic-project-grid .data-loading,
-.dynamic-project-grid .data-error,
-.dynamic-project-grid .data-empty{
-  grid-column:1/-1;
-}
-
-.project-card{
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  overflow:hidden;
-  background:#fff;
-  box-shadow:0 10px 30px rgba(13,27,42,.06);
-}
-
-.dynamic-project-card{
-  display:flex;
-  flex-direction:column;
-}
-
-.project-image{
-  height:210px;
-  background:linear-gradient(135deg,#134670,#244363);
-  position:relative;
-}
-
-.project-image:after{
-  content:"JB";
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  color:rgba(212,175,55,.28);
-  font-size:90px;
-  font-weight:700;
-}
-
-.dynamic-project-image{
-  background-size:cover;
-  background-position:center;
-}
-
-.card-body{
-  padding:22px;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-}
-
-.tag{
-  font-size:10px;
-  letter-spacing:.14em;
-  color:#8a6d16;
-  font-weight:700;
-}
-
-.card-body h3{
-  font-size:25px;
-  margin:8px 0 3px;
-}
-
-.card-body p{
-  color:var(--muted);
-  font-size:14px;
-}
-
-.project-card-topline{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.project-location{
-  color:var(--muted);
-  font-size:11px;
-}
-
-.project-developer{
-  margin:0 0 14px;
-  font-weight:600;
-}
-
-.project-meta{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:auto;
-}
-
-.project-meta span{
-  background:var(--soft);
-  border-radius:999px;
-  padding:7px 10px;
-  font-size:11px;
-  color:var(--ink);
-}
-
-.project-card-actions{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-top:18px;
-}
-
-.text-button{
-  border:0;
-  background:transparent;
-  padding:0;
-  color:var(--gold);
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.compare-chip{
-  border:1px solid #d8dce3;
-  background:#fff;
-  color:var(--ink);
-  border-radius:999px;
-  padding:7px 10px;
-  font:inherit;
-  font-size:11px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.compare-chip.is-selected{
-  border-color:var(--gold);
-  background:#fbf6df;
-}
-
-.light-gold{background:#fbfaf5}
-
-.developer-search{
-  display:flex;
-  max-width:760px;
-  margin:auto;
-  gap:10px;
-}
-
-.developer-row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:28px;
-}
-
-.developer-pill{
-  padding:14px 18px;
-  background:#fff;
-  border:1px solid #eadfbd;
-  border-radius:999px;
-  font-weight:700;
-}
-
-.developer-pill span{
-  font-size:11px;
-  color:#8c7a4a;
-  margin-left:8px;
-}
-
-.developer-pill-button{
-  cursor:pointer;
-  font:inherit;
-  color:var(--ink);
-}
-
-.compare-status{
-  text-align:center;
-  color:var(--muted);
-  margin-bottom:18px;
-}
-
-.compare-preview{
-  border:1px solid var(--line);
-  border-radius:18px;
-  overflow:auto;
-  margin-bottom:28px;
-  background:#fff;
-}
-
-.compare-empty{
-  padding:34px;
-  text-align:center;
-  color:var(--muted);
-}
-
-.compare-row{
-  display:grid;
-  grid-template-columns:1.5fr repeat(3,1fr);
-  min-width:720px;
-}
-
-.compare-row-dynamic{
-  min-width:640px;
-}
-
-.compare-row span{
-  padding:16px;
-  border-bottom:1px solid var(--line);
-  border-right:1px solid var(--line);
-}
-
-.compare-row.head{
-  background:var(--navy);
-  color:#fff;
-  font-weight:700;
-}
-
-.compare-row:last-child span{border-bottom:0}
-
-.compare-criteria{
-  font-weight:700;
-  background:#fbfaf5;
-}
-
-.international{
-  background:linear-gradient(135deg,var(--navy2),var(--navy));
-  color:#fff;
-}
-
-.international p,.international li{color:#d3d9e0}
-
-.international ul{
-  padding-left:20px;
-  margin:20px 0;
-}
-
-.international-box{
-  border:1px solid rgba(212,175,55,.35);
-  border-radius:24px;
-  padding:40px;
-  background:rgba(255,255,255,.035);
-}
-
-.currency{
-  font-size:80px;
-  font-weight:700;
-  color:var(--gold2);
-  line-height:1;
-}
-
-.final-cta{background:#f8f8f6}
-.final-cta p{color:var(--muted)}
-
-.footer{
-  background:#134670;
-  color:#cbd2db;
-  padding:55px 0 20px;
-}
-
-.footer-grid{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr;
-  gap:40px;
-}
-
-.footer-logo{
-  width:130px;
-  height:90px;
-  object-fit:contain;
-}
-
-.footer h4{color:#fff;margin-top:0}
-
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,.1);
-  margin-top:35px;
-  padding-top:18px;
-  font-size:12px;
-  color:#8d98a6;
-}
-
-.center{text-align:center}
-
-.data-loading,
-.data-error,
-.data-empty{
-  border:1px dashed #d8dce3;
-  border-radius:16px;
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-  background:#fff;
-}
-
-
-/* PROFILE MODAL */
-
-.profile-modal{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:grid;
-  place-items:center;
-  padding:24px;
-}
-
-.profile-modal[hidden]{display:none}
-
-.profile-modal-backdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(7,19,33,.78);
-  backdrop-filter:blur(6px);
-}
-
-.profile-modal-card{
-  position:relative;
-  z-index:1;
-  width:min(900px,96vw);
-  max-height:88vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:24px;
-  padding:36px;
-  box-shadow:0 30px 80px rgba(0,0,0,.28);
-}
-
-.profile-modal-close{
-  position:absolute;
-  top:14px;
-  right:16px;
-  width:40px;
-  height:40px;
-  border:0;
-  border-radius:50%;
-  background:var(--soft);
-  color:var(--navy);
-  font-size:24px;
-  cursor:pointer;
-}
-
-body[dir="rtl"] .profile-modal-close{
-  right:auto;
-  left:16px;
-}
-
-.profile-heading h2{
-  font-size:clamp(30px,5vw,48px);
-  line-height:1.1;
-  margin:8px 0 12px;
-}
-
-.profile-heading p{
-  color:var(--muted);
-}
-
-.profile-project-developer{
-  font-weight:700;
-  color:#8a6d16!important;
-}
-
-.profile-facts{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin:26px 0;
-}
-
-.profile-facts>div{
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-}
-
-.profile-facts span{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  margin-bottom:6px;
-}
-
-.profile-facts strong{
-  display:block;
-  font-size:15px;
-}
-
-.profile-subtitle{
-  margin-top:30px;
-}
-
-.profile-project-list{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:24px;
-}
-
-.profile-project-link{
-  text-align:left;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#fff;
-  padding:14px;
-  cursor:pointer;
-  font:inherit;
-}
-
-body[dir="rtl"] .profile-project-link{text-align:right}
-
-.profile-project-link span{
-  display:block;
-  font-weight:700;
-}
-
-.profile-project-link small{
-  display:block;
-  color:var(--muted);
-  margin-top:3px;
-}
-
-.profile-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:24px;
-}
-
-.profile-source-link{margin-top:8px}
-
-
-/* RTL */
-
-body[dir="rtl"] .nav-actions{margin-right:auto}
-body[dir="rtl"] .developer-pill span{
-  margin-left:0;
-  margin-right:8px;
-}
-body[dir="rtl"] .international ul{
-  padding-left:0;
-  padding-right:20px;
-}
-body[dir="rtl"] .compare-row span{
-  border-right:0;
-  border-left:1px solid var(--line);
-}
-
-
-/* RESPONSIVE */
-
-@media(max-width:900px){
-  .main-nav{display:none}
-  .nav-actions{margin-left:auto}
-  body[dir="rtl"] .nav-actions{
-    margin-left:0;
-    margin-right:auto;
+  if (!price) {
+    return { price: null, sourceClass: 'unavailable' };
   }
 
-  .hero{min-height:650px}
-
-  .finder-grid{
-    grid-template-columns:1fr 1fr;
+  if (
+    project.price_evidence_type === 'OFFICIAL_PRICE' ||
+    project.official_starting_price
+  ) {
+    return { price, sourceClass: 'official' };
   }
 
-  .cards-3,.split,.footer-grid{
-    grid-template-columns:1fr;
+  return { price, sourceClass: 'market_reference' };
+}
+
+function finderDeliveryYear(project) {
+  if (project.completion_year) return Number(project.completion_year);
+
+  if (project.delivery_date) {
+    const year = new Date(project.delivery_date).getFullYear();
+    return Number.isFinite(year) ? year : null;
   }
 
-  .value-cards{
-    grid-template-columns:1fr;
+  return null;
+}
+
+function finderMatchDecorate(project, values) {
+  let score = 0;
+  const reasons = [];
+  const gaps = [];
+
+  if (values.location) {
+    const loc = `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+
+    if (loc.includes(values.location.toLowerCase())) {
+      score += 30;
+      reasons.push(lang === 'ar' ? '✓ الموقع مطابق' : '✓ Location matches');
+    }
+  } else {
+    score += 15;
   }
 
-  .section-head{display:block}
-
-  .section-head .text-link{
-    display:inline-block;
-    margin-top:12px;
+  if (values.type) {
+    if (projectMatchesUnitType(project, values.type)) {
+      score += 25;
+      reasons.push(lang === 'ar' ? '✓ نوع الوحدة مطابق' : '✓ Unit type matches');
+    }
+  } else {
+    score += 12;
   }
 
-  .brand img{width:72px}
+  const pricing = finderProjectPrice(project);
+  const range = finderBudgetRange(values.budget);
 
-  .hero-content{padding:90px 0}
+  if (values.budget && range) {
+    if (pricing.price) {
+      if (pricing.price >= range[0] && pricing.price <= range[1]) {
+        score += pricing.sourceClass === 'official' ? 20 : 17;
 
-  .profile-facts{
-    grid-template-columns:1fr 1fr;
+        reasons.push(
+          pricing.sourceClass === 'official'
+            ? (lang === 'ar'
+                ? '✓ السعر الرسمي داخل الميزانية'
+                : '✓ Official price fits budget')
+            : (lang === 'ar'
+                ? '✓ المرجع السوقي داخل الميزانية'
+                : '✓ Market reference fits budget')
+        );
+      }
+    } else {
+      gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
+    }
+  } else if (pricing.price) {
+    score += 10;
+  } else {
+    score += 4;
+    gaps.push(lang === 'ar' ? 'السعر قيد التحقق' : 'Price under verification');
+  }
+
+  if (values.delivery) {
+    const y = finderDeliveryYear(project);
+    const currentYear = new Date().getFullYear();
+
+    if (y) {
+      let ok = false;
+
+      if (values.delivery === 'Ready') {
+        ok = y <= currentYear;
+      } else if (values.delivery === '1-3') {
+        ok = y > currentYear && y <= currentYear + 3;
+      } else if (values.delivery === '3plus') {
+        ok = y > currentYear + 3;
+      }
+
+      if (ok) {
+        score += 10;
+        reasons.push(lang === 'ar' ? '✓ التسليم متوافق' : '✓ Delivery matches');
+      }
+    } else {
+      gaps.push(lang === 'ar'
+        ? 'موعد التسليم قيد التحقق'
+        : 'Delivery under verification');
+    }
+  } else {
+    score += 5;
+  }
+
+  const projectType = String(project.project_type || '').toLowerCase();
+
+  if (values.purpose === 'Investment') {
+    if (projectType) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ نوع المشروع مناسب للتقييم الاستثماري'
+        : '✓ Project type is investment-relevant');
+    }
+  } else if (values.purpose === 'Personal use') {
+    if (
+      projectType.includes('residential') ||
+      projectType.includes('coastal') ||
+      projectType.includes('mixed')
+    ) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ مناسب للاستخدام الشخصي'
+        : '✓ Suitable for personal use');
+    }
+  } else if (values.purpose === 'Both') {
+    score += 5;
+  } else {
+    score += 3;
+  }
+
+  if (project.verification_status === 'verified') {
+    score += 5;
+    reasons.push(lang === 'ar' ? '✓ مشروع موثّق' : '✓ Verified project');
+  }
+
+  if (project.production_status === 'PRODUCTION_READY') {
+    score += 5;
+  }
+
+  if (values.payment === 'low-down') {
+    if (
+      project.min_down_payment_percentage !== null &&
+      project.min_down_payment_percentage !== undefined &&
+      Number(project.min_down_payment_percentage) <= 10
+    ) {
+      score += 5;
+      reasons.push(lang === 'ar' ? '✓ مقدم منخفض' : '✓ Low down payment');
+    } else if (
+      project.min_down_payment_percentage === null ||
+      project.min_down_payment_percentage === undefined
+    ) {
+      gaps.push(lang === 'ar'
+        ? 'بيانات المقدم قيد التحقق'
+        : 'Down payment under verification');
+    }
+  } else if (values.payment === 'long-plan') {
+    if (Number(project.max_installment_years || 0) >= 7) {
+      score += 5;
+      reasons.push(lang === 'ar'
+        ? '✓ فترة سداد طويلة'
+        : '✓ Long payment plan');
+    } else if (!project.max_installment_years) {
+      gaps.push(lang === 'ar'
+        ? 'مدة السداد قيد التحقق'
+        : 'Payment term under verification');
+    }
+  }
+
+  return {
+    score: Math.min(100, Math.max(0, Math.round(score))),
+    reasons,
+    gaps
+  };
+}
+
+function enrichFinderMatches(list, values) {
+  return list
+    .map(project => ({
+      ...project,
+      _match: finderMatchDecorate(project, values)
+    }))
+    .sort((a, b) => {
+      const aKnown = finderProjectPrice(a).price ? 1 : 0;
+      const bKnown = finderProjectPrice(b).price ? 1 : 0;
+
+      if (aKnown !== bKnown) return bKnown - aKnown;
+      return (b._match?.score || 0) - (a._match?.score || 0);
+    });
+}
+
+function finderApiParams(values) {
+  const typeAliases = normalizeUnitType(values.type || '');
+  const primaryType =
+    values.type === 'Commercial'
+      ? null
+      : (typeAliases[0] || null);
+
+  // Keep unknown-price / unknown-delivery projects available so they can
+  // appear in the Potential Matches group instead of disappearing.
+  return {
+    p_location: values.location || null,
+    p_budget_max: null,
+    p_property_type: primaryType,
+    p_delivery_year_max: null,
+    p_down_payment_max: null,
+    p_only_ready: false,
+    p_limit: 100,
+    p_offset: 0
+  };
+}
+
+function postFilterFinderResults(list, values) {
+  const currentYear = new Date().getFullYear();
+  const range = finderBudgetRange(values.budget);
+
+  return list.filter(project => {
+    const pricing = finderProjectPrice(project);
+    const deliveryYear = finderDeliveryYear(project);
+
+    // Known price outside budget = exclude.
+    // Unknown price = keep as potential match.
+    if (range && pricing.price) {
+      if (pricing.price < range[0] || pricing.price > range[1]) {
+        return false;
+      }
+    }
+
+    // Known delivery conflict = exclude.
+    // Unknown delivery = keep and mark for verification.
+    if (values.delivery && deliveryYear) {
+      if (values.delivery === 'Ready' && deliveryYear > currentYear) {
+        return false;
+      }
+
+      if (
+        values.delivery === '1-3' &&
+        (deliveryYear <= currentYear || deliveryYear > currentYear + 3)
+      ) {
+        return false;
+      }
+
+      if (
+        values.delivery === '3plus' &&
+        deliveryYear <= currentYear + 3
+      ) {
+        return false;
+      }
+    }
+
+    if (
+      values.payment === 'long-plan' &&
+      project.max_installment_years &&
+      Number(project.max_installment_years) < 7
+    ) {
+      return false;
+    }
+
+    if (
+      values.payment === 'low-down' &&
+      project.min_down_payment_percentage !== null &&
+      project.min_down_payment_percentage !== undefined &&
+      Number(project.min_down_payment_percentage) > 10
+    ) {
+      return false;
+    }
+
+    if (
+      values.type === 'Commercial' &&
+      !projectMatchesUnitType(project, 'Commercial')
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+async function shortlistProjects(values) {
+  try {
+    const rows = await supabaseRpc(
+      'jb_search_projects_v1',
+      finderApiParams(values)
+    );
+
+    const mapped = (Array.isArray(rows) ? rows : [])
+      .map(row => {
+        const local = projects.find(project => project.slug === row.slug);
+        if (!local) return null;
+
+        return {
+          ...local,
+          starting_price: row.display_starting_price ?? local.starting_price,
+          display_starting_price: row.display_starting_price ?? local.display_starting_price,
+          completion_year: row.completion_year ?? local.completion_year,
+          delivery_date: row.delivery_date ?? local.delivery_date,
+          property_type_slugs: row.property_type_slugs || local.property_type_slugs,
+          market_min_area: row.market_min_area ?? local.market_min_area,
+          market_max_area: row.market_max_area ?? local.market_max_area,
+          min_down_payment_percentage:
+            row.min_down_payment_percentage ?? local.min_down_payment_percentage,
+          max_installment_years:
+            row.max_installment_years ?? local.max_installment_years,
+          readiness_score: row.readiness_score ?? local.readiness_score,
+          production_status: row.production_status ?? local.production_status
+        };
+      })
+      .filter(Boolean);
+
+    return enrichFinderMatches(postFilterFinderResults(mapped, values), values);
+
+  } catch (error) {
+    console.warn('Finder RPC fallback:', error);
+
+    // Safe fallback uses only the already production-filtered catalogue.
+    return enrichFinderMatches(
+      postFilterFinderResults(
+        projects.filter(project => {
+          const locationMatch = !values.location || (() => {
+            const location =
+              `${project.locations?.city || ''} ${project.locations?.area || ''}`.toLowerCase();
+            return location.includes(values.location.toLowerCase());
+          })();
+
+          const unitTypeMatch = projectMatchesUnitType(project, values.type);
+          return locationMatch && unitTypeMatch;
+        }),
+        values
+      ),
+      values
+    );
   }
 }
 
-@media(max-width:560px){
-  .nav-wrap{min-height:70px}
-  .nav-actions .btn{display:none}
+function shortlistItem(project) {
+  const match = project._match || {
+    score: 0,
+    reasons: [],
+    gaps: []
+  };
 
-  .hero h1{font-size:42px}
-  .hero p{font-size:16px}
+  const pricing = finderProjectPrice(project);
 
-  .section{padding:68px 0}
+  const priceLabel = !pricing.price
+    ? (lang === 'ar'
+        ? 'السعر قيد التحقق'
+        : 'Price under verification')
+    : pricing.sourceClass === 'official'
+      ? (lang === 'ar'
+          ? `سعر رسمي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Official price: ${formatMoney(pricing.price, project.currency || 'EGP')}`)
+      : (lang === 'ar'
+          ? `مرجع سوقي: ${formatMoney(pricing.price, project.currency || 'EGP')}`
+          : `Market reference: ${formatMoney(pricing.price, project.currency || 'EGP')}`);
 
-  .finder-grid{
-    grid-template-columns:1fr;
-    padding:16px;
-  }
+  const priceClass = !pricing.price
+    ? 'price-unknown'
+    : pricing.sourceClass === 'official'
+      ? 'price-official'
+      : 'price-market';
 
-  .developer-search{
-    flex-direction:column;
-  }
+  return `
+    <button
+      class="finder-shortlist-item matching-card ${
+        pricing.price
+          ? 'confirmed-match-card'
+          : 'potential-match-card'
+      }"
+      type="button"
+      data-project-profile="${project.id}">
 
-  .compare-row{
-    font-size:13px;
-  }
+      <span class="finder-shortlist-thumb">
+        ${
+          project.cover_image_url
+            ? `<img src="${escapeHtml(project.cover_image_url)}" alt="" loading="lazy">`
+            : `<b>${projectInitials(project)}</b>`
+        }
+      </span>
 
-  .profile-modal{
-    padding:10px;
-  }
+      <span class="finder-shortlist-copy">
+        <span class="matching-card-title">
+          <strong class="match-project-name">
+            ${escapeHtml(projectName(project))}
+          </strong>
 
-  .profile-modal-card{
-    padding:28px 20px;
-  }
+          <b class="match-score">
+            ${match.score}% ${lang === 'ar' ? 'تطابق' : 'Match'}
+          </b>
+        </span>
 
-  .profile-facts{
-    grid-template-columns:1fr;
-  }
+        <small class="match-meta">
+          ${escapeHtml(projectDeveloper(project))} · ${escapeHtml(projectLocation(project))}
+        </small>
 
-  .profile-project-list{
-    grid-template-columns:1fr;
-  }
+        <strong class="match-price ${priceClass}">
+          ${escapeHtml(priceLabel)}
+        </strong>
 
-  .project-card-actions{
-    align-items:flex-start;
-    flex-direction:column;
-  }
+        <span class="match-reasons">
+          ${match.reasons
+            .slice(0, 4)
+            .map(reason => `<em class="match-positive">${escapeHtml(reason)}</em>`)
+            .join('')}
 
-  .currency{font-size:60px}
+          ${match.gaps
+            .slice(0, 2)
+            .map(gap => `<em class="match-gap">○ ${escapeHtml(gap)}</em>`)
+            .join('')}
+        </span>
+      </span>
+    </button>
+  `;
 }
 
+async function renderFinderPreview(values, shouldScroll = true) {
+  const result = document.getElementById('finderResult');
+  if (!result) return;
+
+  const readiness = calculateReadiness(values);
+
+  result.hidden = false;
+  result.innerHTML = `
+    <div class="data-empty">
+      ${lang === 'ar'
+        ? 'جارٍ البحث في مشروعات JB المتاحة...'
+        : 'Searching JB available projects...'}
+    </div>
+  `;
+
+  currentShortlist = await shortlistProjects(values);
+  currentSearchProfile = {...values, readiness};
+
+  const confirmedMatches = currentShortlist.filter(
+    project => Boolean(finderProjectPrice(project).price)
+  );
+
+  const potentialMatches = currentShortlist.filter(
+    project => !finderProjectPrice(project).price
+  );
+
+  const confirmedPreview = confirmedMatches.slice(0, 3);
+  const remainingPreviewSlots = Math.max(0, 3 - confirmedPreview.length);
+  const potentialPreview = potentialMatches.slice(0, remainingPreviewSlots);
+
+  const shownCount = confirmedPreview.length + potentialPreview.length;
+  const hiddenCount = Math.max(0, currentShortlist.length - shownCount);
+
+  result.hidden = false;
+
+  result.innerHTML = `
+    <div class="finder-result-content finder-rich-results">
+      <div class="finder-result-head">
+        <div>
+          <span class="finder-result-label">
+            ${lang === 'ar' ? 'نتيجة أولية من JB' : 'YOUR JB PREVIEW'}
+          </span>
+
+          <h3>
+            ${lang === 'ar'
+              ? 'أفضل النتائج المتاحة حاليًا'
+              : 'Your best available matches'}
+          </h3>
+        </div>
+
+        <div class="readiness-score">
+          <strong>${readiness}%</strong>
+          <span>${lang === 'ar' ? 'اكتمال ملف البحث' : 'Search profile'}</span>
+        </div>
+      </div>
+
+      <p class="finder-result-copy">
+        ${
+          lang === 'ar'
+            ? 'نرتب المشروعات وفق متطلباتك الحالية. يظهر السعر الرسمي أولًا، ثم المرجع السوقي الموثق عند غياب السعر الرسمي. المشروعات التي تناسب الموقع ونوع الوحدة ولكن ما زال سعرها غير موثق تظهر بشكل منفصل حتى لا نفقد خيارًا محتملًا.'
+            : 'We rank projects using your current requirements. Official pricing is shown first, followed by verified market references where no official price is available. Projects that fit location and unit type but still need price verification are shown separately so a potentially suitable option is not lost.'
+        }
+      </p>
+
+      ${
+        confirmedPreview.length
+          ? `
+            <section class="match-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar' ? 'أفضل التطابقات' : 'Best Matches'}</strong>
+                <span>${lang === 'ar'
+                  ? 'السعر معروف ومتوافق مع معايير البحث المختارة'
+                  : 'Known price and budget-aligned'}</span>
+              </div>
+
+              <div class="finder-shortlist rich-finder-list">
+                ${confirmedPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
+
+      ${
+        potentialPreview.length
+          ? `
+            <section class="match-group potential-group">
+              <div class="match-group-head">
+                <strong>${lang === 'ar'
+                  ? 'خيارات محتملة — تحتاج تحقق السعر'
+                  : 'Potential Matches — Price Verification Needed'}</strong>
+
+                <span>${lang === 'ar'
+                  ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي يحتاج تحققًا إضافيًا'
+                  : 'Location and unit type fit, but current price still needs verification'}</span>
+              </div>
+
+              <div class="finder-shortlist rich-finder-list">
+                ${potentialPreview.map(shortlistItem).join('')}
+              </div>
+            </section>
+          `
+          : ''
+      }
+
+      ${
+        !shownCount
+          ? `<div class="data-empty">${
+              lang === 'ar'
+                ? 'لا توجد نتائج منشورة مطابقة لهذه المتطلبات حاليًا.'
+                : 'No published projects currently match these requirements.'
+            }</div>`
+          : ''
+      }
+
+      ${
+        hiddenCount > 0
+          ? `<div class="shortlist-locked">
+              <strong>${lang === 'ar'
+                ? `هناك ${hiddenCount} نتيجة إضافية`
+                : `${hiddenCount} more results available`}</strong>
+
+              <span>${lang === 'ar'
+                ? 'أدخل بيانات التواصل للحصول على القائمة الكاملة وحفظ ملف البحث.'
+                : 'Add your contact details to unlock the full shortlist and save this search.'}</span>
+            </div>`
+          : ''
+      }
+
+      <form id="leadCaptureForm" class="lead-capture-form">
+        <div class="lead-capture-heading">
+          <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
+          <span>${lang === 'ar'
+            ? 'أخبرنا بتفضيلاتك حتى نرشح لك الأنسب الآن ولاحقًا.'
+            : 'Tell us your preferences so JB can recommend the best fit now and later.'}</span>
+        </div>
+
+        <div class="lead-capture-grid">
+          <label>
+            <span>${lang === 'ar' ? 'الاسم' : 'Name'}</span>
+            <input id="leadName" name="full_name" required autocomplete="name">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'رقم الهاتف' : 'Phone number'}</span>
+            <input id="leadPhone" name="phone" required autocomplete="tel">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'رقم واتساب' : 'WhatsApp number'}</span>
+            <input id="leadWhatsapp" name="whatsapp_phone" autocomplete="tel"
+              placeholder="${lang === 'ar' ? 'اتركه فارغًا إذا كان نفس الهاتف' : 'Leave blank if same as phone'}">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'البريد الإلكتروني (اختياري)' : 'Email (optional)'}</span>
+            <input id="leadEmail" name="email" type="email" autocomplete="email">
+          </label>
+        </div>
+
+        <label class="lead-inline-check">
+          <input id="leadWhatsappSame" type="checkbox" checked>
+          <span>${lang === 'ar' ? 'رقم واتساب هو نفس رقم الهاتف' : 'WhatsApp is the same as my phone number'}</span>
+        </label>
+
+        <div class="preference-panel">
+          <strong>${lang === 'ar' ? 'كيف تفضل أن نتواصل معك؟' : 'How would you like us to contact you?'}</strong>
+          <div class="contact-methods">
+            <label><input class="leadContactMethod" type="checkbox" value="whatsapp" checked> <span>${lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span></label>
+            <label><input class="leadContactMethod" type="checkbox" value="phone"> <span>${lang === 'ar' ? 'اتصال هاتفي' : 'Phone call'}</span></label>
+            <label><input class="leadContactMethod" type="checkbox" value="email"> <span>${lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</span></label>
+          </div>
+        </div>
+
+        <div class="lead-capture-grid preference-grid">
+          <label>
+            <span>${lang === 'ar' ? 'طريقة الدفع المناسبة' : 'Preferred payment method'}</span>
+            <select id="leadPaymentMethod">
+              <option value="flexible">${lang === 'ar' ? 'مرن — حسب أفضل عرض' : 'Flexible — best available option'}</option>
+              <option value="installments">${lang === 'ar' ? 'تقسيط' : 'Installments'}</option>
+              <option value="cash">${lang === 'ar' ? 'كاش / دفعة قوية' : 'Cash / strong upfront'}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'أقصى مقدم مناسب' : 'Maximum suitable down payment'}</span>
+            <select id="leadMaxDownPayment">
+              <option value="">${lang === 'ar' ? 'لا يوجد تفضيل محدد' : 'No specific preference'}</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="15">15%</option>
+              <option value="20">20%</option>
+              <option value="30">30%</option>
+              <option value="50">50%</option>
+            </select>
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'مدة التقسيط المفضلة' : 'Preferred installment term'}</span>
+            <select id="leadInstallmentYears">
+              <option value="">${lang === 'ar' ? 'لا يوجد تفضيل محدد' : 'No specific preference'}</option>
+              <option value="3">3 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="5">5 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="7">7 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="8">8 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="10">10 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'أهم أولوية لك' : 'Your top priority'}</span>
+            <select id="leadTopPriority">
+              <option value="best_value">${lang === 'ar' ? 'أفضل قيمة مقابل السعر' : 'Best value for money'}</option>
+              <option value="location">${lang === 'ar' ? 'الموقع' : 'Location'}</option>
+              <option value="payment">${lang === 'ar' ? 'سهولة السداد' : 'Payment flexibility'}</option>
+              <option value="delivery">${lang === 'ar' ? 'موعد الاستلام' : 'Delivery timing'}</option>
+              <option value="developer">${lang === 'ar' ? 'المطور' : 'Developer'}</option>
+              <option value="space">${lang === 'ar' ? 'المساحة' : 'Space'}</option>
+            </select>
+          </label>
+
+          <label class="full-span">
+            <span>${lang === 'ar' ? 'أي متطلبات أخرى؟ (اختياري)' : 'Anything else we should know? (optional)'}</span>
+            <textarea id="leadNotes" rows="3" maxlength="800"
+              placeholder="${lang === 'ar' ? 'مثال: إطلالة بحر، دور معين، استلام قريب...' : 'Example: sea view, specific floor, near delivery...'}"></textarea>
+          </label>
+        </div>
+
+        <label class="lead-inline-check">
+          <input id="leadOpenAlternatives" type="checkbox" checked>
+          <span>${lang === 'ar'
+            ? 'أنا منفتح على مشروعات أو مناطق مشابهة إذا كانت أكثر ملاءمة لاحتياجاتي.'
+            : 'I am open to similar projects or locations if they are a better fit.'}</span>
+        </label>
+
+        <label class="lead-inline-check">
+          <input id="leadAllowRecommendations" type="checkbox">
+          <span>${lang === 'ar'
+            ? 'أوافق على أن ترشح لي JB مشروعات أو وحدات أخرى مناسبة إذا توفرت لاحقًا.'
+            : 'I agree that JB may recommend other suitable projects or units if they become available later.'}</span>
+        </label>
+
+        <label class="lead-consent consent-row">
+          <input id="leadConsent" type="checkbox" required>
+          <span>${lang === 'ar'
+            ? 'أوافق على استخدام بياناتي للتواصل معي بخصوص هذا البحث العقاري عبر الوسائل التي اخترتها.'
+            : 'I agree that JB may use my details to contact me about this property search through the methods I selected.'}</span>
+        </label>
+
+        <div class="lead-capture-actions">
+          <button class="btn btn-gold" type="submit">
+            ${lang === 'ar' ? 'أرسل لي القائمة الكاملة' : 'Send My Full Shortlist'}
+          </button>
+          <span id="leadCaptureStatus" class="lead-capture-status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  `;
+
+  const whatsappSameCheckbox = document.getElementById('leadWhatsappSame');
+  const whatsappInput = document.getElementById('leadWhatsapp');
+  if (whatsappSameCheckbox?.checked && whatsappInput) {
+    whatsappInput.disabled = true;
+    whatsappInput.setAttribute('aria-disabled', 'true');
+  }
+
+  if (shouldScroll) {
+    result.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+}
+
+async function submitLeadCapture(event) {
+  event.preventDefault();
+
+  const form =
+    event.target?.closest?.('#leadCaptureForm') ||
+    event.target;
+
+  const status =
+    form?.querySelector?.('#leadCaptureStatus') ||
+    document.getElementById('leadCaptureStatus');
+
+  const submitButton =
+    form?.querySelector?.('button[type="submit"]') ||
+    null;
+
+  const name = document.getElementById('leadName')?.value.trim() || '';
+  const phone = document.getElementById('leadPhone')?.value.trim() || '';
+  const email = document.getElementById('leadEmail')?.value.trim() || '';
+  const whatsappSame = Boolean(document.getElementById('leadWhatsappSame')?.checked);
+  const whatsappRaw = document.getElementById('leadWhatsapp')?.value.trim() || '';
+  const whatsappPhone = whatsappSame ? phone : whatsappRaw;
+
+  const contactMethods = Array.from(
+    document.querySelectorAll('.leadContactMethod:checked')
+  ).map(input => input.value);
+
+  const consent = Boolean(document.getElementById('leadConsent')?.checked);
+  const allowRecommendations =
+    Boolean(document.getElementById('leadAllowRecommendations')?.checked);
+
+  const paymentMethod =
+    document.getElementById('leadPaymentMethod')?.value || 'flexible';
+
+  const maxDownPaymentRaw =
+    document.getElementById('leadMaxDownPayment')?.value || '';
+
+  const installmentYearsRaw =
+    document.getElementById('leadInstallmentYears')?.value || '';
+
+  const topPriority =
+    document.getElementById('leadTopPriority')?.value || 'best_value';
+
+  const notes = document.getElementById('leadNotes')?.value.trim() || '';
+  const openAlternatives =
+    Boolean(document.getElementById('leadOpenAlternatives')?.checked);
+
+  const customerPreferences = {
+    payment_method: paymentMethod,
+    max_down_payment_pct: maxDownPaymentRaw ? Number(maxDownPaymentRaw) : null,
+    preferred_installment_years:
+      installmentYearsRaw ? Number(installmentYearsRaw) : null,
+    top_priority: topPriority,
+    open_to_alternatives: openAlternatives,
+    notes: notes || null
+  };
+
+  if (!name || !phone || !consent || !currentSearchProfile) return;
+
+  if (!contactMethods.length) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'اختر وسيلة تواصل واحدة على الأقل.'
+        : 'Please select at least one contact method.';
+    }
+    return;
+  }
+
+  if (contactMethods.includes('email') && !email) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'أدخل البريد الإلكتروني أو ألغِ اختيار التواصل عبر البريد.'
+        : 'Enter your email or deselect Email as a contact method.';
+    }
+    return;
+  }
+
+  if (contactMethods.includes('whatsapp') && !whatsappPhone) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'أدخل رقم واتساب أو اختر أنه نفس رقم الهاتف.'
+        : 'Enter a WhatsApp number or mark it as the same as your phone.';
+    }
+    return;
+  }
+
+  if (submitButton) submitButton.disabled = true;
+
+  if (status) {
+    status.textContent = lang === 'ar'
+      ? 'جارٍ حفظ طلبك...'
+      : 'Saving your request...';
+  }
+
+  try {
+    await supabaseRpc('jb_submit_lead_v2', {
+      p_full_name: name,
+      p_phone: phone,
+      p_whatsapp_phone: whatsappPhone || null,
+      p_email: email || null,
+      p_preferred_contact_methods: contactMethods,
+      p_consent_to_contact: consent,
+      p_allow_recommendations: allowRecommendations,
+      p_consent_text_version: 'jb-web-customer-profile-v2-2026-08-24',
+      p_source: 'website_property_finder',
+      p_language: lang,
+      p_search_profile: currentSearchProfile,
+      p_customer_preferences: customerPreferences,
+      p_matched_project_ids:
+        currentShortlist.slice(0, 20).map(project => project.id),
+      p_page_path: window.location.pathname,
+      p_referrer: document.referrer || null,
+      p_user_agent: navigator.userAgent || null
+    });
+
+    const fullList = currentShortlist.slice(0, 10);
+
+    if (form) {
+      form.innerHTML = `
+        <div class="lead-success">
+          <strong>${lang === 'ar'
+            ? 'تم حفظ بحثك بنجاح.'
+            : 'Your search has been saved.'}</strong>
+          <span>${lang === 'ar'
+            ? 'يمكنك الآن مراجعة القائمة الكاملة، وسيتواصل معك فريق JB حسب وسيلة التواصل التي اخترتها.'
+            : 'You can now review the full shortlist. JB can follow up using your preferred contact method.'}</span>
+        </div>
+      `;
+    }
+
+    const resultRoot =
+      document.querySelector('#finderResult .finder-result-content');
+
+    const locked =
+      document.querySelector('#finderResult .shortlist-locked');
+
+    if (resultRoot && fullList.length) {
+      const confirmed = fullList.filter(
+        project => Boolean(finderProjectPrice(project).price)
+      );
+
+      const potential = fullList.filter(
+        project => !finderProjectPrice(project).price
+      );
+
+      resultRoot.querySelectorAll('.match-group').forEach(group => group.remove());
+
+      const groupsHtml = `
+        ${
+          confirmed.length
+            ? `
+              <section class="match-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar' ? 'أفضل التطابقات' : 'Best Matches'}</strong>
+                  <span>${lang === 'ar'
+                    ? 'السعر معروف ومتوافق مع معايير البحث المختارة'
+                    : 'Known price and budget-aligned'}</span>
+                </div>
+
+                <div class="finder-shortlist rich-finder-list">
+                  ${confirmed.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+
+        ${
+          potential.length
+            ? `
+              <section class="match-group potential-group">
+                <div class="match-group-head">
+                  <strong>${lang === 'ar'
+                    ? 'خيارات محتملة — تحتاج تحقق السعر'
+                    : 'Potential Matches — Price Verification Needed'}</strong>
+
+                  <span>${lang === 'ar'
+                    ? 'الموقع ونوع الوحدة مناسبان لكن السعر الحالي يحتاج تحققًا إضافيًا'
+                    : 'Location and unit type fit, but current price still needs verification'}</span>
+                </div>
+
+                <div class="finder-shortlist rich-finder-list">
+                  ${potential.map(shortlistItem).join('')}
+                </div>
+              </section>
+            `
+            : ''
+        }
+      `;
+
+      const resultCopy = resultRoot.querySelector('.finder-result-copy');
+      const insertPoint = locked || form;
+
+      if (insertPoint) {
+        insertPoint.insertAdjacentHTML('beforebegin', groupsHtml);
+      } else if (resultCopy) {
+        resultCopy.insertAdjacentHTML('afterend', groupsHtml);
+      } else {
+        resultRoot.insertAdjacentHTML('beforeend', groupsHtml);
+      }
+    }
+
+    if (locked) locked.remove();
+
+  } catch (error) {
+    console.error('Lead capture failed:', error);
+
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'تعذر حفظ بيانات التواصل الآن. حاول مرة أخرى بعد قليل.'
+        : 'We could not save your contact details right now. Please try again.';
+    }
+
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
+let finderBusy = false;
+
+async function runFinder(event) {
+  if (event) event.preventDefault();
+  if (finderBusy) return;
+
+  const result = document.getElementById('finderResult');
+  const button = document.getElementById('finderSubmit');
+
+  try {
+    finderBusy = true;
+    if (button) {
+      button.disabled = true;
+      button.dataset.originalText = button.textContent;
+      button.textContent = lang === 'ar' ? 'جارٍ إعداد النتائج...' : 'Building matches...';
+    }
+
+    await renderFinderPreview(getFinderValues(), true);
+  } catch (error) {
+    console.error('Finder failed:', error);
+
+    if (result) {
+      result.hidden = false;
+      result.innerHTML = `
+        <div class="finder-result-content">
+          <div class="data-error">
+            <strong>${lang === 'ar' ? 'تعذر تشغيل الباحث العقاري.' : 'The property finder could not run.'}</strong>
+            <span>${lang === 'ar'
+              ? 'أعد تحميل الصفحة وحاول مرة أخرى. إذا استمرت المشكلة سنراجع اتصال البيانات.'
+              : 'Refresh the page and try again. If the issue continues, we will check the data connection.'}</span>
+          </div>
+        </div>
+      `;
+      result.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  } finally {
+    finderBusy = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent =
+        button.dataset.originalText ||
+        (lang === 'ar' ? 'اعرض أفضل الخيارات المناسبة لي' : 'Find My Best Matches');
+    }
+  }
+}
+
+function bindFinderControls() {
+  const form = document.getElementById('finderForm');
+  const button = document.getElementById('finderSubmit');
+
+  if (form && !form.dataset.finderBound) {
+    form.dataset.finderBound = 'true';
+    form.addEventListener('submit', runFinder);
+  }
+
+  if (button && !button.dataset.finderClickBound) {
+    button.dataset.finderClickBound = 'true';
+    button.addEventListener('click', runFinder);
+  }
+}
+
+bindFinderControls();
+
+document.addEventListener('submit', event => {
+  if (event.target?.id === 'leadCaptureForm') {
+    submitLeadCapture(event);
+  }
+});
+
+document.addEventListener('change', event => {
+  if (event.target?.id === 'leadWhatsappSame') {
+    const whatsappInput = document.getElementById('leadWhatsapp');
+    if (!whatsappInput) return;
+
+    if (event.target.checked) {
+      whatsappInput.value = '';
+      whatsappInput.disabled = true;
+      whatsappInput.setAttribute('aria-disabled', 'true');
+    } else {
+      whatsappInput.disabled = false;
+      whatsappInput.removeAttribute('aria-disabled');
+      whatsappInput.focus();
+    }
+  }
+});
 
 /* =========================================================
-   JB REAL ESTATE — UI / LEAD CAPTURE V2
-   Light premium system
+   INITIALIZE
    ========================================================= */
 
-:root{
-  --navy:#134670;
-  --navy2:#1F5A84;
-  --gold:#d4af37;
-  --gold2:#e4c55d;
-  --ink:#134670;
-  --muted:#64748b;
-  --line:#e3e8ef;
-  --paper:#ffffff;
-  --warm:#f7f5ef;
-  --soft:#f4f7fa;
-}
-
-body{
-  background:#fff;
-  color:var(--ink);
-}
-
-.hero{
-  min-height:500px;
-  background:
-    radial-gradient(circle at 84% 45%, rgba(212,175,55,.13), transparent 24%),
-    linear-gradient(118deg,#134670 0%,#1F5A84 70%,#1F5A84 100%);
-}
-
-.hero-content{
-  padding:84px 0 76px;
-  max-width:820px;
-}
-
-.hero h1{
-  max-width:760px;
-}
-
-.finder.section{
-  background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);
-}
-
-.finder-grid{
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 20px 60px rgba(16,33,52,.08);
-}
-
-.finder-privacy-note{
-  margin:15px auto 0;
-  max-width:860px;
-  text-align:center;
-  font-size:13px;
-  color:var(--muted);
-}
-
-.dark-section{
-  background:var(--warm);
-  color:var(--ink);
-}
-
-.dark-section .eyebrow{
-  color:#9b7506;
-}
-
-.dark-section p{
-  color:var(--muted);
-}
-
-.dark-section .text-link{
-  color:#9b7506;
-}
-
-.value-cards article{
-  background:#fff;
-  border:1px solid #e7e1d4;
-  box-shadow:0 10px 30px rgba(16,33,52,.05);
-}
-
-.dynamic-project-card{
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 14px 38px rgba(15,31,48,.07);
-  overflow:hidden;
-}
-
-.dynamic-project-card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 20px 48px rgba(15,31,48,.12);
-}
-
-.dynamic-project-image{
-  min-height:225px;
-  position:relative;
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  overflow:hidden;
-}
-
-.dynamic-project-image.has-photo{
-  color:#fff;
-}
-
-.project-image-location{
-  position:absolute;
-  inset-inline-start:16px;
-  bottom:14px;
-  padding:7px 10px;
-  border-radius:999px;
-  background:rgba(5,18,31,.72);
-  color:#fff;
-  font-size:11px;
-  backdrop-filter:blur(8px);
-}
-
-.project-image-fallback{
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  gap:7px;
-  color:#fff;
-  background:
-    radial-gradient(circle at 22% 20%,rgba(212,175,55,.26),transparent 26%),
-    linear-gradient(135deg,#1F5A84,#134670);
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 20%,rgba(108,184,212,.35),transparent 30%),
-    linear-gradient(135deg,#1d4d68,#1F5A84);
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(212,175,55,.28),transparent 28%),
-    linear-gradient(135deg,#353b46,#134670);
-}
-
-.project-fallback-logo{
-  max-width:88px;
-  max-height:56px;
-  object-fit:contain;
-  filter:drop-shadow(0 4px 12px rgba(0,0,0,.12));
-}
-
-.project-fallback-initials{
-  font-size:42px;
-  font-weight:700;
-  letter-spacing:.04em;
-  color:var(--gold2);
-}
-
-.project-fallback-name{
-  font-size:17px;
-  font-weight:700;
-}
-
-.project-image-fallback small{
-  color:rgba(255,255,255,.72);
-}
-
-.project-price{
-  font-weight:600;
-}
-
-.profile-modal-backdrop{
-  background:rgba(11,25,39,.70);
-  backdrop-filter:blur(8px);
-}
-
-.profile-modal-card{
-  max-width:980px;
-  background:#fff;
-  box-shadow:0 30px 100px rgba(5,16,28,.28);
-}
-
-.profile-brand-row{
-  display:flex;
-  gap:22px;
-  align-items:flex-start;
-}
-
-.profile-developer-logo{
-  width:92px;
-  height:92px;
-  object-fit:contain;
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:12px;
-  background:#fff;
-}
-
-.profile-developer-monogram{
-  width:92px;
-  height:92px;
-  display:grid;
-  place-items:center;
-  border-radius:20px;
-  background:var(--navy);
-  color:var(--gold2);
-  font-size:28px;
-  font-weight:700;
-}
-
-.profile-nav-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:20px;
-  padding-inline-end:44px;
-}
-
-.profile-back{
-  border:0;
-  background:transparent;
-  color:#9b7506;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-  padding:7px 0;
-}
-
-.profile-breadcrumb{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.profile-project-hero .dynamic-project-image{
-  min-height:300px;
-  border-radius:22px;
-  margin-bottom:26px;
-}
-
-.profile-developer-button{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:0;
-  background:transparent;
-  padding:0;
-  color:#8a6706;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.profile-developer-button img{
-  width:28px;
-  height:28px;
-  object-fit:contain;
-}
-
-.btn-outline-dark{
-  border:1px solid var(--navy);
-  background:#fff;
-  color:var(--navy);
-}
-
-.lead-capture-form{
-  margin-top:22px;
-  padding:24px;
-  border-radius:20px;
-  background:#fff;
-  border:1px solid var(--line);
-  box-shadow:0 12px 35px rgba(16,33,52,.06);
-}
-
-.lead-capture-heading{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  align-items:baseline;
-  margin-bottom:18px;
-}
-
-.lead-capture-heading strong{
-  font-size:20px;
-}
-
-.lead-capture-heading span{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.lead-capture-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-}
-
-.lead-capture-grid label{
-  display:grid;
-  gap:7px;
-}
-
-.lead-capture-grid label > span{
-  font-size:12px;
-  font-weight:600;
-  color:var(--ink);
-}
-
-.lead-capture-grid input,
-.lead-capture-grid select{
-  min-height:48px;
-  border:1px solid #d7dee8;
-  border-radius:12px;
-  padding:0 13px;
-  font:inherit;
-  background:#fff;
-  color:var(--ink);
-}
-
-.consent-row{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  margin:17px 0;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.7;
-}
-
-.consent-row input{
-  margin-top:4px;
-  flex:0 0 auto;
-}
-
-.finder-result-head{
-  display:flex;
-  justify-content:space-between;
-  gap:24px;
-  align-items:flex-start;
-}
-
-.shortlist-locked{
-  margin-top:16px;
-  padding:15px 18px;
-  border:1px dashed #d7b342;
-  background:#fffaf0;
-  border-radius:14px;
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:center;
-}
-
-.shortlist-locked span{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.finder-shortlist-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.finder-shortlist-thumb{
-  width:52px;
-  height:52px;
-  border-radius:12px;
-  overflow:hidden;
-  flex:0 0 auto;
-  display:grid;
-  place-items:center;
-  background:var(--navy);
-  color:var(--gold2);
-}
-
-.finder-shortlist-thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.finder-shortlist-thumb b{
-  font-size:15px;
-}
-
-.finder-shortlist-copy{
-  display:grid;
-  gap:3px;
-  text-align:start;
-}
-
-.finder-shortlist-copy small{
-  color:var(--muted);
-}
-
-.lead-capture-status{
-  margin:10px 0 0;
-  font-size:12px;
-  color:#a74d36;
-}
-
-.lead-success{
-  display:grid;
-  gap:7px;
-  padding:7px 0;
-}
-
-.lead-success strong{
-  color:#1f6d4d;
-}
-
-@media (max-width:900px){
-  .hero{min-height:430px}
-  .hero-content{padding:62px 0}
-  .lead-capture-grid{grid-template-columns:1fr}
-  .finder-result-head,
-  .shortlist-locked,
-  .lead-capture-heading,
-  .profile-nav-row{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-  .profile-brand-row{flex-direction:column}
-}
-
-@media (max-width:600px){
-  .hero{min-height:390px}
-  .dynamic-project-image{min-height:190px}
-  .profile-project-hero .dynamic-project-image{min-height:210px}
-}
-
-
-/* =========================================================
-   JB V2 HOTFIX — Lead consent checkbox layout
-   Fixes global input width/height rules affecting checkbox.
-   ========================================================= */
-
-.lead-capture-form .consent-row{
-  display:flex;
-  flex-direction:row;
-  align-items:flex-start;
-  justify-content:flex-start;
-  gap:10px;
-  margin:18px 0;
-  width:100%;
-  min-height:0;
-  font-size:12px;
-  font-weight:400;
-  line-height:1.7;
-  color:var(--muted);
-}
-
-.lead-capture-form .consent-row input[type="checkbox"]{
-  width:18px !important;
-  height:18px !important;
-  min-width:18px;
-  min-height:18px;
-  flex:0 0 18px;
-  margin:3px 0 0;
-  padding:0;
-  border-radius:4px;
-  accent-color:var(--gold);
-  cursor:pointer;
-}
-
-.lead-capture-form .consent-row span{
-  display:block;
-  flex:1 1 auto;
-  width:auto;
-  min-width:0;
-  max-width:none;
-  color:var(--muted);
-  text-align:start;
-  white-space:normal;
-  overflow-wrap:anywhere;
-}
-
-.lead-capture-form{
-  min-height:0;
-}
-
-.lead-capture-form .btn{
-  justify-self:start;
-}
-
-[dir="rtl"] .lead-capture-form .consent-row{
-  text-align:right;
-}
-
-@media (max-width:600px){
-  .lead-capture-form{
-    padding:18px;
-  }
-
-  .lead-capture-form .consent-row{
-    font-size:11.5px;
-  }
-
-  .lead-capture-form .btn{
-    width:100%;
-    justify-content:center;
-  }
-}
-
-
-/* =========================================================
-   JB V2.1 — LIGHTER PREMIUM PALETTE
-   Same navy family, brighter and less visually heavy.
-   ========================================================= */
-
-:root{
-  --navy:#134670;
-  --navy2:#1F5A84;
-  --gold:#D6AE35;
-  --gold2:#E7C85E;
-  --ink:#17304A;
-  --muted:#6B7D90;
-  --warm:#FAF9F5;
-  --soft:#F5F8FB;
-  --line:#E3EAF0;
-}
-
-.site-header{
-  background:rgba(25,53,79,.97);
-  border-bottom-color:rgba(226,196,93,.22);
-}
-
-.hero{
-  background:
-    radial-gradient(circle at 84% 45%, rgba(231,200,94,.16), transparent 25%),
-    linear-gradient(118deg,#1F5A84 0%,#214866 65%,#2C5878 100%);
-}
-
-.hero::after{
-  opacity:.45;
-}
-
-.finder.section{
-  background:linear-gradient(180deg,#F6F9FC 0%,#FFFFFF 100%);
-}
-
-.finder-result{
-  background:linear-gradient(135deg,#234762,#2D5875);
-  border:1px solid rgba(231,200,94,.28);
-  box-shadow:0 18px 45px rgba(25,53,79,.12);
-}
-
-.finder-result-content p,
-.finder-result-next,
-.finder-shortlist-copy small{
-  color:#DCE6EE;
-}
-
-.finder-shortlist-item{
-  background:rgba(255,255,255,.055);
-  border-color:rgba(231,200,94,.28);
-}
-
-.shortlist-locked{
-  background:#FFFDF6;
-  color:var(--ink);
-  border-color:#DFC35D;
-}
-
-.shortlist-locked span{
-  color:#728195;
-}
-
-.lead-capture-form{
-  background:#FFFFFF;
-  border-color:#DCE5EC;
-  box-shadow:0 16px 38px rgba(28,61,88,.08);
-}
-
-.dark-section{
-  background:#F8F7F2;
-  color:var(--ink);
-}
-
-.value-cards article{
-  background:#FFFFFF;
-}
-
-.project-image-fallback{
-  background:
-    radial-gradient(circle at 22% 20%,rgba(231,200,94,.24),transparent 27%),
-    linear-gradient(135deg,#2D5875,#134670);
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 18%,rgba(146,207,229,.32),transparent 30%),
-    linear-gradient(135deg,#3C718C,#244C69);
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(231,200,94,.24),transparent 28%),
-    linear-gradient(135deg,#4B6174,#263E55);
-}
-
-.profile-modal-backdrop{
-  background:rgba(27,58,87,.58);
-}
-
-.footer{
-  background:#1F5A84;
-}
-
-.btn-navy{
-  background:#134670;
-  border-color:#134670;
-}
-
-.btn-navy:hover{
-  background:#1F5A84;
-  border-color:#1F5A84;
-}
-
-.compare-chip,
-.btn-outline-dark{
-  border-color:#315A78;
-  color:#134670;
-}
-
-@media (max-width:900px){
-  .site-header{
-    background:#134670;
-  }
-}
-
-
-/* =========================================================
-   JB V2.2 — GLOBAL LIGHT NAVY + CONSENT FORM FINAL FIX
-   ========================================================= */
-
-:root{
-  --navy:#134670;
-  --navy2:#1F5A84;
-  --navy3:#2D6F9B;
-  --gold:#D6AE35;
-  --gold2:#E7C85E;
-  --ink:#17304A;
-  --muted:#6B7D90;
-  --warm:#FBFAF7;
-  --soft:#F6F9FC;
-  --line:#E2EAF0;
-}
-
-/* Apply the new navy family consistently to the major dark surfaces. */
-.site-header{
-  background:#134670 !important;
-}
-
-.hero{
-  background:
-    radial-gradient(circle at 84% 45%, rgba(231,200,94,.16), transparent 25%),
-    linear-gradient(120deg,#1F5A84 0%,#1F5A84 58%,#2D6F9B 100%) !important;
-}
-
-.finder-result{
-  background:
-    linear-gradient(135deg,#1F5A84 0%,#1F5A84 100%) !important;
-}
-
-.footer,
-.cta,
-.international-box,
-.compare-row.head{
-  background:#134670;
-}
-
-.btn-navy{
-  background:#134670 !important;
-  border-color:#134670 !important;
-}
-
-.btn-navy:hover{
-  background:#1F5A84 !important;
-  border-color:#1F5A84 !important;
-}
-
-.project-image-fallback{
-  background:
-    radial-gradient(circle at 22% 20%,rgba(231,200,94,.23),transparent 27%),
-    linear-gradient(135deg,#1F5A84,#134670) !important;
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 18%,rgba(171,221,238,.28),transparent 30%),
-    linear-gradient(135deg,#2D6F9B,#1F5A84) !important;
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(231,200,94,.22),transparent 28%),
-    linear-gradient(135deg,#496B83,#1F5A84) !important;
-}
-
-.profile-developer-monogram,
-.finder-shortlist-thumb{
-  background:#134670 !important;
-}
-
-.profile-modal-backdrop{
-  background:rgba(27,58,87,.48) !important;
-}
-
-/* Keep content sections bright and premium. */
-.finder.section{
-  background:linear-gradient(180deg,#F6F9FC 0%,#FFFFFF 100%) !important;
-}
-
-.dark-section{
-  background:#FAF9F5 !important;
-  color:var(--ink) !important;
-}
-
-.lead-capture-form{
-  background:#FFFFFF !important;
-  min-height:auto !important;
-  height:auto !important;
-  padding:24px !important;
-}
-
-/* FINAL consent layout.
-   Explicit grid placement prevents the old global label/input rules
-   from pushing the checkbox to the center and squeezing the text. */
-.lead-capture-form label.consent-row{
-  display:grid !important;
-  grid-template-columns:20px minmax(0,1fr) !important;
-  column-gap:11px !important;
-  row-gap:0 !important;
-  align-items:start !important;
-  justify-content:stretch !important;
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:18px 0 20px !important;
-  padding:0 !important;
-  font-size:12px !important;
-  font-weight:400 !important;
-  line-height:1.75 !important;
-  color:var(--muted) !important;
-}
-
-html[dir="rtl"] .lead-capture-form label.consent-row{
-  direction:rtl !important;
-  grid-template-columns:20px minmax(0,1fr) !important;
-}
-
-html[dir="ltr"] .lead-capture-form label.consent-row{
-  direction:ltr !important;
-}
-
-.lead-capture-form label.consent-row > input[type="checkbox"]{
-  grid-column:1 !important;
-  width:18px !important;
-  height:18px !important;
-  min-width:18px !important;
-  min-height:18px !important;
-  max-width:18px !important;
-  max-height:18px !important;
-  margin:4px 0 0 !important;
-  padding:0 !important;
-  border-radius:4px !important;
-  align-self:start !important;
-  justify-self:start !important;
-  appearance:auto !important;
-  accent-color:var(--gold) !important;
-}
-
-.lead-capture-form label.consent-row > span{
-  grid-column:2 !important;
-  display:block !important;
-  width:100% !important;
-  min-width:0 !important;
-  max-width:none !important;
-  margin:0 !important;
-  padding:0 !important;
-  white-space:normal !important;
-  overflow-wrap:normal !important;
-  word-break:normal !important;
-  text-align:start !important;
-  color:var(--muted) !important;
-}
-
-.lead-capture-form > .btn,
-.lead-capture-form button[type="submit"]{
-  margin-top:0 !important;
-}
-
-/* Lighter result cards so the full finder area is not visually heavy. */
-.finder-shortlist-item{
-  background:rgba(255,255,255,.08) !important;
-  border-color:rgba(231,200,94,.32) !important;
-}
-
-.shortlist-locked{
-  background:#FFFDF6 !important;
-  color:var(--ink) !important;
-}
-
-@media (max-width:600px){
-  .lead-capture-form label.consent-row{
-    grid-template-columns:18px minmax(0,1fr) !important;
-    column-gap:9px !important;
-  }
-
-  .lead-capture-form label.consent-row > input[type="checkbox"]{
-    width:16px !important;
-    height:16px !important;
-    min-width:16px !important;
-    min-height:16px !important;
-    max-width:16px !important;
-    max-height:16px !important;
-  }
-}
-
-
-/* =========================================================
-   JB V2.3 — FINAL BRAND NAVY
-   User-selected primary navy: #134670
-   ========================================================= */
-
-:root{
-  --navy:#134670;
-  --navy2:#1F5A84;
-  --navy3:#2D6F9B;
-  --gold:#D6AE35;
-  --gold2:#E7C85E;
-  --ink:#16354F;
-  --muted:#6B7D90;
-  --warm:#FBFAF7;
-  --soft:#F6F9FC;
-  --line:#E2EAF0;
-}
-
-.site-header{
-  background:#134670 !important;
-}
-
-.hero{
-  background:
-    radial-gradient(circle at 84% 45%, rgba(231,200,94,.16), transparent 25%),
-    linear-gradient(120deg,#134670 0%,#1F5A84 58%,#2D6F9B 100%) !important;
-}
-
-.finder-result{
-  background:linear-gradient(135deg,#134670 0%,#1F5A84 100%) !important;
-}
-
-.footer,
-.cta,
-.international-box,
-.compare-row.head,
-.profile-developer-monogram,
-.finder-shortlist-thumb{
-  background:#134670 !important;
-}
-
-.btn-navy{
-  background:#134670 !important;
-  border-color:#134670 !important;
-}
-
-.btn-navy:hover{
-  background:#1F5A84 !important;
-  border-color:#1F5A84 !important;
-}
-
-.project-image-fallback{
-  background:
-    radial-gradient(circle at 22% 20%,rgba(231,200,94,.23),transparent 27%),
-    linear-gradient(135deg,#1F5A84,#134670) !important;
-}
-
-.project-image-fallback[data-project-kind*="Coastal"]{
-  background:
-    radial-gradient(circle at 78% 18%,rgba(171,221,238,.28),transparent 30%),
-    linear-gradient(135deg,#2D6F9B,#1F5A84) !important;
-}
-
-.project-image-fallback[data-project-kind*="Commercial"]{
-  background:
-    radial-gradient(circle at 20% 18%,rgba(231,200,94,.22),transparent 28%),
-    linear-gradient(135deg,#3A6C8F,#134670) !important;
-}
-
-.profile-modal-backdrop{
-  background:rgba(19,70,112,.45) !important;
-}
-
-
-/* =========================================================
-   JB V2.4 — HERO LIGHTENING + VISIBLE GOLD CIRCLE
-   Primary brand navy remains #134670.
-   ========================================================= */
-
-.hero{
-  background:
-    radial-gradient(circle at 82% 42%, rgba(231,200,94,.12), transparent 26%),
-    linear-gradient(120deg,#1B527B 0%,#23628C 56%,#34779C 100%) !important;
-}
-
-/* The old overlay was making the hero much darker than the chosen palette. */
-.hero-overlay{
-  background:
-    linear-gradient(
-      90deg,
-      rgba(19,70,112,.42) 0%,
-      rgba(19,70,112,.22) 50%,
-      rgba(19,70,112,.06) 100%
-    ) !important;
-}
-
-/* Make the decorative circle clearly gold and intentionally visible. */
-.hero::after{
-  right:-95px !important;
-  bottom:-145px !important;
-  width:610px !important;
-  height:610px !important;
-  border:2px solid rgba(214,174,53,.82) !important;
-  opacity:1 !important;
-  box-shadow:
-    0 0 0 30px rgba(214,174,53,.10),
-    0 0 0 62px rgba(214,174,53,.045) !important;
-}
-
-/* Add a soft gold glow around the visible arc without overpowering text. */
-.hero::before{
-  content:"";
-  position:absolute;
-  right:-40px;
-  bottom:-90px;
-  width:500px;
-  height:500px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle,
-      transparent 58%,
-      rgba(214,174,53,.12) 59%,
-      rgba(214,174,53,.035) 70%,
-      transparent 72%);
-  pointer-events:none;
-  z-index:0;
-}
-
-.hero-content{
-  position:relative;
-  z-index:2;
-}
-
-.hero-overlay{
-  z-index:1;
-}
-
-.hero::after,
-.hero::before{
-  pointer-events:none;
-}
-
-@media (max-width:900px){
-  .hero::after{
-    right:-245px !important;
-    bottom:-180px !important;
-    width:520px !important;
-    height:520px !important;
-  }
-
-  .hero::before{
-    right:-205px;
-    bottom:-130px;
-    width:430px;
-    height:430px;
-  }
-}
-
-/* ===== V3.1 Matching Engine ===== */
-/* JB V3.1 Matching Engine */
-.matching-card{align-items:flex-start!important;gap:14px!important;text-align:start!important}
-.matching-card-title{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%}
-.match-score{flex:0 0 auto;color:#E7C85E;font-size:12px;font-style:normal}
-.match-reasons{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:7px}
-.match-reasons em{font-style:normal;font-size:11px;line-height:1.5}
-.match-positive{color:#EAF6EF}.match-gap{color:#D6DEE6}
-@media(max-width:600px){.matching-card-title{align-items:flex-start;flex-direction:column;gap:4px}}
-
-/* ===== V3.4 Grouped Results ===== */
-/* =========================================================
-   JB V3.4 — Finder readability + grouped results
-   Add this block at the END of styles.css
-   ========================================================= */
-
-.finder-result-copy{
-  font-size:16px !important;
-  line-height:1.75 !important;
-  font-weight:500 !important;
-}
-
-.match-group{
-  margin-top:22px;
-}
-
-.match-group + .match-group{
-  margin-top:28px;
-}
-
-.match-group-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:18px;
-  margin:0 0 13px;
-  padding:0 2px;
-}
-
-.match-group-head strong{
-  font-size:19px;
-  line-height:1.3;
-  font-weight:800;
-  color:#fff;
-}
-
-.match-group-head span{
-  font-size:14px;
-  line-height:1.5;
-  font-weight:600;
-  color:#dce8f1;
-}
-
-.matching-card{
-  align-items:flex-start !important;
-  gap:16px !important;
-  min-height:125px;
-  padding:19px 20px !important;
-  text-align:start !important;
-}
-
-.matching-card-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  width:100%;
-}
-
-.match-project-name{
-  font-size:18px !important;
-  line-height:1.3 !important;
-  font-weight:800 !important;
-  color:#f0c94d !important;
-}
-
-.match-score{
-  flex:0 0 auto;
-  font-size:15px !important;
-  line-height:1.3 !important;
-  font-weight:800 !important;
-  color:#f0c94d !important;
-}
-
-.match-meta{
-  display:block;
-  margin-top:7px;
-  font-size:14px !important;
-  line-height:1.5 !important;
-  font-weight:600 !important;
-  color:#eef5fa !important;
-}
-
-.match-price{
-  display:block;
-  margin-top:9px;
-  font-size:15px !important;
-  line-height:1.45 !important;
-  font-weight:800 !important;
-}
-
-.price-official{
-  color:#fff !important;
-}
-
-.price-market{
-  color:#f0c94d !important;
-}
-
-.price-unknown{
-  color:#d8e1e8 !important;
-}
-
-.match-reasons{
-  display:flex !important;
-  flex-wrap:wrap;
-  gap:7px 12px;
-  margin-top:10px !important;
-}
+const yearElement = document.getElementById('year');
 
-.match-reasons em{
-  font-size:14px !important;
-  line-height:1.55 !important;
-  font-weight:600 !important;
-  font-style:normal;
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
 }
 
-.match-positive{
-  color:#fff !important;
-}
-
-.match-gap{
-  color:#d6dfe7 !important;
-}
-
-.potential-group .matching-card{
-  opacity:.94;
-  border-style:dashed !important;
-}
-
-.potential-group .match-project-name,
-.potential-group .match-score{
-  color:#f2d66f !important;
-}
-
-.shortlist-locked{
-  font-size:14px !important;
-  line-height:1.55 !important;
-}
-
-@media(max-width:700px){
-  .match-group-head{
-    align-items:flex-start;
-    flex-direction:column;
-    gap:5px;
-  }
-
-  .matching-card{
-    padding:16px !important;
-  }
-
-  .matching-card-title{
-    align-items:flex-start;
-    flex-direction:column;
-    gap:5px;
-  }
-
-  .match-project-name{
-    font-size:17px !important;
-  }
-
-  .match-score,
-  .match-meta,
-  .match-price,
-  .match-reasons em{
-    font-size:13.5px !important;
-  }
-
-  .finder-result-copy{
-    font-size:15px !important;
-  }
-}
-
-/* ===== V3.5 Typography ===== */
-/* =========================================================
-   JB V3.5 — Finder typography refinement
-   Add this block at the END of styles.css
-   Keeps Poppins/Cairo; improves readability without changing JS
-   ========================================================= */
-
-/* Section intro text */
-.finder-result-copy{
-  font-size:17px !important;
-  line-height:1.8 !important;
-  font-weight:600 !important;
-  color:#ffffff !important;
-}
-
-/* Group headings */
-.match-group-head{
-  align-items:flex-start !important;
-}
-
-.match-group-head strong{
-  font-size:20px !important;
-  line-height:1.3 !important;
-  font-weight:800 !important;
-  color:#ffffff !important;
-  letter-spacing:-0.01em;
-}
-
-.match-group-head span{
-  display:block;
-  margin-top:4px;
-  font-size:15px !important;
-  line-height:1.55 !important;
-  font-weight:600 !important;
-  color:#ffffff !important;
-  opacity:.92;
-}
-
-/* Card overall readability */
-.matching-card{
-  padding:22px 22px !important;
-  min-height:132px !important;
-}
-
-.matching-card-title{
-  gap:18px !important;
-}
-
-/* Project title */
-.match-project-name{
-  font-size:19px !important;
-  line-height:1.35 !important;
-  font-weight:800 !important;
-  color:#ffffff !important;
-  letter-spacing:-0.01em;
-}
-
-/* Match score */
-.match-score{
-  font-size:16px !important;
-  line-height:1.35 !important;
-  font-weight:800 !important;
-  color:#ffffff !important;
-}
-
-/* Developer + location */
-.match-meta{
-  display:block !important;
-  margin-top:8px !important;
-  font-size:15px !important;
-  line-height:1.55 !important;
-  font-weight:650 !important;
-  color:#ffffff !important;
-}
-
-/* Price */
-.match-price{
-  display:block !important;
-  margin-top:10px !important;
-  font-size:16px !important;
-  line-height:1.5 !important;
-  font-weight:800 !important;
-  color:#ffffff !important;
-}
-
-/* Force official / market / unknown price labels to same clear white */
-.price-official,
-.price-market,
-.price-unknown{
-  color:#ffffff !important;
-}
-
-/* Match reasons become clearer separated chips/lines */
-.match-reasons{
-  display:flex !important;
-  flex-wrap:wrap !important;
-  gap:8px 10px !important;
-  margin-top:12px !important;
-}
-
-.match-reasons em{
-  display:inline-flex !important;
-  align-items:center !important;
-  padding:5px 8px !important;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:999px;
-  font-size:15px !important;
-  line-height:1.4 !important;
-  font-weight:650 !important;
-  font-style:normal !important;
-  color:#ffffff !important;
-  background:rgba(255,255,255,.04);
-}
-
-.match-positive,
-.match-gap{
-  color:#ffffff !important;
-}
-
-/* Slightly dim potential cards, but keep text readable */
-.potential-group .matching-card{
-  opacity:1 !important;
-}
-
-.potential-group .match-project-name,
-.potential-group .match-score,
-.potential-group .match-price,
-.potential-group .match-meta,
-.potential-group .match-reasons em{
-  color:#ffffff !important;
-}
-
-/* Locked-results text */
-.shortlist-locked strong{
-  font-size:16px !important;
-  font-weight:800 !important;
-}
-
-.shortlist-locked span{
-  font-size:15px !important;
-  line-height:1.5 !important;
-  font-weight:600 !important;
-}
-
-/* Arabic keeps Cairo; English keeps Poppins */
-html[lang="ar"] .matching-card,
-html[lang="ar"] .match-group-head,
-html[lang="ar"] .finder-result-copy{
-  font-family:"Cairo",sans-serif !important;
-}
-
-html[lang="en"] .matching-card,
-html[lang="en"] .match-group-head,
-html[lang="en"] .finder-result-copy{
-  font-family:"Poppins",sans-serif !important;
-}
-
-@media(max-width:700px){
-  .finder-result-copy{
-    font-size:15.5px !important;
-  }
-
-  .match-group-head strong{
-    font-size:18px !important;
-  }
-
-  .match-group-head span{
-    font-size:14px !important;
-  }
-
-  .matching-card{
-    padding:18px !important;
-  }
-
-  .match-project-name{
-    font-size:17px !important;
-  }
-
-  .match-score,
-  .match-price,
-  .match-meta,
-  .match-reasons em{
-    font-size:14px !important;
-  }
-
-  .match-reasons em{
-    padding:4px 7px !important;
-  }
-}
-
-/* ===== V3.6 Gold/White Hierarchy ===== */
-/* =========================================================
-   JB V3.6 — Gold/White hierarchy refinement
-   Add this block at the END of styles.css
-   Keeps current sizes/chips/layout; changes only visual emphasis.
-   ========================================================= */
-
-/* Project name + match score in JB gold */
-.match-project-name,
-.match-score{
-  color:#E7C45A !important;
-}
-
-/* Market reference in gold */
-.price-market{
-  color:#E7C45A !important;
-}
-
-/* Official price stays white */
-.price-official{
-  color:#FFFFFF !important;
-}
-
-/* Unknown price stays white but slightly softer */
-.price-unknown{
-  color:#FFFFFF !important;
-  opacity:.92;
-}
-
-/* Developer/location + explanatory text remain white */
-.match-meta,
-.match-group-head span,
-.finder-result-copy{
-  color:#FFFFFF !important;
-}
-
-/* Keep chips exactly as they are visually, with white text */
-.match-reasons em,
-.match-positive,
-.match-gap{
-  color:#FFFFFF !important;
-}
+applyLang();
+bindFinderControls();
 
-/* Group headings remain white for clean hierarchy */
-.match-group-head strong{
-  color:#FFFFFF !important;
-}
-
-/* Potential matches keep the same gold emphasis on name and score */
-.potential-group .match-project-name,
-.potential-group .match-score{
-  color:#E7C45A !important;
-}
-
-/* If a potential match later receives a market reference, show it in gold */
-.potential-group .price-market{
-  color:#E7C45A !important;
-}
-
-/* =========================================================
-   JB CUSTOMER PREFERENCE PROFILE V2 — NON-DESTRUCTIVE ADDENDUM
-   Preserves V3.6 visual hierarchy.
-   ========================================================= */
-
-.preference-panel{
-  margin:14px 0;
-  padding:14px 16px;
-  border:1px solid rgba(214,174,53,.28);
-  border-radius:12px;
-  background:rgba(214,174,53,.06);
-}
-
-.preference-panel > strong{
-  display:block;
-  margin-bottom:10px;
-  color:var(--ink);
-}
-
-.contact-methods{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px 18px;
-}
-
-.contact-methods label,
-.lead-inline-check{
-  display:flex;
-  align-items:flex-start;
-  gap:9px;
-  cursor:pointer;
-}
-
-.contact-methods input,
-.lead-inline-check input,
-.lead-consent input{
-  width:auto;
-  min-width:16px;
-  margin-top:3px;
-}
-
-.lead-inline-check{
-  margin:12px 0;
-  color:var(--ink);
-  line-height:1.45;
-}
-
-.preference-grid{
-  margin-top:14px;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  bindFinderControls();
+});
 
-.lead-capture-grid .full-span{
-  grid-column:1 / -1;
-}
-
-.lead-capture-grid textarea{
-  width:100%;
-  resize:vertical;
-  min-height:84px;
-  font:inherit;
-}
-
-#leadWhatsapp:disabled{
-  opacity:.58;
-  cursor:not-allowed;
-}
-
-@media (max-width:700px){
-  .contact-methods{
-    flex-direction:column;
-    gap:8px;
-  }
-}
+loadMarketData();
