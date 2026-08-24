@@ -2136,8 +2136,8 @@ async function renderFinderPreview(values, shouldScroll = true) {
         <div class="lead-capture-heading">
           <strong>${lang === 'ar' ? 'احصل على القائمة الكاملة' : 'Get the full shortlist'}</strong>
           <span>${lang === 'ar'
-            ? 'لن نطلب منك إنشاء حساب الآن.'
-            : 'No account creation required.'}</span>
+            ? 'أخبرنا بتفضيلاتك حتى نرشح لك الأنسب الآن ولاحقًا.'
+            : 'Tell us your preferences so JB can recommend the best fit now and later.'}</span>
         </div>
 
         <div class="lead-capture-grid">
@@ -2147,30 +2147,109 @@ async function renderFinderPreview(values, shouldScroll = true) {
           </label>
 
           <label>
-            <span>${lang === 'ar' ? 'رقم الهاتف / واتساب' : 'Phone / WhatsApp'}</span>
+            <span>${lang === 'ar' ? 'رقم الهاتف' : 'Phone number'}</span>
             <input id="leadPhone" name="phone" required autocomplete="tel">
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'رقم واتساب' : 'WhatsApp number'}</span>
+            <input id="leadWhatsapp" name="whatsapp_phone" autocomplete="tel"
+              placeholder="${lang === 'ar' ? 'اتركه فارغًا إذا كان نفس الهاتف' : 'Leave blank if same as phone'}">
           </label>
 
           <label>
             <span>${lang === 'ar' ? 'البريد الإلكتروني (اختياري)' : 'Email (optional)'}</span>
             <input id="leadEmail" name="email" type="email" autocomplete="email">
           </label>
+        </div>
 
+        <label class="lead-inline-check">
+          <input id="leadWhatsappSame" type="checkbox" checked>
+          <span>${lang === 'ar' ? 'رقم واتساب هو نفس رقم الهاتف' : 'WhatsApp is the same as my phone number'}</span>
+        </label>
+
+        <div class="preference-panel">
+          <strong>${lang === 'ar' ? 'كيف تفضل أن نتواصل معك؟' : 'How would you like us to contact you?'}</strong>
+          <div class="contact-methods">
+            <label><input class="leadContactMethod" type="checkbox" value="whatsapp" checked> <span>${lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span></label>
+            <label><input class="leadContactMethod" type="checkbox" value="phone"> <span>${lang === 'ar' ? 'اتصال هاتفي' : 'Phone call'}</span></label>
+            <label><input class="leadContactMethod" type="checkbox" value="email"> <span>${lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</span></label>
+          </div>
+        </div>
+
+        <div class="lead-capture-grid preference-grid">
           <label>
-            <span>${lang === 'ar' ? 'طريقة التواصل المفضلة' : 'Preferred contact'}</span>
-            <select id="leadContactPreference" name="preferred_contact">
-              <option value="whatsapp">${lang === 'ar' ? 'واتساب' : 'WhatsApp'}</option>
-              <option value="phone">${lang === 'ar' ? 'اتصال هاتفي' : 'Phone call'}</option>
-              <option value="email">${lang === 'ar' ? 'بريد إلكتروني' : 'Email'}</option>
+            <span>${lang === 'ar' ? 'طريقة الدفع المناسبة' : 'Preferred payment method'}</span>
+            <select id="leadPaymentMethod">
+              <option value="flexible">${lang === 'ar' ? 'مرن — حسب أفضل عرض' : 'Flexible — best available option'}</option>
+              <option value="installments">${lang === 'ar' ? 'تقسيط' : 'Installments'}</option>
+              <option value="cash">${lang === 'ar' ? 'كاش / دفعة قوية' : 'Cash / strong upfront'}</option>
             </select>
           </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'أقصى مقدم مناسب' : 'Maximum suitable down payment'}</span>
+            <select id="leadMaxDownPayment">
+              <option value="">${lang === 'ar' ? 'لا يوجد تفضيل محدد' : 'No specific preference'}</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="15">15%</option>
+              <option value="20">20%</option>
+              <option value="30">30%</option>
+              <option value="50">50%</option>
+            </select>
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'مدة التقسيط المفضلة' : 'Preferred installment term'}</span>
+            <select id="leadInstallmentYears">
+              <option value="">${lang === 'ar' ? 'لا يوجد تفضيل محدد' : 'No specific preference'}</option>
+              <option value="3">3 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="5">5 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="7">7 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="8">8 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+              <option value="10">10 ${lang === 'ar' ? 'سنوات' : 'years'}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>${lang === 'ar' ? 'أهم أولوية لك' : 'Your top priority'}</span>
+            <select id="leadTopPriority">
+              <option value="best_value">${lang === 'ar' ? 'أفضل قيمة مقابل السعر' : 'Best value for money'}</option>
+              <option value="location">${lang === 'ar' ? 'الموقع' : 'Location'}</option>
+              <option value="payment">${lang === 'ar' ? 'سهولة السداد' : 'Payment flexibility'}</option>
+              <option value="delivery">${lang === 'ar' ? 'موعد الاستلام' : 'Delivery timing'}</option>
+              <option value="developer">${lang === 'ar' ? 'المطور' : 'Developer'}</option>
+              <option value="space">${lang === 'ar' ? 'المساحة' : 'Space'}</option>
+            </select>
+          </label>
+
+          <label class="full-span">
+            <span>${lang === 'ar' ? 'أي متطلبات أخرى؟ (اختياري)' : 'Anything else we should know? (optional)'}</span>
+            <textarea id="leadNotes" rows="3" maxlength="800"
+              placeholder="${lang === 'ar' ? 'مثال: إطلالة بحر، دور معين، استلام قريب...' : 'Example: sea view, specific floor, near delivery...'}"></textarea>
+          </label>
         </div>
+
+        <label class="lead-inline-check">
+          <input id="leadOpenAlternatives" type="checkbox" checked>
+          <span>${lang === 'ar'
+            ? 'أنا منفتح على مشروعات أو مناطق مشابهة إذا كانت أكثر ملاءمة لاحتياجاتي.'
+            : 'I am open to similar projects or locations if they are a better fit.'}</span>
+        </label>
+
+        <label class="lead-inline-check">
+          <input id="leadAllowRecommendations" type="checkbox">
+          <span>${lang === 'ar'
+            ? 'أوافق على أن ترشح لي JB مشروعات أو وحدات أخرى مناسبة إذا توفرت لاحقًا.'
+            : 'I agree that JB may recommend other suitable projects or units if they become available later.'}</span>
+        </label>
 
         <label class="lead-consent consent-row">
           <input id="leadConsent" type="checkbox" required>
           <span>${lang === 'ar'
-            ? 'أوافق على استخدام بياناتي للتواصل معي بخصوص هذا البحث العقاري.'
-            : 'I agree that JB may use my details to contact me about this property search.'}</span>
+            ? 'أوافق على استخدام بياناتي للتواصل معي بخصوص هذا البحث العقاري عبر الوسائل التي اخترتها.'
+            : 'I agree that JB may use my details to contact me about this property search through the methods I selected.'}</span>
         </label>
 
         <div class="lead-capture-actions">
@@ -2182,6 +2261,13 @@ async function renderFinderPreview(values, shouldScroll = true) {
       </form>
     </div>
   `;
+
+  const whatsappSameCheckbox = document.getElementById('leadWhatsappSame');
+  const whatsappInput = document.getElementById('leadWhatsapp');
+  if (whatsappSameCheckbox?.checked && whatsappInput) {
+    whatsappInput.disabled = true;
+    whatsappInput.setAttribute('aria-disabled', 'true');
+  }
 
   if (shouldScroll) {
     result.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -2206,11 +2292,72 @@ async function submitLeadCapture(event) {
   const name = document.getElementById('leadName')?.value.trim() || '';
   const phone = document.getElementById('leadPhone')?.value.trim() || '';
   const email = document.getElementById('leadEmail')?.value.trim() || '';
-  const preferred =
-    document.getElementById('leadContactPreference')?.value || 'whatsapp';
+  const whatsappSame = Boolean(document.getElementById('leadWhatsappSame')?.checked);
+  const whatsappRaw = document.getElementById('leadWhatsapp')?.value.trim() || '';
+  const whatsappPhone = whatsappSame ? phone : whatsappRaw;
+
+  const contactMethods = Array.from(
+    document.querySelectorAll('.leadContactMethod:checked')
+  ).map(input => input.value);
+
   const consent = Boolean(document.getElementById('leadConsent')?.checked);
+  const allowRecommendations =
+    Boolean(document.getElementById('leadAllowRecommendations')?.checked);
+
+  const paymentMethod =
+    document.getElementById('leadPaymentMethod')?.value || 'flexible';
+
+  const maxDownPaymentRaw =
+    document.getElementById('leadMaxDownPayment')?.value || '';
+
+  const installmentYearsRaw =
+    document.getElementById('leadInstallmentYears')?.value || '';
+
+  const topPriority =
+    document.getElementById('leadTopPriority')?.value || 'best_value';
+
+  const notes = document.getElementById('leadNotes')?.value.trim() || '';
+  const openAlternatives =
+    Boolean(document.getElementById('leadOpenAlternatives')?.checked);
+
+  const customerPreferences = {
+    payment_method: paymentMethod,
+    max_down_payment_pct: maxDownPaymentRaw ? Number(maxDownPaymentRaw) : null,
+    preferred_installment_years:
+      installmentYearsRaw ? Number(installmentYearsRaw) : null,
+    top_priority: topPriority,
+    open_to_alternatives: openAlternatives,
+    notes: notes || null
+  };
 
   if (!name || !phone || !consent || !currentSearchProfile) return;
+
+  if (!contactMethods.length) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'اختر وسيلة تواصل واحدة على الأقل.'
+        : 'Please select at least one contact method.';
+    }
+    return;
+  }
+
+  if (contactMethods.includes('email') && !email) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'أدخل البريد الإلكتروني أو ألغِ اختيار التواصل عبر البريد.'
+        : 'Enter your email or deselect Email as a contact method.';
+    }
+    return;
+  }
+
+  if (contactMethods.includes('whatsapp') && !whatsappPhone) {
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'أدخل رقم واتساب أو اختر أنه نفس رقم الهاتف.'
+        : 'Enter a WhatsApp number or mark it as the same as your phone.';
+    }
+    return;
+  }
 
   if (submitButton) submitButton.disabled = true;
 
@@ -2221,16 +2368,19 @@ async function submitLeadCapture(event) {
   }
 
   try {
-    await supabaseRpc('jb_submit_lead_v1', {
+    await supabaseRpc('jb_submit_lead_v2', {
       p_full_name: name,
       p_phone: phone,
+      p_whatsapp_phone: whatsappPhone || null,
       p_email: email || null,
-      p_preferred_contact: preferred,
+      p_preferred_contact_methods: contactMethods,
       p_consent_to_contact: consent,
-      p_consent_text_version: 'jb-web-production-v1-3-2026-08-24',
+      p_allow_recommendations: allowRecommendations,
+      p_consent_text_version: 'jb-web-customer-profile-v2-2026-08-24',
       p_source: 'website_property_finder',
       p_language: lang,
       p_search_profile: currentSearchProfile,
+      p_customer_preferences: customerPreferences,
       p_matched_project_ids:
         currentShortlist.slice(0, 20).map(project => project.id),
       p_page_path: window.location.pathname,
@@ -2406,6 +2556,23 @@ bindFinderControls();
 document.addEventListener('submit', event => {
   if (event.target?.id === 'leadCaptureForm') {
     submitLeadCapture(event);
+  }
+});
+
+document.addEventListener('change', event => {
+  if (event.target?.id === 'leadWhatsappSame') {
+    const whatsappInput = document.getElementById('leadWhatsapp');
+    if (!whatsappInput) return;
+
+    if (event.target.checked) {
+      whatsappInput.value = '';
+      whatsappInput.disabled = true;
+      whatsappInput.setAttribute('aria-disabled', 'true');
+    } else {
+      whatsappInput.disabled = false;
+      whatsappInput.removeAttribute('aria-disabled');
+      whatsappInput.focus();
+    }
   }
 });
 
