@@ -1,4 +1,4 @@
-// JB REAL ESTATE — PRODUCTION FRONTEND V1.2 — RICH MATCH RESULTS
+// JB REAL ESTATE — PRODUCTION FRONTEND V1.3 — HARDENED LEAD RPC
 // JB REAL ESTATE V2.8 - Reliable Property Finder button binding
 /* =========================================================
    JB REAL ESTATE
@@ -2221,21 +2221,21 @@ async function submitLeadCapture(event) {
   }
 
   try {
-    await supabasePost('lead_capture_submissions', {
-      full_name: name,
-      phone,
-      email: email || null,
-      preferred_contact: preferred,
-      consent_to_contact: consent,
-      consent_text_version: 'jb-web-production-v1-2-2026-08-23',
-      source: 'website_property_finder',
-      language: lang,
-      search_profile: currentSearchProfile,
-      matched_project_ids:
+    await supabaseRpc('jb_submit_lead_v1', {
+      p_full_name: name,
+      p_phone: phone,
+      p_email: email || null,
+      p_preferred_contact: preferred,
+      p_consent_to_contact: consent,
+      p_consent_text_version: 'jb-web-production-v1-3-2026-08-24',
+      p_source: 'website_property_finder',
+      p_language: lang,
+      p_search_profile: currentSearchProfile,
+      p_matched_project_ids:
         currentShortlist.slice(0, 20).map(project => project.id),
-      page_path: window.location.pathname,
-      referrer: document.referrer || null,
-      user_agent: navigator.userAgent || null
+      p_page_path: window.location.pathname,
+      p_referrer: document.referrer || null,
+      p_user_agent: navigator.userAgent || null
     });
 
     const fullList = currentShortlist.slice(0, 10);
