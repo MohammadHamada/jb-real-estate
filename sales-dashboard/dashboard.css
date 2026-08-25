@@ -488,3 +488,114 @@ html[dir="rtl"] .contact-value{
 @media(max-width:760px){
   .action-center-grid{grid-template-columns:1fr}
 }
+
+
+/* ============================================================
+   JB Sales Operations V2.1 — Readability / WhatsApp / Outcomes
+   ============================================================ */
+
+/* Maintain the agreed readability floor */
+.action-group-head h3{font-size:17px}
+.action-lead-main strong{font-size:16px;line-height:1.5}
+.action-lead-main span{font-size:15px;line-height:1.5}
+.action-lead-score{font-size:15px}
+.action-lead-score b{font-size:16px}
+.action-empty{font-size:15px;line-height:1.6}
+
+/* WhatsApp Sales Assistant */
+.whatsapp-assistant{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:17px;
+  margin-top:16px;
+}
+.wa-assistant-head h3{
+  margin:0 0 10px;
+  font-size:20px;
+  line-height:1.4;
+}
+.whatsapp-assistant textarea{
+  min-height:150px;
+  font-size:16px;
+  line-height:1.75;
+  font-weight:600;
+}
+.wa-assistant-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.wa-assistant-actions .btn{
+  font-size:15px;
+}
+
+/* Outcome fields */
+.outcome-field{
+  font-size:15px;
+}
+
+/* Outcome Intelligence */
+.outcome-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.outcome-metric{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  display:grid;
+  gap:5px;
+}
+.outcome-metric span{
+  font-size:15px;
+  color:var(--muted);
+  font-weight:700;
+}
+.outcome-metric strong{
+  font-size:24px;
+  color:var(--navy);
+}
+.outcome-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.outcome-card{
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:15px;
+}
+.outcome-card h3{
+  margin-bottom:10px;
+  font-size:18px;
+}
+.outcome-list-row,
+.outcome-win-row{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:10px 0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  color:var(--text);
+  text-align:start;
+  font-size:15px;
+}
+.outcome-win-row{cursor:pointer}
+.outcome-win-row span{display:grid;gap:3px}
+.outcome-win-row small{font-size:14px;color:var(--muted)}
+.outcome-win-row b,
+.outcome-list-row strong{font-size:15px}
+
+@media(max-width:760px){
+  .outcome-metrics{grid-template-columns:repeat(2,1fr)}
+  .outcome-grid{grid-template-columns:1fr}
+  .whatsapp-assistant textarea{font-size:15px}
+}
