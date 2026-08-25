@@ -2,463 +2,119 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="JB Real Estate Group — Find, compare and make smarter real estate decisions in Egypt.">
-  <title>JB Real Estate Group | Find. Compare. Decide. Invest.</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260814-v28">
-
-
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>JB Sales Intelligence</title>
+  <link rel="stylesheet" href="./dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-
-<header class="site-header">
-  <div class="container nav-wrap">
-
-    <a class="brand" href="#home" aria-label="JB Real Estate Group home">
-      <img src="assets/jb-logo.png" alt="JB Real Estate Group logo">
-    </a>
-
-    <nav class="main-nav" aria-label="Primary navigation">
-      <a href="#properties" data-i18n="nav.properties">Properties</a>
-      <a href="#projects" data-i18n="nav.projects">Projects</a>
-      <a href="#developers" data-i18n="nav.developers">Developers</a>
-      <a href="#compare" data-i18n="nav.compare">Compare</a>
-      <a href="#investment" data-i18n="nav.investment">Investment</a>
-      <a href="#about" data-i18n="nav.about">About JB</a>
-    </nav>
-
-    <div class="nav-actions">
-      <button id="langToggle" class="lang-btn" type="button">العربية</button>
-      <a class="btn btn-gold btn-small" href="#finder" data-i18n="nav.cta">Find My Property</a>
-    </div>
-
-  </div>
-</header>
-
-
-<main id="home">
-
-  <section class="hero">
-    <div class="hero-overlay"></div>
-
-    <div class="container hero-content">
-      <div class="eyebrow" data-i18n="hero.eyebrow">JB REAL ESTATE GROUP</div>
-
-      <h1 data-i18n="hero.title">Find. Compare. Decide. Invest.</h1>
-
-      <p data-i18n="hero.text">
-        Explore opportunities across Egypt, compare developers and projects,
-        and get personalized guidance before you buy.
-      </p>
-
-      <div class="hero-actions">
-        <a class="btn btn-gold" href="#finder" data-i18n="hero.primary">Find My Property</a>
-        <a class="btn btn-outline" href="#compare" data-i18n="hero.secondary">Compare Projects</a>
-      </div>
-
-      <div class="hero-note" data-i18n="hero.note">
-        One market. Multiple options. One trusted partner.
-      </div>
-    </div>
-  </section>
-
-
-  <!-- PROPERTY FINDER -->
-  <section class="finder section" id="finder">
-    <div class="container">
-
-      <div class="section-head center">
-        <span class="eyebrow dark" data-i18n="finder.eyebrow">PROPERTY FINDER</span>
-
-        <h2 data-i18n="finder.title">Tell us what you are looking for.</h2>
-
-        <p data-i18n="finder.text">
-          Tell us your priorities. JB will use them to build a focused shortlist.
-        </p>
-      </div>
-
-      <form id="finderForm" class="finder-grid finder-v2">
-
-        <label>
-          <span data-i18n="fields.location">Location</span>
-          <select id="location">
-            <option value="" data-i18n="options.anyLocation">Any location</option>
-            <option value="North Coast" data-i18n="options.northCoast">North Coast</option>
-            <option value="New Cairo" data-i18n="options.newCairo">New Cairo</option>
-            <option value="New Capital" data-i18n="options.newCapital">New Capital</option>
-            <option value="Ain Sokhna" data-i18n="options.ainSokhna">Ain Sokhna</option>
-            <option value="Sheikh Zayed" data-i18n="options.sheikhZayed">Sheikh Zayed</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.budget">Budget</span>
-          <select id="budget">
-            <option value="" data-i18n="options.anyBudget">Any budget</option>
-            <option value="under5" data-i18n="options.under5">Under EGP 5M</option>
-            <option value="5to10" data-i18n="options.5to10">EGP 5M–10M</option>
-            <option value="10to20" data-i18n="options.10to20">EGP 10M–20M</option>
-            <option value="20plus" data-i18n="options.20plus">EGP 20M+</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.type">Property type</span>
-          <select id="type">
-            <option value="" data-i18n="options.anyType">Any type</option>
-            <option value="Apartment" data-i18n="options.apartment">Apartment</option>
-            <option value="Chalet" data-i18n="options.chalet">Chalet</option>
-            <option value="Villa" data-i18n="options.villa">Villa</option>
-            <option value="Twin House" data-i18n="options.twin">Twin House</option>
-            <option value="Commercial" data-i18n="options.commercial">Commercial</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.purpose">Purpose</span>
-          <select id="purpose">
-            <option value="" data-i18n="options.anyPurpose">Any purpose</option>
-            <option value="Investment" data-i18n="options.investment">Investment</option>
-            <option value="Personal use" data-i18n="options.personal">Personal use</option>
-            <option value="Both" data-i18n="options.both">Both</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.delivery">Delivery</span>
-          <select id="delivery">
-            <option value="" data-i18n="options.anyDelivery">Any delivery</option>
-            <option value="Ready" data-i18n="options.ready">Ready</option>
-            <option value="1-3" data-i18n="options.1to3">1–3 years</option>
-            <option value="3plus" data-i18n="options.3plus">3+ years</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.payment">Payment preference</span>
-          <select id="payment">
-            <option value="" data-i18n="options.anyPayment">No preference</option>
-            <option value="low-down" data-i18n="options.lowDown">Lower down payment</option>
-            <option value="long-plan" data-i18n="options.longPlan">Longer payment plan</option>
-            <option value="cash" data-i18n="options.cash">Cash / strong upfront</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.bedrooms">Bedrooms</span>
-          <select id="bedrooms">
-            <option value="" data-i18n="options.anyBedrooms">No preference</option>
-            <option value="1-2" data-i18n="options.1to2">1–2</option>
-            <option value="3" data-i18n="options.3bed">3</option>
-            <option value="4plus" data-i18n="options.4plus">4+</option>
-          </select>
-        </label>
-
-        <label>
-          <span data-i18n="fields.timeline">Buying timeline</span>
-          <select id="timeline">
-            <option value="" data-i18n="options.anyTimeline">Just exploring</option>
-            <option value="now" data-i18n="options.now">Ready to buy now</option>
-            <option value="3months" data-i18n="options.3months">Within 3 months</option>
-            <option value="6months" data-i18n="options.6months">Within 6 months</option>
-            <option value="later" data-i18n="options.later">6+ months</option>
-          </select>
-        </label>
-
-        <button
-          class="btn btn-gold finder-submit"
-          type="submit"
-          data-i18n="finder.button">
-          Find My Best Matches
-        </button>
-
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">JB</div>
+      <p class="eyebrow">JB REAL ESTATE GROUP</p>
+      <h1>Sales Intelligence</h1>
+      <p class="muted">Private staff access.</p>
+      <form id="loginForm">
+        <label>Email<input id="loginEmail" type="email" required autocomplete="username"></label>
+        <label>Password<input id="loginPassword" type="password" required autocomplete="current-password"></label>
+        <button class="btn primary" type="submit">Sign in</button>
+        <p id="loginStatus" class="status" aria-live="polite"></p>
       </form>
-
-      <div id="finderResult" class="finder-result" hidden></div>
-
-      <p class="finder-privacy-note">
-        <span data-i18n="finder.privacy">Your search is private. Contact details are only requested if you want the full shortlist or a JB advisor to follow up.</span>
-      </p>
-
     </div>
-  </section>
+  </div>
 
-
-  <!-- WHY JB -->
-  <section class="value section dark-section" id="about">
-    <div class="container split">
-
-      <div>
-        <span class="eyebrow" data-i18n="value.eyebrow">WHY JB</span>
-
-        <h2 data-i18n="value.title">
-          We are not here to show you one property. We help you understand your options.
-        </h2>
-
-        <p data-i18n="value.text">
-          JB is being built as a real estate intelligence, advisory and brokerage platform:
-          discover the market, compare alternatives, make a better-informed decision,
-          then complete your purchase with JB.
-        </p>
-
-        <a class="text-link" href="#compare" data-i18n="value.link">
-          See how comparison works →
-        </a>
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">JB</div>
+        <div><strong>Sales Intelligence</strong><span>Internal</span></div>
       </div>
-
-      <div class="value-cards">
-        <article>
-          <b>01</b>
-          <h3 data-i18n="value.card1.title">Multiple Options</h3>
-          <p data-i18n="value.card1.text">Compare opportunities instead of relying on a single sales pitch.</p>
-        </article>
-
-        <article>
-          <b>02</b>
-          <h3 data-i18n="value.card2.title">Clear Sources</h3>
-          <p data-i18n="value.card2.text">Track the source and freshness of important project information.</p>
-        </article>
-
-        <article>
-          <b>03</b>
-          <h3 data-i18n="value.card3.title">Personal Guidance</h3>
-          <p data-i18n="value.card3.text">Move from search to a focused shortlist and advisor conversation.</p>
-        </article>
-
-        <article>
-          <b>04</b>
-          <h3 data-i18n="value.card4.title">Purchase Support</h3>
-          <p data-i18n="value.card4.text">Keep the relationship with JB through the buying journey.</p>
-        </article>
+      <nav>
+        <button class="nav-item active" data-scroll="overview">Overview</button>
+        <button class="nav-item" data-scroll="leads">Lead Queue</button>
+        <button class="nav-item" data-scroll="pipeline">Pipeline</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span id="staffEmail" class="staff-email"></span>
+        <button id="logoutBtn" class="btn ghost">Sign out</button>
       </div>
+    </aside>
 
-    </div>
-  </section>
-
-
-  <!-- DYNAMIC PROJECTS -->
-  <section class="section" id="projects">
-    <div class="container">
-
-      <div class="section-head">
+    <main>
+      <header class="topbar">
         <div>
-          <span class="eyebrow dark" data-i18n="projects.eyebrow">EXPLORE</span>
-          <h2 data-i18n="projects.title">Projects</h2>
-          <p id="projectCount" class="dynamic-count">Loading verified projects...</p>
+          <p class="eyebrow">TODAY'S SALES PRIORITIES</p>
+          <h1>Lead Intelligence Dashboard</h1>
         </div>
+        <button id="refreshBtn" class="btn secondary">Refresh</button>
+      </header>
 
-        <a class="text-link" href="#finder" data-i18n="projects.link">
-          Find my best options →
-        </a>
-      </div>
+      <section id="overview" class="metric-grid">
+        <article class="metric"><span>Hot Leads</span><strong id="mHot">—</strong></article>
+        <article class="metric"><span>Warm Leads</span><strong id="mWarm">—</strong></article>
+        <article class="metric"><span>New Leads</span><strong id="mNew">—</strong></article>
+        <article class="metric danger"><span>Follow-ups Due</span><strong id="mDue">—</strong></article>
+        <article class="metric"><span>Meetings</span><strong id="mMeeting">—</strong></article>
+        <article class="metric"><span>Negotiations</span><strong id="mNegotiation">—</strong></article>
+      </section>
 
-      <div id="projectsGrid" class="cards-3 dynamic-project-grid" aria-live="polite">
-        <div class="data-loading">Loading projects from JB Market Database...</div>
-      </div>
-
-      <div class="center section-action">
-        <button id="loadMoreProjects" class="btn btn-navy" type="button" hidden>
-          Load more projects
-        </button>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- DYNAMIC DEVELOPERS -->
-  <section class="section light-gold" id="developers">
-    <div class="container">
-
-      <div class="section-head center">
-        <span class="eyebrow dark" data-i18n="developers.eyebrow">MARKET DIRECTORY</span>
-        <h2 data-i18n="developers.title">Explore Developers</h2>
-        <p data-i18n="developers.text">
-          Browse verified developer profiles and explore their published projects.
-        </p>
-      </div>
-
-      <div class="developer-search">
-        <input
-          id="developerSearch"
-          type="search"
-          placeholder="Search developer..."
-          data-i18n-placeholder="developers.search">
-
-        <button
-          id="developerSearchBtn"
-          class="btn btn-navy"
-          type="button"
-          data-i18n="developers.searchBtn">
-          Search
-        </button>
-      </div>
-
-      <p id="developerCount" class="dynamic-count center">Loading developers...</p>
-
-      <div id="developerRow" class="developer-row" aria-live="polite">
-        <div class="data-loading">Loading developer directory...</div>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- DYNAMIC COMPARE -->
-  <section class="section compare-section" id="compare">
-    <div class="container">
-
-      <div class="section-head center">
-        <span class="eyebrow dark" data-i18n="compare.eyebrow">COMPARE BEFORE YOU BUY</span>
-        <h2 data-i18n="compare.title">One market. Clearer decisions.</h2>
-        <p data-i18n="compare.text">
-          Select up to three projects and compare the verified data currently available.
-        </p>
-      </div>
-
-      <div id="compareStatus" class="compare-status">
-        Select up to 3 projects using the Compare button on project cards.
-      </div>
-
-      <div id="comparePreview" class="compare-preview">
-        <div class="compare-empty">
-          No projects selected yet.
+      <section id="leads" class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">PRIORITY QUEUE</p><h2>Leads</h2></div>
+          <div class="filters">
+            <input id="searchInput" type="search" placeholder="Search name, phone, project…">
+            <select id="temperatureFilter">
+              <option value="">All temperatures</option>
+              <option value="HOT">HOT</option>
+              <option value="WARM">WARM</option>
+              <option value="NURTURE">NURTURE</option>
+            </select>
+            <select id="stageFilter">
+              <option value="">All stages</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="options_sent">Options sent</option>
+              <option value="meeting">Meeting</option>
+              <option value="viewing">Viewing</option>
+              <option value="negotiation">Negotiation</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+              <option value="nurture">Nurture</option>
+            </select>
+            <label class="check"><input id="dueOnly" type="checkbox"> Due only</label>
+          </div>
         </div>
-      </div>
+        <div id="leadTableWrap" class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Lead</th><th>Score</th><th>Stage</th><th>Next action</th>
+                <th>Best match</th><th>Follow-up</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+        <p id="leadStatus" class="status"></p>
+      </section>
 
-      <div class="center">
-        <button id="clearComparison" class="btn btn-outline-dark" type="button" hidden>
-          Clear comparison
-        </button>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- INTERNATIONAL -->
-  <section class="section international" id="investment">
-    <div class="container split international-inner">
-
-      <div>
-        <span class="eyebrow" data-i18n="intl.eyebrow">INTERNATIONAL BUYERS</span>
-
-        <h2 data-i18n="intl.title">
-          Invest in Egypt with a clearer view of the market.
-        </h2>
-
-        <p data-i18n="intl.text">
-          JB will provide English-first discovery, project comparison and buyer guidance
-          for international clients interested in Egypt.
-        </p>
-
-        <ul>
-          <li data-i18n="intl.li1">Arabic + English from V1</li>
-          <li data-i18n="intl.li2">Investment-focused property search</li>
-          <li data-i18n="intl.li3">Transparent sources and update dates</li>
-          <li data-i18n="intl.li4">Personalized consultation</li>
-        </ul>
-
-        <a href="#finder" class="btn btn-gold" data-i18n="intl.button">
-          Request a consultation
-        </a>
-      </div>
-
-      <div class="international-box">
-        <div class="currency">EGP</div>
-
-        <h3 data-i18n="intl.boxTitle">
-          Built for local and international buyers
-        </h3>
-
-        <p data-i18n="intl.boxText">
-          The data model is designed to support multiple languages,
-          currencies and future market modules such as land and commercial opportunities.
-        </p>
-      </div>
-
-    </div>
-  </section>
-
-
-  <section class="section final-cta">
-    <div class="container center">
-      <span class="eyebrow dark" data-i18n="cta.eyebrow">READY TO START?</span>
-
-      <h2 data-i18n="cta.title">Tell JB what you want to buy.</h2>
-
-      <p data-i18n="cta.text">
-        We will turn your requirements into a focused property shortlist.
-      </p>
-
-      <a href="#finder" class="btn btn-navy" data-i18n="cta.button">
-        Find My Best Matches
-      </a>
-    </div>
-  </section>
-
-</main>
-
-
-<!-- DYNAMIC PROFILE MODAL -->
-<div id="profileModal" class="profile-modal" hidden>
-  <div class="profile-modal-backdrop" data-close-modal></div>
-
-  <article class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
-
-    <button
-      id="profileModalClose"
-      class="profile-modal-close"
-      type="button"
-      aria-label="Close">
-      ×
-    </button>
-
-    <div id="profileModalContent"></div>
-
-  </article>
-</div>
-
-
-<footer class="footer">
-  <div class="container footer-grid">
-
-    <div>
-      <img src="assets/jb-logo.png" alt="JB Real Estate Group" class="footer-logo">
-      <p>Building Wealth Through Real Estate.</p>
-    </div>
-
-    <div>
-      <h4 data-i18n="footer.contact">Contact</h4>
-      <p>+20 111 295 3333</p>
-      <p>
-        <a href="https://wa.me/message/P3YFFPLDIWOLM1" target="_blank" rel="noopener">
-          WhatsApp Business
-        </a>
-      </p>
-    </div>
-
-    <div>
-      <h4 data-i18n="footer.social">Social</h4>
-      <p><a href="https://www.facebook.com/profile.php?id=61592188772811" target="_blank" rel="noopener">Facebook</a></p>
-      <p><a href="https://www.instagram.com/jb_realestategroup" target="_blank" rel="noopener">Instagram</a></p>
-      <p><a href="https://www.tiktok.com/@jb.realestate.eg" target="_blank" rel="noopener">TikTok</a></p>
-    </div>
-
+      <section id="pipeline" class="panel">
+        <div class="panel-head"><div><p class="eyebrow">PIPELINE</p><h2>Current flow</h2></div></div>
+        <div id="pipelineGrid" class="pipeline-grid"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="container footer-bottom">
-    © <span id="year"></span> JB Real Estate Group.
-    <span data-i18n="footer.demo">Live market database connected to Supabase.</span>
+  <div id="leadDrawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <section class="drawer-panel">
+      <button class="drawer-close" data-close-drawer aria-label="Close">×</button>
+      <div id="leadDetail"></div>
+    </section>
   </div>
-</footer>
 
-<script src="script.js?v=20260823-final-production-v1-2"></script>
-
+  <script src="./dashboard.js"></script>
 </body>
 </html>
