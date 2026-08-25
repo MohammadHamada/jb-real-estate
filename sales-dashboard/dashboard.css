@@ -624,3 +624,32 @@ html[dir="rtl"] .contact-value{
 .followup-health-grid strong{font-size:23px;line-height:1.25;color:var(--navy);font-weight:900}
 @media(max-width:1100px){.conversion-kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.conversion-kpis{grid-template-columns:repeat(2,1fr)}.conversion-layout{grid-template-columns:1fr}.followup-health-grid{grid-template-columns:1fr 1fr}}
+
+
+/* ============================================================
+   JB Follow-up Automation V1
+   ============================================================ */
+.followup-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.followup-summary>div{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:5px;background:#fff}
+.followup-summary span{font-size:15px;line-height:1.5;color:var(--muted);font-weight:800}
+.followup-summary strong{font-size:23px;line-height:1.2;color:var(--navy);font-weight:900}
+.followup-queue-grid{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:10px}
+.followup-queue-group{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}
+.followup-queue-head{padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8fafb;border-bottom:1px solid var(--line)}
+.followup-queue-head h3{margin:0;font-size:16px;line-height:1.4;font-weight:900}
+.followup-queue-head strong{font-size:16px}
+.followup-lead-row{width:100%;border:0;border-bottom:1px solid var(--line);background:#fff;padding:12px;display:flex;justify-content:space-between;gap:10px;text-align:start;cursor:pointer;color:var(--text)}
+.followup-lead-row:last-child{border-bottom:0}
+.followup-lead-row:hover{background:#fbfcfd}
+.followup-lead-row>div:first-child{display:grid;gap:4px}
+.followup-lead-row strong{font-size:16px;line-height:1.45;font-weight:900}
+.followup-lead-row span{font-size:15px;line-height:1.45;color:var(--muted);font-weight:600}
+.followup-lead-row small{font-size:14px;line-height:1.4;color:var(--muted)}
+.followup-lead-row>div:last-child{font-size:15px;white-space:nowrap}
+.followup-empty{padding:14px;font-size:15px;line-height:1.6;color:var(--muted)}
+.quick-followup-box{border:1px solid var(--line);border-radius:12px;padding:12px;margin:4px 0 12px}
+.quick-followup-title{font-size:16px;line-height:1.5;font-weight:900;margin-bottom:9px}
+.quick-followup-actions{display:flex;flex-wrap:wrap;gap:8px}
+.quick-followup-actions .btn{font-size:15px;min-height:38px}
+@media(max-width:1250px){.followup-summary{grid-template-columns:repeat(3,1fr)}.followup-queue-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.followup-summary{grid-template-columns:repeat(2,1fr)}.followup-queue-grid{grid-template-columns:1fr}}
