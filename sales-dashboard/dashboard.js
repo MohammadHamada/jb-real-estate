@@ -42,7 +42,15 @@ const I18N = {
     actionCenter:"ACTION CENTER", whatToDoToday:"What should we do today?",
     contactNow:"Contact now", followUpDue:"Follow-up due", sendOptions:"Send options",
     meetingStage:"Meetings", negotiationStage:"Negotiations", noActions:"No leads in this action group.",
-    openLead:"Open lead"
+    openLead:"Open lead",
+    whatsappAssistant:"WhatsApp Sales Assistant", generateMessage:"Generate message", copyMessage:"Copy message",
+    openWhatsApp:"Open WhatsApp", messagePreview:"Message preview", outcomeIntelligence:"OUTCOME INTELLIGENCE",
+    wonLostInsights:"Won / Lost Insights", wonDeals:"Won", lostDeals:"Lost", winRate:"Win rate",
+    wonValue:"Won value", lostReasons:"Lost reasons", recentWins:"Recent wins", noData:"No data yet.",
+    lostReason:"Lost reason", wonProject:"Won project", wonValueField:"Won value (EGP)",
+    chooseReason:"Choose reason", reasonPrice:"Price", reasonPayment:"Payment plan", reasonLocation:"Location",
+    reasonDeveloper:"Developer", reasonDelivery:"Delivery", reasonUnit:"Unit", reasonCompetitor:"Competitor",
+    reasonPostponed:"Postponed", reasonNoResponse:"No response", reasonNotQualified:"Not qualified", reasonOther:"Other"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -73,7 +81,15 @@ const I18N = {
     actionCenter:"مركز إجراءات اليوم", whatToDoToday:"ما الذي يجب أن نفعله اليوم؟",
     contactNow:"تواصل الآن", followUpDue:"متابعة مستحقة", sendOptions:"أرسل الخيارات",
     meetingStage:"الاجتماعات", negotiationStage:"المفاوضات", noActions:"لا توجد حالات في هذه المجموعة.",
-    openLead:"فتح العميل"
+    openLead:"فتح العميل",
+    whatsappAssistant:"مساعد رسائل واتساب", generateMessage:"إنشاء الرسالة", copyMessage:"نسخ الرسالة",
+    openWhatsApp:"فتح واتساب", messagePreview:"معاينة الرسالة", outcomeIntelligence:"تحليل نتائج المبيعات",
+    wonLostInsights:"تحليل الصفقات المغلقة", wonDeals:"تم البيع", lostDeals:"صفقات مفقودة", winRate:"نسبة الفوز",
+    wonValue:"قيمة الصفقات", lostReasons:"أسباب فقد الصفقات", recentWins:"أحدث الصفقات الناجحة", noData:"لا توجد بيانات حتى الآن.",
+    lostReason:"سبب فقد الصفقة", wonProject:"المشروع المباع", wonValueField:"قيمة الصفقة (جنيه)",
+    chooseReason:"اختر السبب", reasonPrice:"السعر", reasonPayment:"خطة السداد", reasonLocation:"الموقع",
+    reasonDeveloper:"المطور", reasonDelivery:"موعد الاستلام", reasonUnit:"الوحدة", reasonCompetitor:"منافس",
+    reasonPostponed:"تأجيل الشراء", reasonNoResponse:"لا يرد", reasonNotQualified:"غير مؤهل", reasonOther:"سبب آخر"
   }
 };
 
@@ -250,6 +266,59 @@ async function loadActionCenter(){
   }
 }
 
+
+const LOST_REASON_LABELS = {
+  price:{en:"Price",ar:"السعر"},
+  payment_plan:{en:"Payment plan",ar:"خطة السداد"},
+  location:{en:"Location",ar:"الموقع"},
+  developer:{en:"Developer",ar:"المطور"},
+  delivery:{en:"Delivery",ar:"موعد الاستلام"},
+  unit:{en:"Unit",ar:"الوحدة"},
+  competitor:{en:"Competitor",ar:"منافس"},
+  postponed:{en:"Postponed",ar:"تأجيل الشراء"},
+  no_response:{en:"No response",ar:"لا يرد"},
+  not_qualified:{en:"Not qualified",ar:"غير مؤهل"},
+  other:{en:"Other",ar:"سبب آخر"},
+  unspecified:{en:"Unspecified",ar:"غير محدد"}
+};
+
+function lostReasonLabel(v){
+  return LOST_REASON_LABELS[v]?.[currentLang] || v || "—";
+}
+
+async function loadOutcomes(){
+  $("outcomeStatus").textContent=tr("loading");
+  try{
+    const d=await rpc("jb_sales_outcome_intelligence_v1");
+    const s=d.summary||{};
+    $("oWon").textContent=s.won_count??0;
+    $("oLost").textContent=s.lost_count??0;
+    $("oWinRate").textContent=`${s.win_rate_pct??0}%`;
+    $("oWonValue").textContent=fmtMoney(s.won_value_total||0,"EGP");
+
+    $("lostReasonsList").innerHTML=(d.lost_reasons||[]).map(x=>`
+      <div class="outcome-list-row">
+        <span>${esc(lostReasonLabel(x.reason))}</span>
+        <strong>${esc(x.count)}</strong>
+      </div>
+    `).join("") || `<p class="muted">${tr("noData")}</p>`;
+
+    $("recentWinsList").innerHTML=(d.recent_wins||[]).map(x=>`
+      <button class="outcome-win-row" type="button" data-outcome-lead="${esc(x.lead_id)}">
+        <span><strong>${esc(x.full_name)}</strong><small>${esc(fmtDate(x.updated_at))}</small></span>
+        <b>${esc(fmtMoney(x.won_value||0,"EGP"))}</b>
+      </button>
+    `).join("") || `<p class="muted">${tr("noData")}</p>`;
+
+    document.querySelectorAll("[data-outcome-lead]").forEach(btn=>{
+      btn.addEventListener("click",()=>openLead(btn.dataset.outcomeLead));
+    });
+    $("outcomeStatus").textContent="";
+  }catch(e){
+    $("outcomeStatus").textContent=e.message||"Failed to load outcome intelligence.";
+  }
+}
+
 async function loadSummary(){
   const s=await rpc("jb_sales_dashboard_summary_v1");
   $("mHot").textContent=s.hot_leads??0; $("mWarm").textContent=s.warm_leads??0; $("mNew").textContent=s.new_leads??0;
@@ -297,6 +366,29 @@ async function openLead(id){
 }
 document.querySelectorAll("[data-close-drawer]").forEach(x=>x.addEventListener("click",closeDrawer));
 function closeDrawer(){ $("leadDrawer").classList.add("hidden"); $("leadDrawer").setAttribute("aria-hidden","true"); currentLeadId=null; }
+
+
+function buildWhatsAppMessage(lead, top3){
+  const name=lead.full_name||"";
+  const t=(top3||[])[0]||null;
+  const project=t ? ((currentLang==="ar"?t.name_ar:t.name_en)||t.name_en||t.name_ar||"") : "";
+
+  if(currentLang==="ar"){
+    let msg=`أستاذ/ة ${name}، أهلاً بحضرتك من JB Real Estate.\n`;
+    if(project) msg+=`بناءً على اختياراتك، من أقرب الخيارات المناسبة لك مشروع ${project}.\n`;
+    if(t?.why_it_fits_ar) msg+=`سبب الترشيح: ${t.why_it_fits_ar}.\n`;
+    if(t?.next_question_ar) msg+=`${t.next_question_ar}\n`;
+    msg+=`إذا أحببت، أرسل لحضرتك مقارنة مختصرة بين أفضل الخيارات المناسبة لك.`;
+    return msg;
+  }
+
+  let msg=`Hello ${name}, this is JB Real Estate.\n`;
+  if(project) msg+=`Based on your preferences, one of the closest matches is ${project}.\n`;
+  if(t?.why_it_fits) msg+=`Why it fits: ${t.why_it_fits}.\n`;
+  if(t?.next_question) msg+=`${t.next_question}\n`;
+  msg+=`If you would like, I can send you a short comparison of your best options.`;
+  return msg;
+}
 
 function renderLeadDetail(d){
   const l=d.lead||{}, p=l.search_profile||{}, cp=l.customer_preferences||{}, wa=l.whatsapp_phone||l.phone;
@@ -377,6 +469,18 @@ function renderLeadDetail(d){
       </div></article>
     </div>
     <p class="eyebrow">${tr("top3Support")}</p><div class="top3">${top3}</div>
+    <article class="whatsapp-assistant">
+      <div class="wa-assistant-head">
+        <div><p class="eyebrow">${tr("whatsappAssistant")}</p><h3>${tr("messagePreview")}</h3></div>
+      </div>
+      <textarea id="waMessagePreview"></textarea>
+      <div class="wa-assistant-actions">
+        <button id="waGenerateBtn" class="btn secondary" type="button">${tr("generateMessage")}</button>
+        <button id="waCopyBtn" class="btn secondary" type="button">${tr("copyMessage")}</button>
+        ${wa?`<button id="waOpenBtn" class="btn primary" type="button">${tr("openWhatsApp")}</button>`:""}
+      </div>
+    </article>
+
     <form id="leadUpdateForm" class="update-form">
       <div><p class="eyebrow">${tr("salesOperation")}</p><h3>${tr("updateLead")}</h3></div>
       <div class="form-grid">
@@ -386,6 +490,25 @@ function renderLeadDetail(d){
         <label>${tr("salesOwner")}<input id="uOwner" value="${esc(l.sales_owner||"")}"></label>
         <label>${tr("nextFollowup")}<input id="uFollow" type="datetime-local"></label>
         <label class="check"><input id="uClearFollow" type="checkbox"> ${tr("clearFollowup")}</label>
+        <label id="lostReasonWrap" class="outcome-field hidden">${tr("lostReason")}
+          <select id="uLostReason">
+            <option value="">${tr("chooseReason")}</option>
+            <option value="price">${tr("reasonPrice")}</option>
+            <option value="payment_plan">${tr("reasonPayment")}</option>
+            <option value="location">${tr("reasonLocation")}</option>
+            <option value="developer">${tr("reasonDeveloper")}</option>
+            <option value="delivery">${tr("reasonDelivery")}</option>
+            <option value="unit">${tr("reasonUnit")}</option>
+            <option value="competitor">${tr("reasonCompetitor")}</option>
+            <option value="postponed">${tr("reasonPostponed")}</option>
+            <option value="no_response">${tr("reasonNoResponse")}</option>
+            <option value="not_qualified">${tr("reasonNotQualified")}</option>
+            <option value="other">${tr("reasonOther")}</option>
+          </select>
+        </label>
+        <label id="wonValueWrap" class="outcome-field hidden">${tr("wonValueField")}
+          <input id="uWonValue" type="number" min="0" step="1000" value="${esc(l.won_value??"")}">
+        </label>
       </div>
       <label>${tr("salesNote")}<textarea id="uNotes" placeholder="${esc(tr("salesNotePlaceholder"))}"></textarea></label>
       <label class="check"><input id="uContacted" type="checkbox"> ${tr("markContacted")}</label>
@@ -394,6 +517,28 @@ function renderLeadDetail(d){
     </form>
     <article class="detail-card" style="margin-top:16px"><h3>${tr("recentActivity")}</h3><div class="activity">${activity}</div></article>`;
   $("leadUpdateForm").addEventListener("submit",saveLeadUpdate);
+
+  const syncOutcomeFields=()=>{
+    const stage=$("uStage").value;
+    $("lostReasonWrap").classList.toggle("hidden",stage!=="lost");
+    $("wonValueWrap").classList.toggle("hidden",stage!=="won");
+  };
+  $("uStage").addEventListener("change",syncOutcomeFields);
+  syncOutcomeFields();
+
+  const refreshWaMessage=()=>{
+    $("waMessagePreview").value=buildWhatsAppMessage(l,d.top3||[]);
+  };
+  refreshWaMessage();
+  $("waGenerateBtn").addEventListener("click",refreshWaMessage);
+  $("waCopyBtn").addEventListener("click",()=>copyText($("waMessagePreview").value,$("waCopyBtn")));
+  if($("waOpenBtn")){
+    $("waOpenBtn").addEventListener("click",()=>{
+      const msg=encodeURIComponent($("waMessagePreview").value||"");
+      window.open(`https://wa.me/${waHref(wa)}?text=${msg}`,"_blank","noopener");
+    });
+  }
+
   document.querySelectorAll(".copy-contact-btn").forEach(btn=>{
     btn.addEventListener("click",()=>copyText(btn.dataset.copyValue,btn));
   });
@@ -406,14 +551,16 @@ async function saveLeadUpdate(e){
       p_lead_id:currentLeadId,p_sales_stage:$("uStage").value,p_sales_owner:$("uOwner").value.trim()||null,
       p_next_follow_up_at:follow?new Date(follow).toISOString():null,p_clear_follow_up:$("uClearFollow").checked,
       p_sales_notes:$("uNotes").value.trim()||null,p_mark_contacted:$("uContacted").checked,
-      p_lost_reason:null,p_won_project_id:null,p_won_value:null
+      p_lost_reason:$("uStage").value==="lost" ? ($("uLostReason").value||null) : null,
+      p_won_project_id:null,
+      p_won_value:$("uStage").value==="won" && $("uWonValue").value ? Number($("uWonValue").value) : null
     });
     $("updateStatus").textContent=tr("saved");
     await Promise.all([loadSummary(),loadLeads()]); await openLead(currentLeadId);
   }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
 
-async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadLeads()]);}catch(e){console.error(e);}}
+async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadLeads()]);}catch(e){console.error(e);}}
 
 applyLang();
 (async()=>{if(await checkAccess()) await loadAll();})();
