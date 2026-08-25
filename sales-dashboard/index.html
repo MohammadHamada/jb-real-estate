@@ -102,6 +102,42 @@
         <p id="outcomeStatus" class="status"></p>
       </section>
 
+      <section id="conversionAnalytics" class="panel conversion-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="conversionAnalytics">CONVERSION ANALYTICS</p>
+            <h2 data-i18n="salesFunnelPerformance">Sales Funnel Performance</h2>
+          </div>
+        </div>
+
+        <div class="conversion-kpis">
+          <article class="conversion-kpi"><span data-i18n="leadToWon">Lead → Won</span><strong id="cLeadWon">—</strong></article>
+          <article class="conversion-kpi"><span data-i18n="leadToContact">Lead → Contact</span><strong id="cLeadContact">—</strong></article>
+          <article class="conversion-kpi"><span data-i18n="contactToQualified">Contact → Qualified</span><strong id="cContactQualified">—</strong></article>
+          <article class="conversion-kpi"><span data-i18n="qualifiedToMeeting">Qualified → Meeting</span><strong id="cQualifiedMeeting">—</strong></article>
+          <article class="conversion-kpi"><span data-i18n="meetingToWon">Meeting → Won</span><strong id="cMeetingWon">—</strong></article>
+        </div>
+
+        <div class="conversion-layout">
+          <article class="conversion-card">
+            <h3 data-i18n="salesFunnel">Sales Funnel</h3>
+            <div id="salesFunnel" class="funnel-list"></div>
+          </article>
+
+          <article class="conversion-card">
+            <h3 data-i18n="followupHealth">Follow-up Health</h3>
+            <div class="followup-health-grid">
+              <div><span data-i18n="overdueFollowups">Overdue</span><strong id="cOverdue">—</strong></div>
+              <div><span data-i18n="dueToday">Due today</span><strong id="cDueToday">—</strong></div>
+              <div><span data-i18n="noFollowupScheduled">No follow-up</span><strong id="cNoFollowup">—</strong></div>
+              <div><span data-i18n="noFirstContact">No first contact</span><strong id="cNoFirstContact">—</strong></div>
+            </div>
+          </article>
+        </div>
+
+        <p id="conversionStatus" class="status"></p>
+      </section>
+
       <section id="leads" class="panel">
         <div class="panel-head">
           <div><p class="eyebrow" data-i18n="priorityQueue">PRIORITY QUEUE</p><h2 data-i18n="leads">Leads</h2></div>
