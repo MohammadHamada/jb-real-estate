@@ -381,3 +381,178 @@ html[dir="rtl"] .contact-value{
   .match-card h3{font-size:18px}
   .match-lines div{font-size:13.5px}
 }
+/* =========================================================
+   JB Dashboard — Lower Sections Readability Patch
+   Add at the END of dashboard.css
+   ========================================================= */
+
+/* 1) General lower-section readability */
+.detail-card,
+.update-form,
+.match-card,
+.activity-item {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* 2) Search profile + customer preferences */
+.detail-card h3 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.kv {
+  gap: 10px 14px;
+}
+
+.kv b {
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 900;
+}
+
+.kv span {
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+/* 3) Top 3 recommendations cards */
+.match-card {
+  padding: 20px;
+}
+
+.match-card h3 {
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.match-meta {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.match-role {
+  font-size: 14px;
+  font-weight: 900;
+  padding: 6px 10px;
+}
+
+.match-lines {
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.match-lines div {
+  font-size: 16px;
+  line-height: 1.85;
+  font-weight: 600;
+}
+
+.match-lines b {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* 4) Eyebrow section titles */
+.eyebrow {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+/* 5) Update form */
+.update-form h3 {
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+.update-form label {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 800;
+}
+
+.update-form input,
+.update-form select,
+.update-form textarea {
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.update-form textarea {
+  min-height: 140px;
+}
+
+.update-form .btn,
+.update-form button {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+/* 6) Recent activity */
+.activity-item {
+  font-size: 15px;
+  line-height: 1.8;
+  font-weight: 600;
+}
+
+/* 7) Status texts */
+.status,
+.muted {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 8) Mobile tuning */
+@media (max-width: 768px) {
+  .detail-card,
+  .update-form,
+  .match-card,
+  .activity-item {
+    font-size: 15px;
+  }
+
+  .detail-card h3 {
+    font-size: 18px;
+  }
+
+  .kv b {
+    font-size: 14px;
+  }
+
+  .kv span {
+    font-size: 15px;
+  }
+
+  .match-card h3 {
+    font-size: 22px;
+  }
+
+  .match-meta {
+    font-size: 14px;
+  }
+
+  .match-lines div,
+  .match-lines b {
+    font-size: 15px;
+  }
+
+  .update-form h3 {
+    font-size: 20px;
+  }
+
+  .update-form input,
+  .update-form select,
+  .update-form textarea {
+    font-size: 15px;
+  }
+}
