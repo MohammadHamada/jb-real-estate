@@ -38,7 +38,11 @@ const I18N = {
     noActivity:"No internal activity recorded yet.", saving:"Saving…", saved:"Saved.", updateFailed:"Update failed.",
     failedLoadLeads:"Failed to load leads.", whatsapp:"WhatsApp", scoreLabel:"Score",
     contactDetails:"Contact details", phone:"Phone", copy:"Copy", copied:"Copied", copyFailed:"Copy failed",
-    primaryContact:"Primary contact", noContact:"Not provided"
+    primaryContact:"Primary contact", noContact:"Not provided",
+    actionCenter:"ACTION CENTER", whatToDoToday:"What should we do today?",
+    contactNow:"Contact now", followUpDue:"Follow-up due", sendOptions:"Send options",
+    meetingStage:"Meetings", negotiationStage:"Negotiations", noActions:"No leads in this action group.",
+    openLead:"Open lead"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -65,7 +69,11 @@ const I18N = {
     noActivity:"لا توجد أنشطة داخلية مسجلة حتى الآن.", saving:"جارٍ الحفظ…", saved:"تم الحفظ.", updateFailed:"فشل التحديث.",
     failedLoadLeads:"تعذر تحميل العملاء.", whatsapp:"واتساب", scoreLabel:"التقييم",
     contactDetails:"وسائل التواصل", phone:"الهاتف", copy:"نسخ", copied:"تم النسخ", copyFailed:"تعذر النسخ",
-    primaryContact:"وسيلة التواصل الأساسية", noContact:"غير متاح"
+    primaryContact:"وسيلة التواصل الأساسية", noContact:"غير متاح",
+    actionCenter:"مركز إجراءات اليوم", whatToDoToday:"ما الذي يجب أن نفعله اليوم؟",
+    contactNow:"تواصل الآن", followUpDue:"متابعة مستحقة", sendOptions:"أرسل الخيارات",
+    meetingStage:"الاجتماعات", negotiationStage:"المفاوضات", noActions:"لا توجد حالات في هذه المجموعة.",
+    openLead:"فتح العميل"
   }
 };
 
@@ -203,6 +211,45 @@ document.querySelectorAll("[data-scroll]").forEach(btn=>{
 ["temperatureFilter","stageFilter","dueOnly"].forEach(id=>$(id).addEventListener("change",loadLeads));
 $("searchInput").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadLeads,250);});
 
+
+function actionGroup(titleKey, items, icon){
+  const rows=(items||[]).map(x=>{
+    const project=(currentLang==="ar" ? x.best_project_name_ar : x.best_project_name_en) || x.best_project_name_en || x.best_project_name_ar || tr("noSavedMatch");
+    return `<button class="action-lead-card" type="button" data-action-lead="${esc(x.lead_id)}">
+      <div class="action-lead-main">
+        <strong>${esc(x.full_name)}</strong>
+        <span>${esc(project)}</span>
+      </div>
+      <div class="action-lead-score">${tempBadge(x.lead_temperature)} <b>${esc(x.qualification_score??"—")}</b></div>
+    </button>`;
+  }).join("") || `<div class="action-empty">${tr("noActions")}</div>`;
+
+  return `<article class="action-group">
+    <div class="action-group-head"><span class="action-icon">${icon}</span><h3>${tr(titleKey)}</h3><b>${items?.length||0}</b></div>
+    <div class="action-group-list">${rows}</div>
+  </article>`;
+}
+
+async function loadActionCenter(){
+  $("actionCenterStatus").textContent=tr("loading");
+  try{
+    const data=await rpc("jb_sales_action_center_v1",{p_limit_per_group:8});
+    $("actionCenterGrid").innerHTML=[
+      actionGroup("contactNow",data.contact_now,"☎"),
+      actionGroup("followUpDue",data.follow_up_due,"↻"),
+      actionGroup("sendOptions",data.send_shortlist,"➜"),
+      actionGroup("meetingStage",data.meetings,"◫"),
+      actionGroup("negotiationStage",data.negotiations,"◆")
+    ].join("");
+    $("actionCenterStatus").textContent="";
+    document.querySelectorAll("[data-action-lead]").forEach(btn=>{
+      btn.addEventListener("click",()=>openLead(btn.dataset.actionLead));
+    });
+  }catch(e){
+    $("actionCenterStatus").textContent=e.message||"Failed to load action center.";
+  }
+}
+
 async function loadSummary(){
   const s=await rpc("jb_sales_dashboard_summary_v1");
   $("mHot").textContent=s.hot_leads??0; $("mWarm").textContent=s.warm_leads??0; $("mNew").textContent=s.new_leads??0;
@@ -290,15 +337,15 @@ function renderLeadDetail(d){
       <div class="match-head">
         <div><h3>#${esc(t.recommendation_order)} ${esc((currentLang==="ar"?t.name_ar:t.name_en)||t.name_en||t.name_ar)}</h3>
         <div class="match-meta">${esc((currentLang==="ar"?t.developer_name_ar:t.developer_name_en)||t.developer_name_en||t.developer_name_ar||"")} · ${esc(t.city||"")} ${t.area?`· ${esc(t.area)}`:""} · ${esc(fmtMoney(t.display_starting_price,t.currency))}</div></div>
-        <span class="match-role">${esc(roleLabel(t.fit_role))}</span>
+        <span class="match-role">${esc(currentLang==="ar" ? (t.fit_role_ar||roleLabel(t.fit_role)) : roleLabel(t.fit_role))}</span>
       </div>
       <div class="match-lines">
-        <div><b>${tr("confidence")}:</b> <span class="confidence ${esc((t.confidence_level||"").toLowerCase())}">${esc(confLabel(t.confidence_level))}</span></div>
-        <div><b>${tr("why")}:</b> ${esc(t.why_it_fits||"—")}</div>
-        <div><b>${tr("likelyObjection")}:</b> ${esc(t.likely_objection||"—")}</div>
-        <div><b>${tr("salesAngle")}:</b> ${esc(t.sales_angle||"—")}</div>
-        <div><b>${tr("nextQuestion")}:</b> ${esc(t.next_question||"—")}</div>
-        <div><b>${tr("nextActionLabel")}:</b> ${esc(t.next_action||"—")}</div>
+        <div><b>${tr("confidence")}:</b> <span class="confidence ${esc((t.confidence_level||"").toLowerCase())}">${esc(currentLang==="ar" ? (t.confidence_level_ar||confLabel(t.confidence_level)) : confLabel(t.confidence_level))}</span></div>
+        <div><b>${tr("why")}:</b> ${esc(currentLang==="ar" ? (t.why_it_fits_ar||t.why_it_fits||"—") : (t.why_it_fits||"—"))}</div>
+        <div><b>${tr("likelyObjection")}:</b> ${esc(currentLang==="ar" ? (t.likely_objection_ar||t.likely_objection||"—") : (t.likely_objection||"—"))}</div>
+        <div><b>${tr("salesAngle")}:</b> ${esc(currentLang==="ar" ? (t.sales_angle_ar||t.sales_angle||"—") : (t.sales_angle||"—"))}</div>
+        <div><b>${tr("nextQuestion")}:</b> ${esc(currentLang==="ar" ? (t.next_question_ar||t.next_question||"—") : (t.next_question||"—"))}</div>
+        <div><b>${tr("nextActionLabel")}:</b> ${esc(currentLang==="ar" ? (t.next_action_ar||t.next_action||"—") : (t.next_action||"—"))}</div>
       </div>
     </article>`).join("") || `<div class="detail-card"><p class="muted">${tr("noMatches")}</p></div>`;
 
@@ -366,7 +413,7 @@ async function saveLeadUpdate(e){
   }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
 
-async function loadAll(){try{await Promise.all([loadSummary(),loadLeads()]);}catch(e){console.error(e);}}
+async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadLeads()]);}catch(e){console.error(e);}}
 
 applyLang();
 (async()=>{if(await checkAccess()) await loadAll();})();
