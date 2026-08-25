@@ -1,215 +1,372 @@
-:root{
-  --navy:#123f62; --navy2:#0b2e49; --gold:#d5ad42; --gold2:#ebca69;
-  --bg:#f5f7f9; --card:#fff; --text:#17364e; --muted:#6a7c8c;
-  --line:#dfe6eb; --danger:#a5463b; --ok:#287a56; --warm:#9b6e16;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select,textarea{font:inherit}
-.hidden{display:none!important}
-.auth-screen{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,var(--navy2),var(--navy))}
-.auth-card{width:min(420px,92vw);background:#fff;border-radius:22px;padding:34px;box-shadow:0 28px 80px rgba(0,0,0,.25)}
-.brand-mark{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--navy2);font-weight:900;font-size:22px;margin-bottom:18px}
-.brand-mark.small{width:38px;height:38px;font-size:15px;margin:0}
-.eyebrow{margin:0 0 6px;color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.12em}
-h1,h2,h3,p{margin-top:0}
-.muted,.status{color:var(--muted)}
-.auth-card form,.update-form{display:grid;gap:14px}
-label{display:grid;gap:7px;font-weight:700;font-size:13px}
-input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff;color:var(--text)}
-textarea{min-height:100px;resize:vertical}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
-.btn.primary{background:var(--navy);color:#fff}
-.btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--line)}
-.btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25)}
-.app{min-height:100vh}
-.sidebar{position:fixed;inset:0 auto 0 0;width:238px;background:var(--navy2);color:#fff;padding:22px 16px;display:flex;flex-direction:column;z-index:20}
-.sidebar-brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-.sidebar-brand div:last-child{display:grid}.sidebar-brand span{font-size:11px;opacity:.65}
-.sidebar nav{display:grid;gap:6px}
-.nav-item{border:0;background:transparent;color:#dce8f0;text-align:left;padding:11px;border-radius:9px;cursor:pointer}
-.nav-item.active,.nav-item:hover{background:rgba(255,255,255,.09);color:#fff}
-.sidebar-bottom{margin-top:auto;display:grid;gap:10px}.staff-email{font-size:12px;opacity:.75;overflow-wrap:anywhere}
-main{margin-left:238px;padding:30px;max-width:1600px}
-.topbar{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}
-.topbar h1{margin:0;font-size:29px}
-.metric-grid{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:12px;margin-bottom:22px}
-.metric{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px;display:grid;gap:7px}
-.metric span{font-size:12px;color:var(--muted);font-weight:700}.metric strong{font-size:28px;color:var(--navy)}
-.metric.danger strong{color:var(--danger)}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:22px;box-shadow:0 8px 24px rgba(17,62,95,.04)}
-.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:14px}.panel-head h2{margin:0}
-.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.filters input{width:230px}.filters select{width:auto}
-.check{display:flex;align-items:center;gap:6px;font-weight:700}.check input{width:16px;height:16px}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:950px}
-th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-td{font-size:13px}.lead-name{font-weight:800}.lead-contact{font-size:11px;color:var(--muted)}
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900}
-.badge.hot{background:#ffe5e0;color:#a33e32}.badge.warm{background:#fff2d1;color:#8a641d}.badge.nurture{background:#e9eef2;color:#5f7180}
-.stage{font-weight:800;color:var(--navy)}.action{font-weight:800;color:#705314}
-.open-btn{padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--navy);font-weight:800;cursor:pointer}
-.pipeline-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px}
-.pipeline-card{border:1px solid var(--line);border-radius:12px;padding:13px}.pipeline-card span{color:var(--muted);font-size:11px}.pipeline-card strong{display:block;font-size:23px;margin-top:5px}
-.drawer{position:fixed;inset:0;z-index:100}
-.drawer-backdrop{position:absolute;inset:0;background:rgba(2,19,31,.55)}
-.drawer-panel{position:absolute;right:0;top:0;bottom:0;width:min(760px,96vw);background:#f8fafb;overflow:auto;padding:26px;box-shadow:-18px 0 60px rgba(0,0,0,.2)}
-.drawer-close{position:absolute;right:18px;top:14px;border:0;background:transparent;font-size:34px;color:var(--muted);cursor:pointer}
-.lead-hero{background:var(--navy);color:#fff;border-radius:18px;padding:22px;margin-bottom:16px}.lead-hero h2{margin:4px 0 8px}.lead-hero .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;opacity:.88}
-.lead-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.lead-actions a{text-decoration:none}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.detail-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px}.detail-card h3{font-size:14px;margin-bottom:10px}
-.kv{display:grid;grid-template-columns:135px 1fr;gap:6px 10px;font-size:12px}.kv b{color:var(--muted)}
-.top3{display:grid;gap:12px;margin:14px 0}
-.match-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;border-left:4px solid var(--gold)}
-.match-head{display:flex;justify-content:space-between;gap:10px;align-items:start}.match-head h3{margin:0 0 5px}.match-role{font-size:10px;font-weight:900;color:#775a12;background:#fff1c5;padding:5px 7px;border-radius:999px}
-.match-meta{font-size:12px;color:var(--muted);margin-bottom:10px}.match-lines{display:grid;gap:7px;font-size:12px}.match-lines b{color:var(--navy)}
-.confidence{font-weight:900}.confidence.high{color:var(--ok)}.confidence.medium{color:var(--warm)}.confidence.low{color:var(--danger)}
-.update-form{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.activity{display:grid;gap:7px}.activity-item{font-size:12px;padding:9px 0;border-bottom:1px solid var(--line)}
-@media(max-width:1100px){.metric-grid{grid-template-columns:repeat(3,1fr)}.pipeline-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:760px){.sidebar{display:none}main{margin-left:0;padding:16px}.metric-grid{grid-template-columns:repeat(2,1fr)}.panel-head{align-items:stretch;flex-direction:column}.filters{display:grid;grid-template-columns:1fr 1fr}.filters input{width:auto;grid-column:1/-1}.detail-grid,.form-grid{grid-template-columns:1fr}.pipeline-grid{grid-template-columns:repeat(2,1fr)}}
+const SUPABASE_URL = "https://cmjeijjkdztlvhqzcjrg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_foGnQkjteOAQ7XL6SBqAVA_fQACuQ7a";
 
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
 
-/* ============================================================
-   JB Sales Intelligence — Bilingual / RTL support
-   ============================================================ */
-.auth-lang-row{display:flex;justify-content:flex-end;margin-bottom:8px}
-.lang-btn,.lang-switch{
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--navy);
-  border-radius:999px;
-  padding:8px 12px;
-  font-weight:900;
-  cursor:pointer;
-}
-.topbar-actions{display:flex;gap:8px;align-items:center}
+const $ = (id) => document.getElementById(id);
+const authScreen = $("authScreen");
+const app = $("app");
+let currentLeadId = null;
+let searchTimer = null;
+let currentLang = localStorage.getItem("jb_sales_dashboard_lang") || "en";
 
-html[dir="rtl"] body{
-  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+const I18N = {
+  en: {
+    brand:"JB REAL ESTATE GROUP", salesIntelligence:"Sales Intelligence", privateAccess:"Private staff access.",
+    email:"Email", password:"Password", signIn:"Sign in", internal:"Internal", overview:"Overview",
+    leadQueue:"Lead Queue", pipeline:"Pipeline", signOut:"Sign out", todaysPriorities:"TODAY'S SALES PRIORITIES",
+    dashboardTitle:"Lead Intelligence Dashboard", refresh:"Refresh", hotLeads:"Hot Leads", warmLeads:"Warm Leads",
+    newLeads:"New Leads", followupsDue:"Follow-ups Due", meetings:"Meetings", negotiations:"Negotiations",
+    priorityQueue:"PRIORITY QUEUE", leads:"Leads", searchPlaceholder:"Search name, phone, project…",
+    allTemperatures:"All temperatures", allStages:"All stages", dueOnly:"Due only", lead:"Lead", score:"Score",
+    stage:"Stage", nextAction:"Next action", bestMatch:"Best match", followup:"Follow-up", currentFlow:"Current flow",
+    loading:"Loading…", noSavedMatch:"No saved match", open:"Open", leadsCount:"leads", loadingLead:"Loading lead…",
+    failedLoadLead:"Failed to load lead.", unauthorized:"This account is not authorized for JB Sales Intelligence.",
+    accessFailed:"Access check failed.", signingIn:"Signing in…", lead360:"LEAD 360", call:"Call", location:"Location",
+    budget:"Budget", propertyType:"Property type", purpose:"Purpose", delivery:"Delivery", timeline:"Timeline",
+    searchProfile:"Search profile", customerPreferences:"Customer preferences", payment:"Payment",
+    maxDown:"Max down payment", installmentYears:"Installment years", topPriority:"Top priority",
+    alternatives:"Alternatives", futureRecommendations:"Future recommendations", yes:"Yes", no:"No",
+    allowed:"Allowed", notAllowed:"Not allowed", top3Support:"TOP 3 DECISION SUPPORT", confidence:"Confidence",
+    why:"Why", likelyObjection:"Likely objection", salesAngle:"Sales angle", nextQuestion:"Next question",
+    nextActionLabel:"Next action", noMatches:"No saved project matches for this lead.", salesOperation:"SALES OPERATION",
+    updateLead:"Update lead", salesOwner:"Sales owner", nextFollowup:"Next follow-up", clearFollowup:"Clear follow-up",
+    salesNote:"Sales note", salesNotePlaceholder:"What happened, objection, commitment, next step…",
+    markContacted:"Mark contact made now", saveUpdate:"Save update", recentActivity:"Recent activity",
+    noActivity:"No internal activity recorded yet.", saving:"Saving…", saved:"Saved.", updateFailed:"Update failed.",
+    failedLoadLeads:"Failed to load leads.", whatsapp:"WhatsApp", scoreLabel:"Score",
+    contactDetails:"Contact details", phone:"Phone", copy:"Copy", copied:"Copied", copyFailed:"Copy failed",
+    primaryContact:"Primary contact", noContact:"Not provided"
+  },
+  ar: {
+    brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
+    email:"البريد الإلكتروني", password:"كلمة المرور", signIn:"تسجيل الدخول", internal:"داخلي", overview:"نظرة عامة",
+    leadQueue:"قائمة العملاء", pipeline:"مسار المبيعات", signOut:"تسجيل الخروج", todaysPriorities:"أولويات المبيعات اليوم",
+    dashboardTitle:"لوحة ذكاء العملاء والمبيعات", refresh:"تحديث", hotLeads:"عملاء ساخنون", warmLeads:"عملاء دافئون",
+    newLeads:"عملاء جدد", followupsDue:"متابعات مستحقة", meetings:"اجتماعات", negotiations:"مفاوضات",
+    priorityQueue:"قائمة الأولويات", leads:"العملاء", searchPlaceholder:"ابحث بالاسم أو الهاتف أو المشروع…",
+    allTemperatures:"كل درجات الجدية", allStages:"كل المراحل", dueOnly:"المستحق فقط", lead:"العميل", score:"التقييم",
+    stage:"المرحلة", nextAction:"الإجراء التالي", bestMatch:"أفضل مشروع", followup:"المتابعة", currentFlow:"المسار الحالي",
+    loading:"جارٍ التحميل…", noSavedMatch:"لا يوجد تطابق محفوظ", open:"فتح", leadsCount:"عميل", loadingLead:"جارٍ تحميل بيانات العميل…",
+    failedLoadLead:"تعذر تحميل بيانات العميل.", unauthorized:"هذا الحساب غير مصرح له بالدخول إلى لوحة JB.",
+    accessFailed:"فشل التحقق من صلاحية الدخول.", signingIn:"جارٍ تسجيل الدخول…", lead360:"ملف العميل 360", call:"اتصال",
+    location:"المنطقة", budget:"الميزانية", propertyType:"نوع العقار", purpose:"الغرض", delivery:"الاستلام", timeline:"موعد الشراء",
+    searchProfile:"بيانات البحث", customerPreferences:"تفضيلات العميل", payment:"طريقة الدفع",
+    maxDown:"أقصى مقدم", installmentYears:"سنوات التقسيط", topPriority:"الأولوية الرئيسية",
+    alternatives:"قبول البدائل", futureRecommendations:"ترشيحات مستقبلية", yes:"نعم", no:"لا",
+    allowed:"مسموح", notAllowed:"غير مسموح", top3Support:"أفضل 3 ترشيحات لدعم قرار البيع", confidence:"درجة الثقة",
+    why:"لماذا يناسبه", likelyObjection:"الاعتراض المتوقع", salesAngle:"زاوية البيع", nextQuestion:"السؤال التالي",
+    nextActionLabel:"الإجراء التالي", noMatches:"لا توجد مشروعات محفوظة مناسبة لهذا العميل.", salesOperation:"إدارة عملية البيع",
+    updateLead:"تحديث العميل", salesOwner:"مسؤول المبيعات", nextFollowup:"موعد المتابعة القادمة", clearFollowup:"مسح موعد المتابعة",
+    salesNote:"ملاحظة المبيعات", salesNotePlaceholder:"ماذا حدث؟ الاعتراض؟ الالتزام؟ الخطوة التالية…",
+    markContacted:"تم التواصل الآن", saveUpdate:"حفظ التحديث", recentActivity:"آخر الأنشطة",
+    noActivity:"لا توجد أنشطة داخلية مسجلة حتى الآن.", saving:"جارٍ الحفظ…", saved:"تم الحفظ.", updateFailed:"فشل التحديث.",
+    failedLoadLeads:"تعذر تحميل العملاء.", whatsapp:"واتساب", scoreLabel:"التقييم",
+    contactDetails:"وسائل التواصل", phone:"الهاتف", copy:"نسخ", copied:"تم النسخ", copyFailed:"تعذر النسخ",
+    primaryContact:"وسيلة التواصل الأساسية", noContact:"غير متاح"
+  }
+};
+
+const STAGES = {
+  new:{en:"New",ar:"جديد"}, contacted:{en:"Contacted",ar:"تم التواصل"}, qualified:{en:"Qualified",ar:"مؤهل"},
+  options_sent:{en:"Options sent",ar:"تم إرسال الخيارات"}, meeting:{en:"Meeting",ar:"اجتماع"},
+  viewing:{en:"Viewing",ar:"معاينة"}, negotiation:{en:"Negotiation",ar:"تفاوض"}, won:{en:"Won",ar:"تم البيع"},
+  lost:{en:"Lost",ar:"مفقود"}, nurture:{en:"Nurture",ar:"متابعة طويلة"}
+};
+const ACTIONS = {
+  FOLLOW_UP_DUE:{en:"Follow-up due",ar:"متابعة مستحقة"}, CONTACT_NOW:{en:"Contact now",ar:"تواصل الآن"},
+  SEND_SHORTLIST:{en:"Send shortlist",ar:"أرسل قائمة مختصرة"}, NURTURE:{en:"Nurture",ar:"متابعة طويلة"},
+  SEND_BEST_MATCH:{en:"Send best match",ar:"أرسل أفضل مشروع"}, SEND_COMPARISON:{en:"Send comparison",ar:"أرسل مقارنة"},
+  BOOK_MEETING:{en:"Book meeting",ar:"احجز اجتماع"}, BOOK_VIEWING:{en:"Book viewing",ar:"احجز معاينة"},
+  NEGOTIATION_FOLLOW_UP:{en:"Negotiation follow-up",ar:"متابعة التفاوض"},
+  CLOSE_FOLLOW_UP:{en:"Closing follow-up",ar:"متابعة الإغلاق"}, REVIEW:{en:"Review",ar:"مراجعة"}
+};
+const ROLES = {
+  BEST_FIT:{en:"Best fit",ar:"أفضل تطابق"},
+  FINANCIAL_FIT:{en:"Financial fit",ar:"أفضل خيار مالي"},
+  STRATEGIC_ALTERNATIVE:{en:"Strategic alternative",ar:"بديل استراتيجي"}
+};
+const CONF = {HIGH:{en:"HIGH",ar:"عالية"},MEDIUM:{en:"MEDIUM",ar:"متوسطة"},LOW:{en:"LOW",ar:"منخفضة"}};
+
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[c]));
+const tr = k => I18N[currentLang][k] || I18N.en[k] || k;
+const stageLabel = s => STAGES[s]?.[currentLang] || s || "—";
+const actionLabel = s => ACTIONS[s]?.[currentLang] || (s||"").replaceAll("_"," ");
+const roleLabel = s => ROLES[s]?.[currentLang] || (s||"").replaceAll("_"," ");
+const confLabel = s => CONF[s]?.[currentLang] || s || "—";
+
+function applyLang(){
+  document.documentElement.lang=currentLang;
+  document.documentElement.dir=currentLang==="ar"?"rtl":"ltr";
+  document.title=currentLang==="ar"?"JB — ذكاء المبيعات":"JB Sales Intelligence";
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>el.placeholder=tr(el.dataset.i18nPlaceholder));
+  document.querySelectorAll("[data-stage-option]").forEach(el=>el.textContent=stageLabel(el.dataset.stageOption));
+  const toggle=currentLang==="ar"?"English":"العربية";
+  if($("langBtn")) $("langBtn").textContent=toggle;
+  if($("authLangBtn")) $("authLangBtn").textContent=toggle;
 }
-html[dir="rtl"] .sidebar{
-  inset:0 0 0 auto;
+function toggleLang(){
+  currentLang=currentLang==="en"?"ar":"en";
+  localStorage.setItem("jb_sales_dashboard_lang",currentLang);
+  applyLang();
+  if(!app.classList.contains("hidden")) loadAll();
+  if(currentLeadId) openLead(currentLeadId);
 }
-html[dir="rtl"] main{
-  margin-left:0;
-  margin-right:238px;
+$("langBtn").addEventListener("click",toggleLang);
+$("authLangBtn").addEventListener("click",toggleLang);
+
+function fmtDate(v){
+  if(!v) return "—";
+  try{return new Intl.DateTimeFormat(currentLang==="ar"?"ar-EG":"en-GB",{dateStyle:"medium",timeStyle:"short"}).format(new Date(v));}
+  catch{return "—";}
 }
-html[dir="rtl"] .nav-item,
-html[dir="rtl"] th,
-html[dir="rtl"] td{
-  text-align:right;
+function fmtMoney(v,c="EGP"){
+  if(v===null || v===undefined || v==="") return "—";
+  return `${new Intl.NumberFormat(currentLang==="ar"?"ar-EG":"en-US",{maximumFractionDigits:0}).format(Number(v))} ${c||"EGP"}`;
 }
-html[dir="rtl"] .drawer-panel{
-  right:auto;
-  left:0;
-  box-shadow:18px 0 60px rgba(0,0,0,.2);
+function tempBadge(t){
+  const x=(t||"NURTURE").toLowerCase();
+  const label=currentLang==="ar" ? ({HOT:"ساخن",WARM:"دافئ",NURTURE:"متابعة"}[t]||t) : (t||"—");
+  return `<span class="badge ${esc(x)}">${esc(label)}</span>`;
 }
-html[dir="rtl"] .drawer-close{
-  right:auto;
-  left:18px;
-}
-html[dir="rtl"] .match-card{
-  border-left:1px solid var(--line);
-  border-right:4px solid var(--gold);
-}
-html[dir="rtl"] .kv{
-  grid-template-columns:1fr 135px;
-}
-html[dir="rtl"] .kv b{
-  grid-column:2;
-}
-html[dir="rtl"] .kv span{
-  grid-column:1;
-  grid-row:auto;
-}
-html[dir="rtl"] .sidebar-brand,
-html[dir="rtl"] .lead-actions,
-html[dir="rtl"] .filters,
-html[dir="rtl"] .topbar-actions{
-  direction:rtl;
-}
-html[dir="rtl"] .lead-contact,
-html[dir="rtl"] .staff-email{
-  direction:ltr;
-  text-align:right;
-}
-@media(max-width:760px){
-  html[dir="rtl"] main{margin-right:0}
+function telHref(v){return String(v||"").replace(/[^\d+]/g,"");}
+function waHref(v){return String(v||"").replace(/\D/g,"");}
+
+async function copyText(value, button){
+  if(!value) return;
+  try{
+    await navigator.clipboard.writeText(String(value));
+    if(button){
+      const old=button.textContent;
+      button.textContent=tr("copied");
+      button.classList.add("copied");
+      setTimeout(()=>{button.textContent=old;button.classList.remove("copied");},1200);
+    }
+  }catch(_){
+    window.prompt(currentLang==="ar"?"انسخ القيمة:":"Copy value:",String(value));
+  }
 }
 
+async function rpc(name,args={}){
+  const {data,error}=await sb.rpc(name,args);
+  if(error) throw error;
+  return data;
+}
 
-/* ============================================================
-   JB Sales Intelligence V1.2 — Contact visibility & quick copy
-   ============================================================ */
-.lead-contact-panel{
-  margin-top:14px;
-  padding:12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;
-  background:rgba(255,255,255,.08);
+async function checkAccess(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){showLogin();return false;}
+  try{
+    const allowed=await rpc("jb_is_internal_user_v1");
+    if(!allowed){
+      await sb.auth.signOut();
+      showLogin(tr("unauthorized"));
+      return false;
+    }
+    $("staffEmail").textContent=session.user.email||"";
+    authScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+    return true;
+  }catch(e){
+    showLogin(e.message||tr("accessFailed"));
+    return false;
+  }
 }
-.lead-contact-panel-title{
-  font-size:13px;
-  font-weight:900;
-  color:var(--gold2);
-  margin-bottom:9px;
+function showLogin(msg=""){
+  authScreen.classList.remove("hidden");
+  app.classList.add("hidden");
+  $("loginStatus").textContent=msg;
 }
-.lead-contact-items{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+
+$("loginForm").addEventListener("submit",async(e)=>{
+  e.preventDefault();
+  $("loginStatus").textContent=tr("signingIn");
+  const {error}=await sb.auth.signInWithPassword({
+    email:$("loginEmail").value.trim(),
+    password:$("loginPassword").value
+  });
+  if(error){$("loginStatus").textContent=error.message;return;}
+  if(await checkAccess()) await loadAll();
+});
+
+$("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();showLogin();});
+$("refreshBtn").addEventListener("click",loadAll);
+
+document.querySelectorAll("[data-scroll]").forEach(btn=>{
+  btn.addEventListener("click",()=>document.getElementById(btn.dataset.scroll)?.scrollIntoView({behavior:"smooth"}));
+});
+["temperatureFilter","stageFilter","dueOnly"].forEach(id=>$(id).addEventListener("change",loadLeads));
+$("searchInput").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(loadLeads,250);});
+
+async function loadSummary(){
+  const s=await rpc("jb_sales_dashboard_summary_v1");
+  $("mHot").textContent=s.hot_leads??0; $("mWarm").textContent=s.warm_leads??0; $("mNew").textContent=s.new_leads??0;
+  $("mDue").textContent=s.overdue_followups??0; $("mMeeting").textContent=s.meetings??0; $("mNegotiation").textContent=s.negotiations??0;
+  renderPipeline(s);
 }
-.contact-item{
-  display:grid;
-  grid-template-columns:1fr auto;
-  grid-template-areas:
-    "label copy"
-    "value copy";
-  gap:2px 8px;
-  align-items:center;
-  min-width:0;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;
-  padding:9px 10px;
+function renderPipeline(s){
+  const items=currentLang==="ar" ? [
+    ["جديد",s.new_leads],["ساخن",s.hot_leads],["دافئ",s.warm_leads],["اجتماعات",s.meetings],
+    ["مفاوضات",s.negotiations],["تم البيع",s.won],["مفقود",s.lost],["متابعة",s.nurture_leads]
+  ] : [
+    ["New",s.new_leads],["Hot",s.hot_leads],["Warm",s.warm_leads],["Meetings",s.meetings],
+    ["Negotiations",s.negotiations],["Won",s.won],["Lost",s.lost],["Nurture",s.nurture_leads]
+  ];
+  $("pipelineGrid").innerHTML=items.map(([label,value])=>`<article class="pipeline-card"><span>${esc(label)}</span><strong>${esc(value??0)}</strong></article>`).join("");
 }
-.contact-label{
-  grid-area:label;
-  font-size:11px;
-  font-weight:800;
-  color:rgba(255,255,255,.72);
+
+async function loadLeads(){
+  $("leadStatus").textContent=tr("loading");
+  try{
+    const rows=await rpc("jb_sales_dashboard_leads_v1",{
+      p_temperature:$("temperatureFilter").value||null,p_stage:$("stageFilter").value||null,
+      p_only_due:$("dueOnly").checked,p_search:$("searchInput").value.trim()||null,p_limit:150,p_offset:0
+    });
+    $("leadRows").innerHTML=(rows||[]).map(r=>`
+      <tr>
+        <td><div class="lead-name">${esc(r.full_name)}</div><div class="lead-contact">${esc(r.whatsapp_phone||r.phone||r.email||"—")}</div></td>
+        <td>${tempBadge(r.lead_temperature)} <strong>${esc(r.qualification_score??"—")}</strong></td>
+        <td><span class="stage">${esc(stageLabel(r.sales_stage))}</span></td>
+        <td><span class="action">${esc(actionLabel(r.next_best_action||"REVIEW"))}</span><div class="lead-contact">${esc(r.recommended_channel==="whatsapp"?tr("whatsapp"):r.recommended_channel||"")}</div></td>
+        <td>${esc((currentLang==="ar"?r.best_project_name_ar:r.best_project_name_en)||r.best_project_name_en||r.best_project_name_ar||tr("noSavedMatch"))}</td>
+        <td>${esc(fmtDate(r.next_follow_up_at))}</td>
+        <td><button class="open-btn" data-lead="${esc(r.lead_id)}">${tr("open")}</button></td>
+      </tr>`).join("");
+    $("leadStatus").textContent=`${rows?.length||0} ${tr("leadsCount")}`;
+    document.querySelectorAll("[data-lead]").forEach(b=>b.addEventListener("click",()=>openLead(b.dataset.lead)));
+  }catch(e){$("leadStatus").textContent=e.message||tr("failedLoadLeads");}
 }
-.contact-value{
-  grid-area:value;
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  color:#fff;
-  font-size:14px;
-  font-weight:800;
+
+async function openLead(id){
+  currentLeadId=id; $("leadDrawer").classList.remove("hidden"); $("leadDrawer").setAttribute("aria-hidden","false");
+  $("leadDetail").innerHTML=`<p>${tr("loadingLead")}</p>`;
+  try{renderLeadDetail(await rpc("jb_sales_dashboard_lead_detail_v1",{p_lead_id:id}));}
+  catch(e){$("leadDetail").innerHTML=`<p class="status">${esc(e.message||tr("failedLoadLead"))}</p>`;}
 }
-.ltr-value{
-  direction:ltr;
-  text-align:left;
+document.querySelectorAll("[data-close-drawer]").forEach(x=>x.addEventListener("click",closeDrawer));
+function closeDrawer(){ $("leadDrawer").classList.add("hidden"); $("leadDrawer").setAttribute("aria-hidden","true"); currentLeadId=null; }
+
+function renderLeadDetail(d){
+  const l=d.lead||{}, p=l.search_profile||{}, cp=l.customer_preferences||{}, wa=l.whatsapp_phone||l.phone;
+  const contactButtons=[
+    wa?`<a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/${esc(waHref(wa))}">${tr("whatsapp")}</a>`:"",
+    l.phone?`<a class="btn secondary" href="tel:${esc(telHref(l.phone))}">${tr("call")}</a>`:"",
+    l.email?`<a class="btn secondary" href="mailto:${esc(l.email)}">${tr("email")}</a>`:""
+  ].join("");
+
+  const contactDetails = `
+    <div class="lead-contact-panel">
+      <div class="lead-contact-panel-title">${tr("contactDetails")}</div>
+
+      <div class="lead-contact-items">
+        <div class="contact-item">
+          <span class="contact-label">${tr("phone")}</span>
+          <strong class="contact-value ltr-value">${esc(l.phone||tr("noContact"))}</strong>
+          ${l.phone?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(l.phone)}">${tr("copy")}</button>`:""}
+        </div>
+
+        <div class="contact-item">
+          <span class="contact-label">${tr("whatsapp")}</span>
+          <strong class="contact-value ltr-value">${esc(l.whatsapp_phone||l.phone||tr("noContact"))}</strong>
+          ${wa?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(wa)}">${tr("copy")}</button>`:""}
+        </div>
+
+        <div class="contact-item">
+          <span class="contact-label">${tr("email")}</span>
+          <strong class="contact-value ltr-value">${esc(l.email||tr("noContact"))}</strong>
+          ${l.email?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(l.email)}">${tr("copy")}</button>`:""}
+        </div>
+      </div>
+    </div>
+  `;
+
+  const top3=(d.top3||[]).map(t=>`
+    <article class="match-card">
+      <div class="match-head">
+        <div><h3>#${esc(t.recommendation_order)} ${esc((currentLang==="ar"?t.name_ar:t.name_en)||t.name_en||t.name_ar)}</h3>
+        <div class="match-meta">${esc((currentLang==="ar"?t.developer_name_ar:t.developer_name_en)||t.developer_name_en||t.developer_name_ar||"")} · ${esc(t.city||"")} ${t.area?`· ${esc(t.area)}`:""} · ${esc(fmtMoney(t.display_starting_price,t.currency))}</div></div>
+        <span class="match-role">${esc(roleLabel(t.fit_role))}</span>
+      </div>
+      <div class="match-lines">
+        <div><b>${tr("confidence")}:</b> <span class="confidence ${esc((t.confidence_level||"").toLowerCase())}">${esc(confLabel(t.confidence_level))}</span></div>
+        <div><b>${tr("why")}:</b> ${esc(t.why_it_fits||"—")}</div>
+        <div><b>${tr("likelyObjection")}:</b> ${esc(t.likely_objection||"—")}</div>
+        <div><b>${tr("salesAngle")}:</b> ${esc(t.sales_angle||"—")}</div>
+        <div><b>${tr("nextQuestion")}:</b> ${esc(t.next_question||"—")}</div>
+        <div><b>${tr("nextActionLabel")}:</b> ${esc(t.next_action||"—")}</div>
+      </div>
+    </article>`).join("") || `<div class="detail-card"><p class="muted">${tr("noMatches")}</p></div>`;
+
+  const activity=(d.activity||[]).map(a=>`
+    <div class="activity-item"><strong>${esc(actionLabel(a.action_type||"UPDATE"))}</strong>
+    · ${esc(fmtDate(a.created_at))}${a.note?`<div>${esc(a.note)}</div>`:""}</div>`
+  ).join("") || `<p class="muted">${tr("noActivity")}</p>`;
+
+  $("leadDetail").innerHTML=`
+    <section class="lead-hero">
+      <p class="eyebrow">${tr("lead360")}</p><h2>${esc(l.full_name||tr("lead"))}</h2>
+      <div class="meta">${tempBadge(l.lead_temperature)} <span>${tr("scoreLabel")} ${esc(l.qualification_score??"—")}/100</span><span>${esc(stageLabel(l.sales_stage))}</span><span>${esc(actionLabel(l.next_best_action||"REVIEW"))}</span></div>
+      <div class="lead-actions">${contactButtons}</div>
+      ${contactDetails}
+    </section>
+    <div class="detail-grid">
+      <article class="detail-card"><h3>${tr("searchProfile")}</h3><div class="kv">
+        <b>${tr("location")}</b><span>${esc(p.location||"—")}</span><b>${tr("budget")}</b><span>${esc(p.budget||"—")}</span>
+        <b>${tr("propertyType")}</b><span>${esc(p.type||"—")}</span><b>${tr("purpose")}</b><span>${esc(p.purpose||"—")}</span>
+        <b>${tr("delivery")}</b><span>${esc(p.delivery||"—")}</span><b>${tr("timeline")}</b><span>${esc(p.timeline||"—")}</span>
+      </div></article>
+      <article class="detail-card"><h3>${tr("customerPreferences")}</h3><div class="kv">
+        <b>${tr("payment")}</b><span>${esc(cp.payment_method||p.payment||"—")}</span>
+        <b>${tr("maxDown")}</b><span>${esc(cp.max_down_payment_pct??"—")}${cp.max_down_payment_pct!=null?"%":""}</span>
+        <b>${tr("installmentYears")}</b><span>${esc(cp.preferred_installment_years??"—")}</span>
+        <b>${tr("topPriority")}</b><span>${esc(cp.top_priority||"—")}</span>
+        <b>${tr("alternatives")}</b><span>${cp.open_to_alternatives===true?tr("yes"):cp.open_to_alternatives===false?tr("no"):"—"}</span>
+        <b>${tr("futureRecommendations")}</b><span>${l.allow_recommendations?tr("allowed"):tr("notAllowed")}</span>
+      </div></article>
+    </div>
+    <p class="eyebrow">${tr("top3Support")}</p><div class="top3">${top3}</div>
+    <form id="leadUpdateForm" class="update-form">
+      <div><p class="eyebrow">${tr("salesOperation")}</p><h3>${tr("updateLead")}</h3></div>
+      <div class="form-grid">
+        <label>${tr("stage")}<select id="uStage">
+          ${Object.keys(STAGES).map(s=>`<option value="${s}" ${l.sales_stage===s?"selected":""}>${esc(stageLabel(s))}</option>`).join("")}
+        </select></label>
+        <label>${tr("salesOwner")}<input id="uOwner" value="${esc(l.sales_owner||"")}"></label>
+        <label>${tr("nextFollowup")}<input id="uFollow" type="datetime-local"></label>
+        <label class="check"><input id="uClearFollow" type="checkbox"> ${tr("clearFollowup")}</label>
+      </div>
+      <label>${tr("salesNote")}<textarea id="uNotes" placeholder="${esc(tr("salesNotePlaceholder"))}"></textarea></label>
+      <label class="check"><input id="uContacted" type="checkbox"> ${tr("markContacted")}</label>
+      <button class="btn primary" type="submit">${tr("saveUpdate")}</button>
+      <p id="updateStatus" class="status"></p>
+    </form>
+    <article class="detail-card" style="margin-top:16px"><h3>${tr("recentActivity")}</h3><div class="activity">${activity}</div></article>`;
+  $("leadUpdateForm").addEventListener("submit",saveLeadUpdate);
+  document.querySelectorAll(".copy-contact-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>copyText(btn.dataset.copyValue,btn));
+  });
 }
-.copy-contact-btn{
-  grid-area:copy;
-  border:1px solid rgba(255,255,255,.25);
-  background:#fff;
-  color:var(--navy);
-  border-radius:8px;
-  padding:6px 8px;
-  font-size:11px;
-  font-weight:900;
-  cursor:pointer;
+
+async function saveLeadUpdate(e){
+  e.preventDefault(); $("updateStatus").textContent=tr("saving"); const follow=$("uFollow").value;
+  try{
+    await rpc("jb_sales_dashboard_update_lead_v1",{
+      p_lead_id:currentLeadId,p_sales_stage:$("uStage").value,p_sales_owner:$("uOwner").value.trim()||null,
+      p_next_follow_up_at:follow?new Date(follow).toISOString():null,p_clear_follow_up:$("uClearFollow").checked,
+      p_sales_notes:$("uNotes").value.trim()||null,p_mark_contacted:$("uContacted").checked,
+      p_lost_reason:null,p_won_project_id:null,p_won_value:null
+    });
+    $("updateStatus").textContent=tr("saved");
+    await Promise.all([loadSummary(),loadLeads()]); await openLead(currentLeadId);
+  }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
-.copy-contact-btn:hover{background:#f7f2e6}
-.copy-contact-btn.copied{background:#e8f5ee;color:var(--ok)}
-html[dir="rtl"] .ltr-value{text-align:right}
-@media(max-width:760px){
-  .lead-contact-items{grid-template-columns:1fr}
-}
+
+async function loadAll(){try{await Promise.all([loadSummary(),loadLeads()]);}catch(e){console.error(e);}}
+
+applyLang();
+(async()=>{if(await checkAccess()) await loadAll();})();
