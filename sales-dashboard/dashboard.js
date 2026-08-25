@@ -311,8 +311,8 @@ function renderLeadDetail(d){
     <section class="lead-hero">
       <p class="eyebrow">${tr("lead360")}</p><h2>${esc(l.full_name||tr("lead"))}</h2>
       <div class="meta">${tempBadge(l.lead_temperature)} <span>${tr("scoreLabel")} ${esc(l.qualification_score??"—")}/100</span><span>${esc(stageLabel(l.sales_stage))}</span><span>${esc(actionLabel(l.next_best_action||"REVIEW"))}</span></div>
-      <div class="lead-actions">${contactButtons}</div>
       ${contactDetails}
+      <div class="lead-actions">${contactButtons}</div>
     </section>
     <div class="detail-grid">
       <article class="detail-card"><h3>${tr("searchProfile")}</h3><div class="kv">
