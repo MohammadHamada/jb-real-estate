@@ -70,3 +70,72 @@ td{font-size:13px}.lead-name{font-weight:800}.lead-contact{font-size:11px;color:
 .activity{display:grid;gap:7px}.activity-item{font-size:12px;padding:9px 0;border-bottom:1px solid var(--line)}
 @media(max-width:1100px){.metric-grid{grid-template-columns:repeat(3,1fr)}.pipeline-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.sidebar{display:none}main{margin-left:0;padding:16px}.metric-grid{grid-template-columns:repeat(2,1fr)}.panel-head{align-items:stretch;flex-direction:column}.filters{display:grid;grid-template-columns:1fr 1fr}.filters input{width:auto;grid-column:1/-1}.detail-grid,.form-grid{grid-template-columns:1fr}.pipeline-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+/* ============================================================
+   JB Sales Intelligence — Bilingual / RTL support
+   ============================================================ */
+.auth-lang-row{display:flex;justify-content:flex-end;margin-bottom:8px}
+.lang-btn,.lang-switch{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--navy);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+
+html[dir="rtl"] body{
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+}
+html[dir="rtl"] .sidebar{
+  inset:0 0 0 auto;
+}
+html[dir="rtl"] main{
+  margin-left:0;
+  margin-right:238px;
+}
+html[dir="rtl"] .nav-item,
+html[dir="rtl"] th,
+html[dir="rtl"] td{
+  text-align:right;
+}
+html[dir="rtl"] .drawer-panel{
+  right:auto;
+  left:0;
+  box-shadow:18px 0 60px rgba(0,0,0,.2);
+}
+html[dir="rtl"] .drawer-close{
+  right:auto;
+  left:18px;
+}
+html[dir="rtl"] .match-card{
+  border-left:1px solid var(--line);
+  border-right:4px solid var(--gold);
+}
+html[dir="rtl"] .kv{
+  grid-template-columns:1fr 135px;
+}
+html[dir="rtl"] .kv b{
+  grid-column:2;
+}
+html[dir="rtl"] .kv span{
+  grid-column:1;
+  grid-row:auto;
+}
+html[dir="rtl"] .sidebar-brand,
+html[dir="rtl"] .lead-actions,
+html[dir="rtl"] .filters,
+html[dir="rtl"] .topbar-actions{
+  direction:rtl;
+}
+html[dir="rtl"] .lead-contact,
+html[dir="rtl"] .staff-email{
+  direction:ltr;
+  text-align:right;
+}
+@media(max-width:760px){
+  html[dir="rtl"] main{margin-right:0}
+}
