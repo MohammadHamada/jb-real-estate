@@ -55,7 +55,12 @@ const I18N = {
     leadToWon:"Lead → Won", leadToContact:"Lead → Contact", contactToQualified:"Contact → Qualified",
     qualifiedToMeeting:"Qualified → Meeting", meetingToWon:"Meeting → Won", salesFunnel:"Sales Funnel",
     followupHealth:"Follow-up Health", overdueFollowups:"Overdue", dueToday:"Due today",
-    noFollowupScheduled:"No follow-up scheduled", noFirstContact:"No first contact"
+    noFollowupScheduled:"No follow-up scheduled", noFirstContact:"No first contact",
+    followupAutomation:"FOLLOW-UP AUTOMATION", followupWorkQueue:"Follow-up Work Queue",
+    followupContactNow:"Contact now", followupDueToday:"Due today", followupOverdue:"Overdue",
+    followupNoSchedule:"No follow-up scheduled", followupNurture:"Nurture", quickFollowup:"Quick follow-up",
+    tomorrow:"Tomorrow", in3Days:"In 3 days", in7Days:"In 7 days", in14Days:"In 14 days", smartSuggested:"Suggested",
+    noQueueItems:"No leads in this queue."
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -99,7 +104,12 @@ const I18N = {
     leadToWon:"من العميل إلى البيع", leadToContact:"من العميل إلى التواصل", contactToQualified:"من التواصل إلى التأهيل",
     qualifiedToMeeting:"من التأهيل إلى الاجتماع", meetingToWon:"من الاجتماع إلى البيع", salesFunnel:"مسار المبيعات",
     followupHealth:"حالة المتابعات", overdueFollowups:"متابعات متأخرة", dueToday:"مستحقة اليوم",
-    noFollowupScheduled:"بدون متابعة مجدولة", noFirstContact:"بدون تواصل أول"
+    noFollowupScheduled:"بدون متابعة مجدولة", noFirstContact:"بدون تواصل أول",
+    followupAutomation:"أتمتة المتابعة", followupWorkQueue:"قائمة عمل المتابعات",
+    followupContactNow:"تواصل الآن", followupDueToday:"مستحقة اليوم", followupOverdue:"متأخرة",
+    followupNoSchedule:"بدون متابعة مجدولة", followupNurture:"متابعة طويلة", quickFollowup:"متابعة سريعة",
+    tomorrow:"غدًا", in3Days:"بعد 3 أيام", in7Days:"بعد أسبوع", in14Days:"بعد أسبوعين", smartSuggested:"مقترح",
+    noQueueItems:"لا توجد حالات في هذه القائمة."
   }
 };
 
@@ -309,6 +319,56 @@ function conversionStageLabel(stage){
     won:{en:"Won",ar:"تم البيع"}
   };
   return m[stage]?.[currentLang] || stage || "—";
+}
+
+
+function followupQueueCard(titleKey,items,kind){
+  const rows=(items||[]).map(x=>{
+    const project=(currentLang==="ar"?x.best_project_name_ar:x.best_project_name_en)
+      || x.best_project_name_en || x.best_project_name_ar || tr("noSavedMatch");
+    const when=x.next_follow_up_at ? fmtDate(x.next_follow_up_at) : "";
+    return `<button class="followup-lead-row ${esc(kind)}" type="button" data-followup-lead="${esc(x.lead_id)}">
+      <div>
+        <strong>${esc(x.full_name)}</strong>
+        <span>${esc(project)}</span>
+        ${when?`<small>${esc(when)}</small>`:""}
+      </div>
+      <div>${tempBadge(x.lead_temperature)} <b>${esc(x.qualification_score??"—")}</b></div>
+    </button>`;
+  }).join("") || `<div class="followup-empty">${tr("noQueueItems")}</div>`;
+
+  return `<article class="followup-queue-group">
+    <div class="followup-queue-head"><h3>${tr(titleKey)}</h3><strong>${items?.length||0}</strong></div>
+    <div>${rows}</div>
+  </article>`;
+}
+
+async function loadFollowupQueue(){
+  $("followupQueueStatus").textContent=tr("loading");
+  try{
+    const d=await rpc("jb_sales_followup_queue_v1",{p_limit_per_group:10});
+    const s=d.summary||{};
+    $("followupSummary").innerHTML=`
+      <div><span>${tr("followupContactNow")}</span><strong>${esc(s.contact_now??0)}</strong></div>
+      <div><span>${tr("followupDueToday")}</span><strong>${esc(s.due_today??0)}</strong></div>
+      <div><span>${tr("followupOverdue")}</span><strong>${esc(s.overdue??0)}</strong></div>
+      <div><span>${tr("followupNoSchedule")}</span><strong>${esc(s.no_followup_scheduled??0)}</strong></div>
+      <div><span>${tr("followupNurture")}</span><strong>${esc(s.nurture??0)}</strong></div>
+    `;
+    $("followupQueueGrid").innerHTML=[
+      followupQueueCard("followupContactNow",d.contact_now,"contact-now"),
+      followupQueueCard("followupDueToday",d.due_today,"due-today"),
+      followupQueueCard("followupOverdue",d.overdue,"overdue"),
+      followupQueueCard("followupNoSchedule",d.no_followup_scheduled,"no-schedule"),
+      followupQueueCard("followupNurture",d.nurture,"nurture")
+    ].join("");
+    document.querySelectorAll("[data-followup-lead]").forEach(btn=>{
+      btn.addEventListener("click",()=>openLead(btn.dataset.followupLead));
+    });
+    $("followupQueueStatus").textContent="";
+  }catch(e){
+    $("followupQueueStatus").textContent=e.message||"Failed to load follow-up queue.";
+  }
 }
 
 async function loadConversionAnalytics(){
@@ -572,6 +632,16 @@ function renderLeadDetail(d){
           <input id="uWonValue" type="number" min="0" step="1000" value="${esc(l.won_value??"")}">
         </label>
       </div>
+      <div class="quick-followup-box">
+        <div class="quick-followup-title">${tr("quickFollowup")}</div>
+        <div class="quick-followup-actions">
+          <button class="btn secondary quick-followup-btn" type="button" data-days="1">${tr("tomorrow")}</button>
+          <button class="btn secondary quick-followup-btn" type="button" data-days="3">${tr("in3Days")}</button>
+          <button class="btn secondary quick-followup-btn" type="button" data-days="7">${tr("in7Days")}</button>
+          <button class="btn secondary quick-followup-btn" type="button" data-days="14">${tr("in14Days")}</button>
+          <button class="btn secondary quick-followup-btn" type="button" data-smart="1">${tr("smartSuggested")}</button>
+        </div>
+      </div>
       <label>${tr("salesNote")}<textarea id="uNotes" placeholder="${esc(tr("salesNotePlaceholder"))}"></textarea></label>
       <label class="check"><input id="uContacted" type="checkbox"> ${tr("markContacted")}</label>
       <button class="btn primary" type="submit">${tr("saveUpdate")}</button>
@@ -587,6 +657,30 @@ function renderLeadDetail(d){
   };
   $("uStage").addEventListener("change",syncOutcomeFields);
   syncOutcomeFields();
+
+  const toLocalInput=(d)=>{
+    const pad=n=>String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const setFollowupDays=(days)=>{
+    const d=new Date();
+    d.setDate(d.getDate()+Number(days));
+    d.setHours(10,0,0,0);
+    $("uFollow").value=toLocalInput(d);
+    $("uClearFollow").checked=false;
+  };
+  const smartDays=()=>{
+    const stage=$("uStage").value;
+    if(["meeting","viewing","negotiation"].includes(stage)) return 1;
+    if(["qualified","options_sent"].includes(stage)) return 3;
+    if(stage==="nurture") return 14;
+    return 1;
+  };
+  document.querySelectorAll(".quick-followup-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      setFollowupDays(btn.dataset.smart ? smartDays() : btn.dataset.days);
+    });
+  });
 
   const refreshWaMessage=()=>{
     $("waMessagePreview").value=buildWhatsAppMessage(l,d.top3||[]);
@@ -622,7 +716,7 @@ async function saveLeadUpdate(e){
   }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
 
-async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadConversionAnalytics(),loadLeads()]);}catch(e){console.error(e);}}
+async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadFollowupQueue(),loadConversionAnalytics(),loadLeads()]);}catch(e){console.error(e);}}
 
 applyLang();
 (async()=>{if(await checkAccess()) await loadAll();})();
