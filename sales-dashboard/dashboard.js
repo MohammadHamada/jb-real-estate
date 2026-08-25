@@ -36,7 +36,9 @@ const I18N = {
     salesNote:"Sales note", salesNotePlaceholder:"What happened, objection, commitment, next step…",
     markContacted:"Mark contact made now", saveUpdate:"Save update", recentActivity:"Recent activity",
     noActivity:"No internal activity recorded yet.", saving:"Saving…", saved:"Saved.", updateFailed:"Update failed.",
-    failedLoadLeads:"Failed to load leads.", whatsapp:"WhatsApp", scoreLabel:"Score"
+    failedLoadLeads:"Failed to load leads.", whatsapp:"WhatsApp", scoreLabel:"Score",
+    contactDetails:"Contact details", phone:"Phone", copy:"Copy", copied:"Copied", copyFailed:"Copy failed",
+    primaryContact:"Primary contact", noContact:"Not provided"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -61,7 +63,9 @@ const I18N = {
     salesNote:"ملاحظة المبيعات", salesNotePlaceholder:"ماذا حدث؟ الاعتراض؟ الالتزام؟ الخطوة التالية…",
     markContacted:"تم التواصل الآن", saveUpdate:"حفظ التحديث", recentActivity:"آخر الأنشطة",
     noActivity:"لا توجد أنشطة داخلية مسجلة حتى الآن.", saving:"جارٍ الحفظ…", saved:"تم الحفظ.", updateFailed:"فشل التحديث.",
-    failedLoadLeads:"تعذر تحميل العملاء.", whatsapp:"واتساب", scoreLabel:"التقييم"
+    failedLoadLeads:"تعذر تحميل العملاء.", whatsapp:"واتساب", scoreLabel:"التقييم",
+    contactDetails:"وسائل التواصل", phone:"الهاتف", copy:"نسخ", copied:"تم النسخ", copyFailed:"تعذر النسخ",
+    primaryContact:"وسيلة التواصل الأساسية", noContact:"غير متاح"
   }
 };
 
@@ -132,6 +136,21 @@ function tempBadge(t){
 }
 function telHref(v){return String(v||"").replace(/[^\d+]/g,"");}
 function waHref(v){return String(v||"").replace(/\D/g,"");}
+
+async function copyText(value, button){
+  if(!value) return;
+  try{
+    await navigator.clipboard.writeText(String(value));
+    if(button){
+      const old=button.textContent;
+      button.textContent=tr("copied");
+      button.classList.add("copied");
+      setTimeout(()=>{button.textContent=old;button.classList.remove("copied");},1200);
+    }
+  }catch(_){
+    window.prompt(currentLang==="ar"?"انسخ القيمة:":"Copy value:",String(value));
+  }
+}
 
 async function rpc(name,args={}){
   const {data,error}=await sb.rpc(name,args);
@@ -240,6 +259,32 @@ function renderLeadDetail(d){
     l.email?`<a class="btn secondary" href="mailto:${esc(l.email)}">${tr("email")}</a>`:""
   ].join("");
 
+  const contactDetails = `
+    <div class="lead-contact-panel">
+      <div class="lead-contact-panel-title">${tr("contactDetails")}</div>
+
+      <div class="lead-contact-items">
+        <div class="contact-item">
+          <span class="contact-label">${tr("phone")}</span>
+          <strong class="contact-value ltr-value">${esc(l.phone||tr("noContact"))}</strong>
+          ${l.phone?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(l.phone)}">${tr("copy")}</button>`:""}
+        </div>
+
+        <div class="contact-item">
+          <span class="contact-label">${tr("whatsapp")}</span>
+          <strong class="contact-value ltr-value">${esc(l.whatsapp_phone||l.phone||tr("noContact"))}</strong>
+          ${wa?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(wa)}">${tr("copy")}</button>`:""}
+        </div>
+
+        <div class="contact-item">
+          <span class="contact-label">${tr("email")}</span>
+          <strong class="contact-value ltr-value">${esc(l.email||tr("noContact"))}</strong>
+          ${l.email?`<button type="button" class="copy-contact-btn" data-copy-value="${esc(l.email)}">${tr("copy")}</button>`:""}
+        </div>
+      </div>
+    </div>
+  `;
+
   const top3=(d.top3||[]).map(t=>`
     <article class="match-card">
       <div class="match-head">
@@ -267,6 +312,7 @@ function renderLeadDetail(d){
       <p class="eyebrow">${tr("lead360")}</p><h2>${esc(l.full_name||tr("lead"))}</h2>
       <div class="meta">${tempBadge(l.lead_temperature)} <span>${tr("scoreLabel")} ${esc(l.qualification_score??"—")}/100</span><span>${esc(stageLabel(l.sales_stage))}</span><span>${esc(actionLabel(l.next_best_action||"REVIEW"))}</span></div>
       <div class="lead-actions">${contactButtons}</div>
+      ${contactDetails}
     </section>
     <div class="detail-grid">
       <article class="detail-card"><h3>${tr("searchProfile")}</h3><div class="kv">
@@ -301,6 +347,9 @@ function renderLeadDetail(d){
     </form>
     <article class="detail-card" style="margin-top:16px"><h3>${tr("recentActivity")}</h3><div class="activity">${activity}</div></article>`;
   $("leadUpdateForm").addEventListener("submit",saveLeadUpdate);
+  document.querySelectorAll(".copy-contact-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>copyText(btn.dataset.copyValue,btn));
+  });
 }
 
 async function saveLeadUpdate(e){
