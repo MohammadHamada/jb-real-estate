@@ -50,7 +50,12 @@ const I18N = {
     lostReason:"Lost reason", wonProject:"Won project", wonValueField:"Won value (EGP)",
     chooseReason:"Choose reason", reasonPrice:"Price", reasonPayment:"Payment plan", reasonLocation:"Location",
     reasonDeveloper:"Developer", reasonDelivery:"Delivery", reasonUnit:"Unit", reasonCompetitor:"Competitor",
-    reasonPostponed:"Postponed", reasonNoResponse:"No response", reasonNotQualified:"Not qualified", reasonOther:"Other"
+    reasonPostponed:"Postponed", reasonNoResponse:"No response", reasonNotQualified:"Not qualified", reasonOther:"Other",
+    conversionAnalytics:"CONVERSION ANALYTICS", salesFunnelPerformance:"Sales Funnel Performance",
+    leadToWon:"Lead → Won", leadToContact:"Lead → Contact", contactToQualified:"Contact → Qualified",
+    qualifiedToMeeting:"Qualified → Meeting", meetingToWon:"Meeting → Won", salesFunnel:"Sales Funnel",
+    followupHealth:"Follow-up Health", overdueFollowups:"Overdue", dueToday:"Due today",
+    noFollowupScheduled:"No follow-up scheduled", noFirstContact:"No first contact"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -89,7 +94,12 @@ const I18N = {
     lostReason:"سبب فقد الصفقة", wonProject:"المشروع المباع", wonValueField:"قيمة الصفقة (جنيه)",
     chooseReason:"اختر السبب", reasonPrice:"السعر", reasonPayment:"خطة السداد", reasonLocation:"الموقع",
     reasonDeveloper:"المطور", reasonDelivery:"موعد الاستلام", reasonUnit:"الوحدة", reasonCompetitor:"منافس",
-    reasonPostponed:"تأجيل الشراء", reasonNoResponse:"لا يرد", reasonNotQualified:"غير مؤهل", reasonOther:"سبب آخر"
+    reasonPostponed:"تأجيل الشراء", reasonNoResponse:"لا يرد", reasonNotQualified:"غير مؤهل", reasonOther:"سبب آخر",
+    conversionAnalytics:"تحليل التحويل", salesFunnelPerformance:"أداء مسار المبيعات",
+    leadToWon:"من العميل إلى البيع", leadToContact:"من العميل إلى التواصل", contactToQualified:"من التواصل إلى التأهيل",
+    qualifiedToMeeting:"من التأهيل إلى الاجتماع", meetingToWon:"من الاجتماع إلى البيع", salesFunnel:"مسار المبيعات",
+    followupHealth:"حالة المتابعات", overdueFollowups:"متابعات متأخرة", dueToday:"مستحقة اليوم",
+    noFollowupScheduled:"بدون متابعة مجدولة", noFirstContact:"بدون تواصل أول"
   }
 };
 
@@ -284,6 +294,58 @@ const LOST_REASON_LABELS = {
 
 function lostReasonLabel(v){
   return LOST_REASON_LABELS[v]?.[currentLang] || v || "—";
+}
+
+
+function conversionStageLabel(stage){
+  const m={
+    new:{en:"New",ar:"جديد"},
+    contacted:{en:"Contacted",ar:"تم التواصل"},
+    qualified:{en:"Qualified",ar:"مؤهل"},
+    options_sent:{en:"Options sent",ar:"تم إرسال الخيارات"},
+    meeting:{en:"Meeting",ar:"اجتماع"},
+    viewing:{en:"Viewing",ar:"معاينة"},
+    negotiation:{en:"Negotiation",ar:"تفاوض"},
+    won:{en:"Won",ar:"تم البيع"}
+  };
+  return m[stage]?.[currentLang] || stage || "—";
+}
+
+async function loadConversionAnalytics(){
+  $("conversionStatus").textContent=tr("loading");
+  try{
+    const d=await rpc("jb_sales_conversion_analytics_v1");
+    const s=d.summary||{};
+    const f=d.followup_health||{};
+
+    $("cLeadWon").textContent=`${s.overall_lead_to_won_rate??0}%`;
+    $("cLeadContact").textContent=`${s.lead_to_contact_rate??0}%`;
+    $("cContactQualified").textContent=`${s.contact_to_qualified_rate??0}%`;
+    $("cQualifiedMeeting").textContent=`${s.qualified_to_meeting_rate??0}%`;
+    $("cMeetingWon").textContent=`${s.meeting_to_won_rate??0}%`;
+
+    $("cOverdue").textContent=f.overdue_followups??0;
+    $("cDueToday").textContent=f.due_today??0;
+    $("cNoFollowup").textContent=f.no_followup_scheduled??0;
+    $("cNoFirstContact").textContent=f.no_first_contact??0;
+
+    const funnel=d.funnel||[];
+    const maxCount=Math.max(1,...funnel.map(x=>Number(x.count||0)));
+    $("salesFunnel").innerHTML=funnel.map(x=>{
+      const pct=Math.max(4,Math.round(100*Number(x.count||0)/maxCount));
+      return `<div class="funnel-row">
+        <div class="funnel-row-head">
+          <span>${esc(conversionStageLabel(x.stage))}</span>
+          <strong>${esc(x.count??0)}</strong>
+        </div>
+        <div class="funnel-track"><span style="width:${pct}%"></span></div>
+      </div>`;
+    }).join("");
+
+    $("conversionStatus").textContent="";
+  }catch(e){
+    $("conversionStatus").textContent=e.message||"Failed to load conversion analytics.";
+  }
 }
 
 async function loadOutcomes(){
@@ -560,7 +622,7 @@ async function saveLeadUpdate(e){
   }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
 
-async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadLeads()]);}catch(e){console.error(e);}}
+async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadConversionAnalytics(),loadLeads()]);}catch(e){console.error(e);}}
 
 applyLang();
 (async()=>{if(await checkAccess()) await loadAll();})();
