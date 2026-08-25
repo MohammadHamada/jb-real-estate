@@ -599,3 +599,28 @@ html[dir="rtl"] .contact-value{
   .outcome-grid{grid-template-columns:1fr}
   .whatsapp-assistant textarea{font-size:15px}
 }
+
+
+/* ============================================================
+   JB Conversion Analytics V1
+   ============================================================ */
+.conversion-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.conversion-kpi{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px;background:#fff}
+.conversion-kpi span{font-size:15px;line-height:1.5;color:var(--muted);font-weight:800}
+.conversion-kpi strong{font-size:25px;line-height:1.2;color:var(--navy);font-weight:900}
+.conversion-layout{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}
+.conversion-card{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fff}
+.conversion-card h3{margin:0 0 12px;font-size:19px;line-height:1.4;font-weight:900}
+.funnel-list{display:grid;gap:12px}
+.funnel-row{display:grid;gap:7px}
+.funnel-row-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.funnel-row-head span,.funnel-row-head strong{font-size:15px;line-height:1.5}
+.funnel-row-head span{font-weight:800}.funnel-row-head strong{font-weight:900}
+.funnel-track{height:12px;border-radius:999px;background:#eef1f4;overflow:hidden}
+.funnel-track span{display:block;height:100%;min-width:4%;background:var(--navy);border-radius:999px}
+.followup-health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.followup-health-grid>div{border:1px solid var(--line);border-radius:11px;padding:13px;display:grid;gap:5px}
+.followup-health-grid span{font-size:15px;line-height:1.5;color:var(--muted);font-weight:800}
+.followup-health-grid strong{font-size:23px;line-height:1.25;color:var(--navy);font-weight:900}
+@media(max-width:1100px){.conversion-kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.conversion-kpis{grid-template-columns:repeat(2,1fr)}.conversion-layout{grid-template-columns:1fr}.followup-health-grid{grid-template-columns:1fr 1fr}}
