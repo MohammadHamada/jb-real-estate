@@ -105,6 +105,10 @@ const translations = {
     'projects.eyebrow':'EXPLORE',
     'projects.title':'Projects',
     'projects.link':'Find my best options →',
+    'recent.eyebrow':'YOUR JOURNEY',
+    'recent.title':'Recently viewed',
+    'recent.clear':'Clear',
+    'intl.brandTag':'Egypt Real Estate Advisory',
 
     'developers.eyebrow':'MARKET DIRECTORY',
     'developers.title':'Explore Developers',
@@ -230,6 +234,10 @@ const translations = {
 
     'projects.eyebrow':'اكتشف',
     'projects.title':'المشروعات',
+    'recent.eyebrow':'رحلتك',
+    'recent.title':'شوهدت مؤخرًا',
+    'recent.clear':'مسح',
+    'intl.brandTag':'استشارات عقارية في مصر',
     'projects.link':'ابحث عن أفضل الخيارات ←',
 
     'developers.eyebrow':'دليل السوق',
@@ -497,14 +505,22 @@ async function loadMarketData() {
       already excludes MANUAL_REVIEW / QA_REVIEW projects.
     */
 
-    const [publicProjectData, options] = await Promise.all([
+    const [publicProjectData, options, coverRows] = await Promise.all([
       supabaseGet(
         'jb_public_projects_v1?select=project_id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,cover_image_url,website_url,developer_id,developer_slug,developer_name_ar,developer_name_en,developer_logo_url,location_id,city,area,official_starting_price,market_starting_price,display_starting_price,currency,price_evidence_type,delivery_date,completion_year,construction_status,handover_status,property_type_slugs,property_types_en,property_types_ar,market_min_area,market_max_area,min_down_payment_percentage,max_installment_years,payment_evidence_type,readiness_score,readiness,production_status,evidence_source_count,verification_status,last_verified_at&order=name_en.asc'
       ),
-      supabaseRpc('jb_get_filter_options_v1', {})
+      supabaseRpc('jb_get_filter_options_v1', {}),
+      supabaseGet('jb_public_project_cover_v1?select=project_id,public_url,thumbnail_url&order=project_id.asc')
+        .catch(() => [])
     ]);
 
     const rows = Array.isArray(publicProjectData) ? publicProjectData : [];
+    const mediaCoverMap = new Map(
+      (Array.isArray(coverRows) ? coverRows : []).map(item => [
+        item.project_id,
+        item.thumbnail_url || item.public_url || null
+      ])
+    );
     filterOptions = options || null;
     productionApiOnline = true;
 
@@ -522,7 +538,7 @@ async function loadMarketData() {
         description_en: row.description_en,
         overview_ar: row.overview_ar,
         overview_en: row.overview_en,
-        cover_image_url: row.cover_image_url,
+        cover_image_url: mediaCoverMap.get(row.project_id) || row.cover_image_url,
         website_url: row.website_url,
 
         developer_id: row.developer_id,
@@ -611,6 +627,7 @@ async function loadMarketData() {
     renderDevelopers(filteredDevelopers);
     renderProjects();
     renderComparison();
+    renderRecentProjects();
 
   } catch (error) {
     productionApiOnline = false;
@@ -766,6 +783,16 @@ function projectCard(project) {
           </button>
 
           <button
+            class="compare-chip save-chip ${isProjectSaved(project.id) ? 'is-selected' : ''}"
+            type="button"
+            data-project-save="${project.id}"
+            aria-label="${lang === 'ar' ? 'حفظ المشروع' : 'Save project'}">
+            ${isProjectSaved(project.id)
+              ? (lang === 'ar' ? '♥ محفوظ' : '♥ Saved')
+              : (lang === 'ar' ? '♡ حفظ' : '♡ Save')}
+          </button>
+
+          <button
             class="compare-chip ${selected ? 'is-selected' : ''}"
             type="button"
             data-project-compare="${project.id}">
@@ -891,6 +918,88 @@ function searchDevelopers() {
 document.getElementById('developerSearchBtn')?.addEventListener('click', searchDevelopers);
 
 document.getElementById('developerSearch')?.addEventListener('input', searchDevelopers);
+
+
+
+/* =========================================================
+   GUEST SAVED PROJECTS + RECENTLY VIEWED
+   Pre-account journey memory. Client Account will sync these later.
+   ========================================================= */
+
+const JB_SAVED_PROJECTS_KEY = 'jb_saved_projects_v1';
+const JB_RECENT_PROJECTS_KEY = 'jb_recent_projects_v1';
+const JB_RECENT_PROJECTS_MAX = 5;
+
+function readIdList(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeIdList(key, list) {
+  localStorage.setItem(key, JSON.stringify([...new Set(list.filter(Boolean))]));
+}
+
+function isProjectSaved(id) {
+  return readIdList(JB_SAVED_PROJECTS_KEY).includes(id);
+}
+
+function toggleSavedProject(id) {
+  const list = readIdList(JB_SAVED_PROJECTS_KEY);
+  const exists = list.includes(id);
+  const next = exists ? list.filter(item => item !== id) : [id, ...list];
+  writeIdList(JB_SAVED_PROJECTS_KEY, next);
+  renderProjects();
+  renderRecentProjects();
+
+  const modal = document.getElementById('profileModal');
+  if (modal && !modal.hidden) {
+    const current = modalHistory[modalHistory.length - 1];
+    if (current?.type === 'project' && current.id === id) {
+      showProjectProfile(id, current.parentDeveloperId || null, false);
+    }
+  }
+}
+
+function addRecentlyViewedProject(id) {
+  const list = readIdList(JB_RECENT_PROJECTS_KEY).filter(item => item !== id);
+  writeIdList(JB_RECENT_PROJECTS_KEY, [id, ...list].slice(0, JB_RECENT_PROJECTS_MAX));
+  renderRecentProjects();
+}
+
+function renderRecentProjects() {
+  const panel = document.getElementById('recentProjectsPanel');
+  const row = document.getElementById('recentProjectsRow');
+  if (!panel || !row || !projects.length) return;
+
+  const items = readIdList(JB_RECENT_PROJECTS_KEY)
+    .map(id => projects.find(project => project.id === id))
+    .filter(Boolean)
+    .slice(0, JB_RECENT_PROJECTS_MAX);
+
+  panel.hidden = items.length === 0;
+  row.innerHTML = items.map(project => `
+    <button type="button" class="recent-project-card" data-project-profile="${project.id}">
+      <span class="recent-project-thumb">
+        ${project.cover_image_url
+          ? `<img src="${escapeHtml(project.cover_image_url)}" alt="${escapeHtml(projectName(project))}" loading="lazy">`
+          : `<b>${projectInitials(project)}</b>`}
+      </span>
+      <span>
+        <strong>${escapeHtml(projectName(project))}</strong>
+        <small>${escapeHtml(projectLocation(project))}</small>
+      </span>
+    </button>
+  `).join('');
+}
+
+document.getElementById('clearRecentProjects')?.addEventListener('click', () => {
+  localStorage.removeItem(JB_RECENT_PROJECTS_KEY);
+  renderRecentProjects();
+});
 
 
 /* =========================================================
@@ -1061,6 +1170,191 @@ async function showDeveloperProfile(id, pushHistory = true) {
   `, { type: 'developer', id }, false);
 }
 
+
+async function getProjectMedia(slug) {
+  try {
+    const payload = await supabaseRpc('jb_get_project_media_v1', { p_slug: slug });
+    return payload || {media:[]};
+  } catch (error) {
+    console.warn('Project media fallback:', error);
+    return {media:[]};
+  }
+}
+
+function mediaTypeLabel(type) {
+  const labels = {
+    cover:{en:'Cover',ar:'الرئيسية'},
+    gallery:{en:'Photos',ar:'الصور'},
+    master_plan:{en:'Master Plan',ar:'المخطط العام'},
+    floor_plan:{en:'Floor Plans',ar:'مخططات الوحدات'},
+    unit_layout:{en:'Unit Layouts',ar:'تقسيمات الوحدات'},
+    brochure:{en:'Brochure',ar:'البروشور'}
+  };
+  return labels[type]?.[lang] || type;
+}
+
+function renderProjectMedia(project, mediaPayload) {
+  const media = Array.isArray(mediaPayload?.media) ? mediaPayload.media : [];
+  const visualMedia = media.filter(item =>
+    ['cover','gallery','master_plan','floor_plan','unit_layout'].includes(item.media_type)
+  );
+
+  if (!visualMedia.length) {
+    return `<div class="profile-project-hero">${projectVisual(project)}</div>`;
+  }
+
+  const first = visualMedia[0];
+  const groups = [...new Set(visualMedia.map(item => item.media_type))];
+
+  return `
+    <section class="project-media-shell" data-project-media-shell>
+      <div class="project-media-main">
+        <img
+          id="projectMediaMainImage"
+          src="${escapeHtml(first.public_url)}"
+          alt="${escapeHtml((lang === 'ar' ? first.title_ar : first.title_en) || projectName(project))}">
+        <div class="project-media-overlay">
+          <span id="projectMediaCounter">1 / ${visualMedia.length}</span>
+          <a id="projectMediaOpenOriginal" href="${escapeHtml(first.public_url)}" target="_blank" rel="noopener">
+            ${lang === 'ar' ? 'فتح بالحجم الكامل' : 'Open full size'}
+          </a>
+        </div>
+      </div>
+
+      ${groups.length > 1 ? `
+        <div class="project-media-tabs">
+          <button class="project-media-tab is-active" type="button" data-media-filter="all">
+            ${lang === 'ar' ? 'الكل' : 'All'}
+          </button>
+          ${groups.map(type => `
+            <button class="project-media-tab" type="button" data-media-filter="${escapeHtml(type)}">
+              ${escapeHtml(mediaTypeLabel(type))}
+            </button>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <div class="project-media-thumbs" id="projectMediaThumbs">
+        ${visualMedia.map((item,index) => `
+          <button
+            class="project-media-thumb ${index===0?'is-active':''}"
+            type="button"
+            data-media-index="${index}"
+            data-media-type="${escapeHtml(item.media_type)}"
+            data-media-url="${escapeHtml(item.public_url)}"
+            data-media-title="${escapeHtml((lang === 'ar' ? item.title_ar : item.title_en) || projectName(project))}"
+            data-media-source="${escapeHtml(item.source_url || '')}">
+            <img src="${escapeHtml(item.thumbnail_url || item.public_url)}"
+                 alt="${escapeHtml((lang === 'ar' ? item.title_ar : item.title_en) || mediaTypeLabel(item.media_type))}"
+                 loading="lazy">
+            <small>${escapeHtml(mediaTypeLabel(item.media_type))}</small>
+          </button>
+        `).join('')}
+      </div>
+
+      <div class="project-media-meta">
+        <span>${lang === 'ar'
+          ? `${visualMedia.length} مادة بصرية موثقة`
+          : `${visualMedia.length} verified visual item${visualMedia.length===1?'':'s'}`}</span>
+        <span>${lang === 'ar'
+          ? 'يتم عرض المواد المتاحة فقط'
+          : 'Only available media is shown'}</span>
+      </div>
+    </section>
+  `;
+}
+
+function bindProjectMediaGallery() {
+  const thumbs = [...document.querySelectorAll('.project-media-thumb')];
+  const main = document.getElementById('projectMediaMainImage');
+  const counter = document.getElementById('projectMediaCounter');
+  const original = document.getElementById('projectMediaOpenOriginal');
+  const tabs = [...document.querySelectorAll('.project-media-tab')];
+
+  const visibleThumbs = () => thumbs.filter(btn => !btn.hidden);
+
+  const activate = btn => {
+    if (!btn || !main) return;
+    thumbs.forEach(item => item.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    main.src = btn.dataset.mediaUrl;
+    main.alt = btn.dataset.mediaTitle || '';
+    if (original) original.href = btn.dataset.mediaUrl;
+
+    const visible = visibleThumbs();
+    const position = visible.indexOf(btn);
+    if (counter) counter.textContent = `${Math.max(1, position + 1)} / ${visible.length}`;
+  };
+
+  thumbs.forEach(btn => btn.addEventListener('click', () => activate(btn)));
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(item => item.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      const filter = tab.dataset.mediaFilter;
+      thumbs.forEach(btn => {
+        btn.hidden = filter !== 'all' && btn.dataset.mediaType !== filter;
+      });
+      activate(visibleThumbs()[0]);
+    });
+  });
+}
+
+function buildProjectShareUrl(project, channel='copy') {
+  const url = new URL(window.location.href);
+  url.hash = 'projects';
+  url.searchParams.set('project', project.slug);
+  url.searchParams.set('ref', getOrCreateShareCode());
+  url.searchParams.set('via', channel);
+  return url.toString();
+}
+
+async function shareProject(project, channel='copy') {
+  const url = buildProjectShareUrl(project, channel);
+  const message = lang === 'ar'
+    ? `شاهد مشروع ${projectName(project)} على JB Real Estate:\n${url}`
+    : `View ${projectName(project)} on JB Real Estate:\n${url}`;
+
+  await trackReferralEvent('share', channel, getOrCreateShareCode());
+
+  if (channel === 'whatsapp') {
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    return;
+  }
+
+  if (channel === 'email') {
+    window.location.href = `mailto:?subject=${encodeURIComponent(projectName(project))}&body=${encodeURIComponent(message)}`;
+    return;
+  }
+
+  if (channel === 'native' && navigator.share) {
+    await navigator.share({title:projectName(project),text:message,url});
+    return;
+  }
+
+  await navigator.clipboard.writeText(url);
+  const status = document.getElementById('projectShareStatus');
+  if (status) status.textContent = lang === 'ar' ? 'تم نسخ الرابط' : 'Link copied';
+}
+
+function bindProjectShare(project) {
+  document.querySelectorAll('[data-project-share-channel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      shareProject(project, btn.dataset.projectShareChannel || 'copy')
+        .catch(error => console.warn('Project share failed:', error));
+    });
+  });
+}
+
+function openSharedProjectFromUrl() {
+  const slug = new URL(window.location.href).searchParams.get('project');
+  if (!slug || !projects.length) return;
+  const project = projects.find(item => item.slug === slug);
+  if (project) showProjectProfile(project.id, project.developer_id, true);
+}
+
+
 async function showProjectProfile(id, parentDeveloperId = null, pushHistory = true) {
   const localProject = projects.find(item => item.id === id);
   if (!localProject) return;
@@ -1069,6 +1363,17 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
     <div class="data-empty">
       ${lang === 'ar' ? 'جارٍ تحميل بيانات المشروع...' : 'Loading project data...'}
     </div>
+
+    <div class="project-share-panel" id="projectSharePanel" hidden>
+      <strong>${lang === 'ar' ? 'شارك المشروع مع شخص يساعدك في القرار' : 'Share this project with someone you trust'}</strong>
+      <div class="project-share-actions">
+        <button type="button" class="jb-share-btn" data-project-share-channel="whatsapp">WhatsApp</button>
+        <button type="button" class="jb-share-btn" data-project-share-channel="copy">${lang === 'ar' ? 'نسخ الرابط' : 'Copy link'}</button>
+        ${navigator.share ? `<button type="button" class="jb-share-btn" data-project-share-channel="native">${lang === 'ar' ? 'مشاركة من الهاتف' : 'Share'}</button>` : ''}
+        <button type="button" class="jb-share-btn" data-project-share-channel="email">${lang === 'ar' ? 'البريد' : 'Email'}</button>
+      </div>
+      <span id="projectShareStatus" class="jb-share-status" aria-live="polite"></span>
+    </div>
   `, {
     type: 'project',
     id,
@@ -1076,13 +1381,18 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
   }, pushHistory);
 
   let payload = null;
+  let mediaPayload = {media:[]};
 
   try {
-    payload = await supabaseRpc('jb_get_project_details_v1', {
-      p_slug: localProject.slug
-    });
+    [payload, mediaPayload] = await Promise.all([
+      supabaseRpc('jb_get_project_details_v1', { p_slug: localProject.slug }),
+      getProjectMedia(localProject.slug)
+    ]);
   } catch (error) {
-    console.warn('Project RPC fallback:', error);
+    console.warn('Project RPC/media fallback:', error);
+    try {
+      mediaPayload = await getProjectMedia(localProject.slug);
+    } catch {}
   }
 
   const project = {
@@ -1192,9 +1502,7 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
       <span class="profile-breadcrumb">${escapeHtml(projectDeveloper(project))} / ${escapeHtml(projectName(project))}</span>
     </div>
 
-    <div class="profile-project-hero">
-      ${projectVisual(project)}
-    </div>
+    ${renderProjectMedia(project, mediaPayload)}
 
     <div class="profile-heading">
       <span class="eyebrow dark">${lang === 'ar' ? 'ملف المشروع' : 'PROJECT PROFILE'}</span>
@@ -1247,6 +1555,16 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
     </div>
 
     <div class="profile-actions">
+      <button class="btn btn-outline-dark" type="button" data-project-save="${project.id}">
+        ${isProjectSaved(project.id)
+          ? (lang === 'ar' ? '♥ محفوظ في قائمتي' : '♥ Saved')
+          : (lang === 'ar' ? '♡ حفظ المشروع' : '♡ Save project')}
+      </button>
+
+      <button class="btn btn-outline-dark" type="button" data-project-share-toggle>
+        ${lang === 'ar' ? 'مشاركة المشروع' : 'Share project'}
+      </button>
+
       <button class="btn btn-gold" type="button" data-project-compare="${project.id}">
         ${comparison.some(item => item.id === project.id)
           ? (lang === 'ar' ? '✓ موجود في المقارنة' : '✓ In comparison')
@@ -1272,6 +1590,15 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
     id,
     parentDeveloperId: backDeveloperId
   }, false);
+
+  addRecentlyViewedProject(project.id);
+  bindProjectMediaGallery();
+  bindProjectShare(project);
+
+  document.querySelector('[data-project-share-toggle]')?.addEventListener('click', () => {
+    const panel = document.getElementById('projectSharePanel');
+    if (panel) panel.hidden = !panel.hidden;
+  });
 }
 
 document.addEventListener('click', event => {
@@ -1280,6 +1607,7 @@ document.addEventListener('click', event => {
   const projectButton = event.target.closest('[data-project-profile]');
   const compareButton = event.target.closest('[data-project-compare]');
   const consultButton = event.target.closest('[data-project-consult]');
+  const saveButton = event.target.closest('[data-project-save]');
 
   if (backButton) {
     modalBack();
@@ -1298,6 +1626,11 @@ document.addEventListener('click', event => {
       null;
 
     showProjectProfile(projectButton.dataset.projectProfile, parentDeveloperId, true);
+  }
+
+  if (saveButton) {
+    toggleSavedProject(saveButton.dataset.projectSave);
+    return;
   }
 
   if (compareButton) {
@@ -1493,6 +1826,318 @@ document.getElementById('clearComparison')?.addEventListener('click', () => {
 const finderForm = document.getElementById('finderForm');
 let currentSearchProfile = null;
 let currentShortlist = [];
+
+/* =========================================================
+   CUSTOMER EXPERIENCE GROWTH LOOP V1
+   Saved search + referral sharing + return triggers
+   ========================================================= */
+
+const JB_SAVED_SEARCH_KEY = 'jb_saved_search_v1';
+const JB_SHARE_CODE_KEY = 'jb_share_code_v1';
+const JB_REFERRAL_CONTEXT_KEY = 'jb_referral_context_v1';
+
+let previousSavedSearchSnapshot = null;
+
+function safeJsonParse(value, fallback = null) {
+  try {
+    return JSON.parse(value);
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function getOrCreateShareCode() {
+  let code = localStorage.getItem(JB_SHARE_CODE_KEY);
+
+  if (!code) {
+    code = (window.crypto?.randomUUID?.() || (
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      })
+    ));
+
+    localStorage.setItem(JB_SHARE_CODE_KEY, code);
+  }
+
+  return code;
+}
+
+function getReferralContext() {
+  return safeJsonParse(localStorage.getItem(JB_REFERRAL_CONTEXT_KEY), {}) || {};
+}
+
+async function trackReferralEvent(eventType, channel = null, referralCode = null) {
+  try {
+    await supabaseRpc('jb_track_referral_event_v1', {
+      p_event_type: eventType,
+      p_referral_code: referralCode || getOrCreateShareCode(),
+      p_channel: channel || null,
+      p_page_path: window.location.pathname,
+      p_referrer: document.referrer || null
+    });
+  } catch (error) {
+    // Referral analytics must never block the user journey.
+    console.warn('Referral event was not recorded:', error);
+  }
+}
+
+function referralParamsFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  const via = params.get('via');
+
+  if (!ref) return null;
+
+  return {
+    referred_by_code: ref,
+    referral_source: via || 'shared_link',
+    first_seen_at: new Date().toISOString()
+  };
+}
+
+function captureReferralContext() {
+  const incoming = referralParamsFromUrl();
+  if (!incoming) return;
+
+  const existing = getReferralContext();
+
+  if (!existing.referred_by_code) {
+    localStorage.setItem(
+      JB_REFERRAL_CONTEXT_KEY,
+      JSON.stringify(incoming)
+    );
+
+    trackReferralEvent(
+      'visit',
+      incoming.referral_source,
+      incoming.referred_by_code
+    );
+  }
+}
+
+function finderProfileKey(values = {}) {
+  return JSON.stringify({
+    location: values.location || '',
+    budget: values.budget || '',
+    type: values.type || '',
+    purpose: values.purpose || '',
+    delivery: values.delivery || '',
+    payment: values.payment || '',
+    bedrooms: values.bedrooms || '',
+    timeline: values.timeline || ''
+  });
+}
+
+function readSavedSearch() {
+  return safeJsonParse(localStorage.getItem(JB_SAVED_SEARCH_KEY), null);
+}
+
+function saveCurrentSearch(values, shortlist = []) {
+  const payload = {
+    profile: {...values},
+    profile_key: finderProfileKey(values),
+    shortlist_ids: shortlist.map(project => project.id).filter(Boolean),
+    shortlist_slugs: shortlist.map(project => project.slug).filter(Boolean),
+    saved_at: new Date().toISOString()
+  };
+
+  localStorage.setItem(JB_SAVED_SEARCH_KEY, JSON.stringify(payload));
+  return payload;
+}
+
+function applyFinderValues(values = {}) {
+  const ids = ['location','budget','type','purpose','delivery','payment','bedrooms','timeline'];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && Object.prototype.hasOwnProperty.call(values, id)) {
+      el.value = values[id] || '';
+    }
+  });
+}
+
+function sharedSearchValuesFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const allowed = ['location','budget','type','purpose','delivery','payment','bedrooms','timeline'];
+  const values = {};
+  let found = false;
+
+  allowed.forEach(key => {
+    const value = params.get(key);
+    if (value !== null) {
+      values[key] = value;
+      found = true;
+    }
+  });
+
+  return found ? values : null;
+}
+
+function buildShareUrl(channel = 'copy') {
+  const url = new URL(window.location.href);
+  const values = currentSearchProfile || getFinderValues();
+
+  ['location','budget','type','purpose','delivery','payment','bedrooms','timeline']
+    .forEach(key => {
+      if (values?.[key]) url.searchParams.set(key, values[key]);
+      else url.searchParams.delete(key);
+    });
+
+  url.searchParams.set('ref', getOrCreateShareCode());
+  url.searchParams.set('via', channel);
+
+  return url.toString();
+}
+
+function shareMessage() {
+  const values = currentSearchProfile || getFinderValues();
+  const location = values.location || (lang === 'ar' ? 'العقارات في مصر' : 'Egypt real estate');
+  const type = values.type || (lang === 'ar' ? 'عقارات' : 'properties');
+
+  return lang === 'ar'
+    ? `وجدت قائمة خيارات على JB تناسب بحثي عن ${type} في ${location}. راجعها معي:`
+    : `I found a JB shortlist for ${type} in ${location}. Take a look with me:`;
+}
+
+async function shareCurrentSearch(channel = 'copy') {
+  const url = buildShareUrl(channel);
+  const message = shareMessage();
+
+  await trackReferralEvent('share', channel, getOrCreateShareCode());
+
+  if (channel === 'whatsapp') {
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${message} ${url}`)}`,
+      '_blank',
+      'noopener'
+    );
+    return;
+  }
+
+  if (channel === 'email') {
+    const subject = lang === 'ar'
+      ? 'قائمة عقارات للمقارنة من JB'
+      : 'JB property shortlist to compare';
+
+    window.location.href =
+      `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`${message}\n\n${url}`)}`;
+    return;
+  }
+
+  if (channel === 'native' && navigator.share) {
+    await navigator.share({
+      title: lang === 'ar' ? 'قائمة JB العقارية' : 'JB Property Shortlist',
+      text: message,
+      url
+    });
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(url);
+    const status = document.getElementById('shareShortlistStatus');
+    if (status) {
+      status.textContent = lang === 'ar'
+        ? 'تم نسخ الرابط.'
+        : 'Link copied.';
+    }
+  } catch (_) {
+    window.prompt(
+      lang === 'ar' ? 'انسخ هذا الرابط:' : 'Copy this link:',
+      url
+    );
+  }
+}
+
+function renderReturnSearchPrompt() {
+  const finder = document.getElementById('finderForm');
+  if (!finder) return;
+
+  document.getElementById('jbReturnSearchPrompt')?.remove();
+
+  const shared = sharedSearchValuesFromUrl();
+  const saved = readSavedSearch();
+  const candidate = shared || saved?.profile;
+
+  if (!candidate) return;
+
+  applyFinderValues(candidate);
+
+  const box = document.createElement('div');
+  box.id = 'jbReturnSearchPrompt';
+  box.className = 'jb-return-search';
+
+  const isShared = Boolean(shared);
+
+  box.innerHTML = `
+    <div>
+      <strong>${isShared
+        ? (lang === 'ar' ? 'تمت مشاركة قائمة بحث معك' : 'A property search was shared with you')
+        : (lang === 'ar' ? 'مرحبًا بعودتك — بحثك السابق جاهز' : 'Welcome back — your saved search is ready')}</strong>
+      <span>${isShared
+        ? (lang === 'ar' ? 'راجع الاختيارات الحالية وشاهد ما إذا ظهرت خيارات جديدة.' : 'Review the current matches and see whether new options are available.')
+        : (lang === 'ar' ? 'أكمل من حيث توقفت بدل بدء البحث من جديد.' : 'Continue where you left off instead of starting again.')}</span>
+    </div>
+
+    <button id="jbContinueSavedSearch" class="btn btn-navy" type="button">
+      ${lang === 'ar' ? 'عرض النتائج الآن' : 'Show my matches'}
+    </button>
+  `;
+
+  finder.insertAdjacentElement('afterend', box);
+
+  document.getElementById('jbContinueSavedSearch')?.addEventListener('click', async () => {
+    previousSavedSearchSnapshot = saved;
+    await renderFinderPreview(getFinderValues(), true);
+  });
+}
+
+function renderNewMatchesBanner(newCount = 0) {
+  if (!newCount) return '';
+
+  return `
+    <div class="jb-new-matches-banner">
+      <strong>${lang === 'ar'
+        ? `${newCount} ${newCount === 1 ? 'خيار جديد' : 'خيارات جديدة'} منذ آخر بحث`
+        : `${newCount} new ${newCount === 1 ? 'match' : 'matches'} since your last search`}</strong>
+      <span>${lang === 'ar'
+        ? 'تمت مقارنة بحثك المحفوظ بأحدث المشروعات المتاحة في JB.'
+        : 'Your saved criteria were checked against the latest projects available on JB.'}</span>
+    </div>
+  `;
+}
+
+function renderSharePanel() {
+  return `
+    <section class="jb-share-panel">
+      <div>
+        <strong>${lang === 'ar'
+          ? 'ناقش هذه القائمة مع شخص تثق به'
+          : 'Review this shortlist with someone you trust'}</strong>
+        <span>${lang === 'ar'
+          ? 'شارك البحث مع شريك أو صديق للمقارنة واتخاذ القرار معًا.'
+          : 'Share the search with a partner, friend, or colleague and compare together.'}</span>
+      </div>
+
+      <div class="jb-share-actions">
+        <button type="button" class="jb-share-btn" data-share-channel="whatsapp">WhatsApp</button>
+        <button type="button" class="jb-share-btn" data-share-channel="native">
+          ${lang === 'ar' ? 'مشاركة من الهاتف' : 'Share from phone'}
+        </button>
+        <button type="button" class="jb-share-btn" data-share-channel="email">
+          ${lang === 'ar' ? 'البريد' : 'Email'}
+        </button>
+        <button type="button" class="jb-share-btn" data-share-channel="copy">
+          ${lang === 'ar' ? 'نسخ الرابط' : 'Copy link'}
+        </button>
+      </div>
+
+      <span id="shareShortlistStatus" class="jb-share-status" aria-live="polite"></span>
+    </section>
+  `;
+}
 
 function getFinderValues() {
   return {
@@ -2021,6 +2666,22 @@ async function renderFinderPreview(values, shouldScroll = true) {
   currentShortlist = await shortlistProjects(values);
   currentSearchProfile = {...values, readiness};
 
+  const savedBeforeRun = previousSavedSearchSnapshot || readSavedSearch();
+  const currentProfileKey = finderProfileKey(values);
+
+  const previousIds = new Set(
+    savedBeforeRun?.profile_key === currentProfileKey
+      ? (savedBeforeRun.shortlist_ids || [])
+      : []
+  );
+
+  const newMatchCount = previousIds.size
+    ? currentShortlist.filter(project => project.id && !previousIds.has(project.id)).length
+    : 0;
+
+  saveCurrentSearch(currentSearchProfile, currentShortlist);
+  previousSavedSearchSnapshot = null;
+
   const confirmedMatches = currentShortlist.filter(
     project => Boolean(finderProjectPrice(project).price)
   );
@@ -2066,6 +2727,8 @@ async function renderFinderPreview(values, shouldScroll = true) {
             : 'We rank projects using your current requirements. Official pricing is shown first, followed by verified market references where no official price is available. Projects that fit location and unit type but still need price verification are shown separately so a potentially suitable option is not lost.'
         }
       </p>
+
+      ${renderNewMatchesBanner(newMatchCount)}
 
       ${
         confirmedPreview.length
@@ -2131,6 +2794,8 @@ async function renderFinderPreview(values, shouldScroll = true) {
             </div>`
           : ''
       }
+
+      ${shownCount ? renderSharePanel() : ''}
 
       <form id="leadCaptureForm" class="lead-capture-form">
         <div class="lead-capture-heading">
@@ -2368,7 +3033,9 @@ async function submitLeadCapture(event) {
   }
 
   try {
-    await supabaseRpc('jb_submit_lead_v2', {
+    const referralContext = getReferralContext();
+
+    await supabaseRpc('jb_submit_lead_v3', {
       p_full_name: name,
       p_phone: phone,
       p_whatsapp_phone: whatsappPhone || null,
@@ -2376,7 +3043,7 @@ async function submitLeadCapture(event) {
       p_preferred_contact_methods: contactMethods,
       p_consent_to_contact: consent,
       p_allow_recommendations: allowRecommendations,
-      p_consent_text_version: 'jb-web-customer-profile-v2-2026-08-24',
+      p_consent_text_version: 'jb-web-growth-loop-v1-2026-08-24',
       p_source: 'website_property_finder',
       p_language: lang,
       p_search_profile: currentSearchProfile,
@@ -2385,7 +3052,10 @@ async function submitLeadCapture(event) {
         currentShortlist.slice(0, 20).map(project => project.id),
       p_page_path: window.location.pathname,
       p_referrer: document.referrer || null,
-      p_user_agent: navigator.userAgent || null
+      p_user_agent: navigator.userAgent || null,
+      p_referral_code: getOrCreateShareCode(),
+      p_referred_by_code: referralContext.referred_by_code || null,
+      p_referral_source: referralContext.referral_source || null
     });
 
     const fullList = currentShortlist.slice(0, 10);
@@ -2559,6 +3229,17 @@ document.addEventListener('submit', event => {
   }
 });
 
+document.addEventListener('click', event => {
+  const shareButton = event.target?.closest?.('[data-share-channel]');
+  if (!shareButton) return;
+
+  const channel = shareButton.dataset.shareChannel || 'copy';
+
+  shareCurrentSearch(channel).catch(error => {
+    console.warn('Share action failed:', error);
+  });
+});
+
 document.addEventListener('change', event => {
   if (event.target?.id === 'leadWhatsappSame') {
     const whatsappInput = document.getElementById('leadWhatsapp');
@@ -2586,11 +3267,19 @@ if (yearElement) {
   yearElement.textContent = new Date().getFullYear();
 }
 
+captureReferralContext();
+getOrCreateShareCode();
+
 applyLang();
 bindFinderControls();
 
 document.addEventListener('DOMContentLoaded', () => {
   bindFinderControls();
+  renderReturnSearchPrompt();
 });
 
-loadMarketData();
+loadMarketData().then(() => {
+  renderReturnSearchPrompt();
+  renderRecentProjects();
+  openSharedProjectFromUrl();
+});
