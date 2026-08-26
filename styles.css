@@ -2424,29 +2424,427 @@ html[lang="en"] .finder-result-copy{
     gap:8px;
   }
 }
-/* Fix contact-method labels visibility inside preference panel */
-.preference-panel{
-  background: #f3f0ea;
-  border: 1px solid rgba(214, 174, 53, 0.35);
+
+
+/* =========================================================
+   JB CUSTOMER EXPERIENCE GROWTH LOOP V1
+   Saved search + referral sharing + return triggers
+   ========================================================= */
+
+.jb-return-search{
+  margin:18px 0 0;
+  padding:16px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border:1px solid rgba(214,174,53,.32);
+  border-radius:14px;
+  background:#fffdf6;
+  box-shadow:0 10px 28px rgba(19,70,112,.07);
 }
 
-.preference-panel > strong{
-  color: #143a5a !important;
+.jb-return-search > div{
+  display:grid;
+  gap:4px;
 }
 
-.contact-methods label{
-  color: #143a5a !important;
-  font-weight: 700;
+.jb-return-search strong{
+  color:#143a5a;
 }
 
-.contact-methods label span{
-  color: #143a5a !important;
+.jb-return-search span{
+  color:#5c6f82;
+  font-size:14px;
 }
 
-.lead-inline-check{
-  color: #143a5a !important;
+.jb-new-matches-banner{
+  margin:14px 0 4px;
+  padding:13px 15px;
+  display:grid;
+  gap:4px;
+  border-radius:12px;
+  border:1px solid rgba(231,196,90,.42);
+  background:rgba(231,196,90,.12);
 }
 
-.lead-inline-check span{
-  color: #143a5a !important;
+.jb-new-matches-banner strong{
+  color:#E7C45A;
+}
+
+.jb-new-matches-banner span{
+  color:#fff;
+  opacity:.92;
+  font-size:13px;
+}
+
+.jb-share-panel{
+  margin:18px 0;
+  padding:16px;
+  display:grid;
+  gap:12px;
+  border:1px solid #dce5ec;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 12px 28px rgba(19,70,112,.07);
+}
+
+.jb-share-panel > div:first-child{
+  display:grid;
+  gap:4px;
+}
+
+.jb-share-panel strong{
+  color:#143a5a;
+}
+
+.jb-share-panel span{
+  color:#5f7184;
+  font-size:14px;
+}
+
+.jb-share-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.jb-share-btn{
+  appearance:none;
+  border:1px solid #315A78;
+  border-radius:999px;
+  background:#fff;
+  color:#134670;
+  padding:9px 13px;
+  font:inherit;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .15s ease, background .15s ease;
+}
+
+.jb-share-btn:hover{
+  transform:translateY(-1px);
+  background:#f5f8fb;
+}
+
+.jb-share-status{
+  min-height:18px;
+  color:#49657d !important;
+  font-size:12px !important;
+}
+
+@media (max-width:700px){
+  .jb-return-search{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .jb-return-search .btn{
+    width:100%;
+  }
+
+  .jb-share-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .jb-share-btn{
+    width:100%;
+  }
+}
+
+
+/* =========================================================
+   JB PUBLIC EXPERIENCE UPGRADE V1
+   Project media + Save/Recent + Share + Brand Card
+   ========================================================= */
+
+/* Brand card replacing ambiguous EGP hero */
+.jb-brand-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.jb-brand-card-mark{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:18px;
+}
+.jb-brand-card-logo{
+  width:86px;
+  height:86px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#fff;
+  padding:8px;
+  box-shadow:0 12px 30px rgba(0,0,0,.15);
+}
+.jb-brand-card-mark>div{
+  display:grid;
+  gap:3px;
+}
+.jb-brand-card-mark strong{
+  font-size:22px;
+  line-height:1.3;
+}
+.jb-brand-card-mark span{
+  font-size:15px;
+  opacity:.84;
+  font-weight:700;
+}
+.jb-currency-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:24px;
+}
+.jb-currency-pills span{
+  min-width:54px;
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.32);
+  font-size:14px;
+  font-weight:900;
+  text-align:center;
+  letter-spacing:.04em;
+}
+
+/* Saved project control */
+.save-chip{
+  min-width:86px;
+}
+.save-chip.is-selected{
+  border-color:rgba(212,175,55,.65);
+}
+
+/* Recently viewed */
+.recent-projects-panel{
+  margin:0 0 24px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fbfcfd;
+}
+.recent-projects-panel[hidden]{display:none}
+.recent-projects-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:12px;
+}
+.recent-projects-head h3{
+  margin:3px 0 0;
+  font-size:21px;
+}
+.recent-clear{
+  border:0;
+  background:transparent;
+  cursor:pointer;
+}
+.recent-projects-row{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.recent-project-card{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:9px;
+  display:grid;
+  grid-template-columns:58px 1fr;
+  gap:10px;
+  align-items:center;
+  color:var(--ink);
+  text-align:start;
+  cursor:pointer;
+}
+.recent-project-card:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(13,27,42,.08);
+}
+.recent-project-thumb{
+  width:58px;
+  height:58px;
+  border-radius:11px;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--navy),#1f5d8c);
+  display:grid;
+  place-items:center;
+  color:#fff;
+}
+.recent-project-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.recent-project-card>span:last-child{
+  display:grid;
+  gap:3px;
+  min-width:0;
+}
+.recent-project-card strong{
+  font-size:15px;
+  line-height:1.35;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.recent-project-card small{
+  font-size:14px;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Dynamic project media gallery */
+.project-media-shell{
+  margin-bottom:22px;
+}
+.project-media-main{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  background:#eef1f4;
+  aspect-ratio:16/9;
+}
+.project-media-main img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.project-media-overlay{
+  position:absolute;
+  inset:auto 12px 12px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.project-media-overlay span,
+.project-media-overlay a{
+  background:rgba(8,27,43,.82);
+  color:#fff;
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:14px;
+  font-weight:800;
+  text-decoration:none;
+  backdrop-filter:blur(6px);
+}
+.project-media-tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.project-media-tab{
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  padding:8px 12px;
+  color:var(--ink);
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.project-media-tab.is-active{
+  background:var(--navy);
+  border-color:var(--navy);
+  color:#fff;
+}
+.project-media-thumbs{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+  margin-top:10px;
+}
+.project-media-thumb{
+  border:2px solid transparent;
+  background:#fff;
+  border-radius:12px;
+  padding:5px;
+  cursor:pointer;
+  text-align:start;
+}
+.project-media-thumb[hidden]{display:none}
+.project-media-thumb.is-active{
+  border-color:var(--gold);
+}
+.project-media-thumb img{
+  width:100%;
+  height:78px;
+  object-fit:cover;
+  border-radius:8px;
+  display:block;
+}
+.project-media-thumb small{
+  display:block;
+  margin-top:5px;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+}
+.project-media-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:9px;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:600;
+}
+
+/* Project share */
+.project-share-panel{
+  margin-top:14px;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fbfcfd;
+}
+.project-share-panel[hidden]{display:none}
+.project-share-panel>strong{
+  display:block;
+  font-size:16px;
+  margin-bottom:10px;
+}
+.project-share-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.project-share-actions .jb-share-btn{
+  font-size:14px;
+  min-height:40px;
+}
+
+/* Keep public detail text comfortably readable */
+.profile-heading p,
+.profile-facts strong,
+.profile-facts span,
+.profile-actions .btn,
+.project-share-panel,
+.project-media-meta{
+  line-height:1.6;
+}
+
+@media(max-width:1100px){
+  .recent-projects-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .project-media-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .jb-brand-card-mark{align-items:flex-start}
+  .jb-brand-card-logo{width:72px;height:72px}
+  .recent-projects-row{grid-template-columns:1fr}
+  .project-media-main{aspect-ratio:4/3}
+  .project-media-thumbs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .project-media-thumb img{height:70px}
+  .project-media-overlay{align-items:flex-end}
 }
