@@ -369,14 +369,19 @@ function formatMoney(value, currency = 'EGP') {
     return lang === 'ar' ? 'غير متاح حاليًا' : 'Not currently available';
   }
 
+  /*
+   * JB UX invariant:
+   * Money must always use Latin/English digits in BOTH Arabic and English UI.
+   * Do not switch price numerals to Arabic-Indic digits.
+   */
   try {
-    return new Intl.NumberFormat(lang === 'ar' ? 'ar-EG' : 'en-EG', {
+    return new Intl.NumberFormat('en-EG', {
       style: 'currency',
       currency: currency || 'EGP',
       maximumFractionDigits: 0
     }).format(Number(value));
   } catch {
-    return `${Number(value).toLocaleString()} ${currency || 'EGP'}`;
+    return `${Number(value).toLocaleString('en-US')} ${currency || 'EGP'}`;
   }
 }
 
@@ -1213,6 +1218,9 @@ function renderProjectMedia(project, mediaPayload) {
           id="projectMediaMainImage"
           src="${escapeHtml(first.public_url)}"
           alt="${escapeHtml((lang === 'ar' ? first.title_ar : first.title_en) || projectName(project))}">
+        <button class="project-media-nav project-media-prev" type="button" aria-label="${lang === 'ar' ? 'الصورة السابقة' : 'Previous image'}">‹</button>
+        <button class="project-media-nav project-media-next" type="button" aria-label="${lang === 'ar' ? 'الصورة التالية' : 'Next image'}">›</button>
+
         <div class="project-media-overlay">
           <span id="projectMediaCounter">1 / ${visualMedia.length}</span>
           <a id="projectMediaOpenOriginal" href="${escapeHtml(first.public_url)}" target="_blank" rel="noopener">
@@ -1265,11 +1273,19 @@ function renderProjectMedia(project, mediaPayload) {
 }
 
 function bindProjectMediaGallery() {
+  const shell = document.querySelector('[data-project-media-shell]');
   const thumbs = [...document.querySelectorAll('.project-media-thumb')];
   const main = document.getElementById('projectMediaMainImage');
   const counter = document.getElementById('projectMediaCounter');
   const original = document.getElementById('projectMediaOpenOriginal');
   const tabs = [...document.querySelectorAll('.project-media-tab')];
+  const prev = document.querySelector('.project-media-prev');
+  const next = document.querySelector('.project-media-next');
+
+  if (!main || !thumbs.length) return;
+
+  let autoplayTimer = null;
+  let userPaused = false;
 
   const visibleThumbs = () => thumbs.filter(btn => !btn.hidden);
 
@@ -1277,16 +1293,56 @@ function bindProjectMediaGallery() {
     if (!btn || !main) return;
     thumbs.forEach(item => item.classList.remove('is-active'));
     btn.classList.add('is-active');
-    main.src = btn.dataset.mediaUrl;
-    main.alt = btn.dataset.mediaTitle || '';
-    if (original) original.href = btn.dataset.mediaUrl;
+
+    main.classList.add('is-changing');
+    window.setTimeout(() => {
+      main.src = btn.dataset.mediaUrl;
+      main.alt = btn.dataset.mediaTitle || '';
+      if (original) original.href = btn.dataset.mediaUrl;
+      main.classList.remove('is-changing');
+    }, 120);
 
     const visible = visibleThumbs();
     const position = visible.indexOf(btn);
     if (counter) counter.textContent = `${Math.max(1, position + 1)} / ${visible.length}`;
   };
 
-  thumbs.forEach(btn => btn.addEventListener('click', () => activate(btn)));
+  const move = direction => {
+    const visible = visibleThumbs();
+    if (visible.length < 2) return;
+    let current = visible.findIndex(btn => btn.classList.contains('is-active'));
+    if (current < 0) current = 0;
+    const nextIndex = (current + direction + visible.length) % visible.length;
+    activate(visible[nextIndex]);
+  };
+
+  const stopAutoplay = () => {
+    if (autoplayTimer) {
+      window.clearInterval(autoplayTimer);
+      autoplayTimer = null;
+    }
+  };
+
+  const startAutoplay = () => {
+    stopAutoplay();
+    if (userPaused || visibleThumbs().length < 2) return;
+    autoplayTimer = window.setInterval(() => move(1), 5000);
+  };
+
+  thumbs.forEach(btn => btn.addEventListener('click', () => {
+    activate(btn);
+    startAutoplay();
+  }));
+
+  prev?.addEventListener('click', () => {
+    move(-1);
+    startAutoplay();
+  });
+
+  next?.addEventListener('click', () => {
+    move(1);
+    startAutoplay();
+  });
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1297,8 +1353,22 @@ function bindProjectMediaGallery() {
         btn.hidden = filter !== 'all' && btn.dataset.mediaType !== filter;
       });
       activate(visibleThumbs()[0]);
+      startAutoplay();
     });
   });
+
+  shell?.addEventListener('mouseenter', () => {
+    userPaused = true;
+    stopAutoplay();
+  });
+  shell?.addEventListener('mouseleave', () => {
+    userPaused = false;
+    startAutoplay();
+  });
+  shell?.addEventListener('focusin', stopAutoplay);
+  shell?.addEventListener('focusout', startAutoplay);
+
+  startAutoplay();
 }
 
 function buildProjectShareUrl(project, channel='copy') {
@@ -2939,6 +3009,31 @@ async function renderFinderPreview(values, shouldScroll = true) {
   }
 }
 
+
+async function submitLeadCaptureRpc(payloadV3) {
+  try {
+    return await supabaseRpc('jb_submit_lead_v3', payloadV3);
+  } catch (v3Error) {
+    console.warn('jb_submit_lead_v3 failed; using V2 compatibility fallback.', v3Error);
+
+    const {
+      p_referral_code,
+      p_referred_by_code,
+      p_referral_source,
+      ...payloadV2
+    } = payloadV3;
+
+    try {
+      return await supabaseRpc('jb_submit_lead_v2', payloadV2);
+    } catch (v2Error) {
+      console.error('Lead V2 fallback also failed.', v2Error);
+      const error = new Error('LEAD_CAPTURE_UNAVAILABLE');
+      error.cause = {v3Error, v2Error};
+      throw error;
+    }
+  }
+}
+
 async function submitLeadCapture(event) {
   event.preventDefault();
 
@@ -3035,7 +3130,7 @@ async function submitLeadCapture(event) {
   try {
     const referralContext = getReferralContext();
 
-    await supabaseRpc('jb_submit_lead_v3', {
+    await submitLeadCaptureRpc({
       p_full_name: name,
       p_phone: phone,
       p_whatsapp_phone: whatsappPhone || null,
