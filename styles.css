@@ -2913,3 +2913,231 @@ html[dir="rtl"] .project-media-next{right:14px}
   .project-media-prev{left:8px}
   .project-media-next{right:8px}
 }
+
+
+/* =========================================================
+   JB PROJECT CARD CAROUSEL V1
+   Dynamic image rotation on project cards (Projects page).
+   ========================================================= */
+
+.project-card-carousel{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--navy),#1f5d8c);
+}
+
+.project-card-slide{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transform:scale(1.01);
+  transition:opacity .65s ease, transform 4.7s ease;
+}
+
+.project-card-slide.is-active{
+  opacity:1;
+  transform:scale(1.045);
+}
+
+.project-card-carousel::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(8,28,43,.44) 0%,
+    rgba(8,28,43,.06) 42%,
+    rgba(8,28,43,.06) 100%
+  );
+  pointer-events:none;
+}
+
+.project-card-dots{
+  position:absolute;
+  z-index:3;
+  left:50%;
+  bottom:10px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 7px;
+  border-radius:999px;
+  background:rgba(8,28,43,.34);
+  backdrop-filter:blur(5px);
+}
+
+.project-card-dots span{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(255,255,255,.52);
+  transition:width .22s ease, background .22s ease;
+}
+
+.project-card-dots span.is-active{
+  width:16px;
+  border-radius:999px;
+  background:#fff;
+}
+
+.project-image-location{
+  position:absolute;
+  z-index:3;
+  right:12px;
+  bottom:12px;
+  background:rgba(8,28,43,.76);
+  color:#fff;
+  border-radius:999px;
+  padding:6px 9px;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  backdrop-filter:blur(5px);
+}
+
+/* Fallback stays available for projects without verified media. */
+.project-image-fallback{
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:5px;
+  text-align:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--navy),#1f5d8c);
+}
+
+@media(max-width:760px){
+  .project-card-dots{bottom:8px}
+  .project-image-location{
+    right:9px;
+    bottom:9px;
+    font-size:11px;
+  }
+}
+
+
+/* =========================================================
+   JB OFFICIAL SOURCE TRUST LAYER V1
+   Conversion psychology: trust without making the external
+   developer website a primary CTA.
+   ========================================================= */
+
+.jb-decision-layer{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fbfcfd;
+}
+
+.jb-decision-copy{
+  display:grid;
+  gap:5px;
+  margin-bottom:13px;
+}
+
+.jb-decision-copy strong{
+  color:#102f4a;
+  font-size:16px;
+  line-height:1.55;
+  font-weight:900;
+}
+
+.jb-decision-copy span{
+  color:#40566a;
+  font-size:15px;
+  line-height:1.65;
+  font-weight:650;
+}
+
+.profile-actions-primary{
+  margin-top:0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.profile-actions-primary .jb-primary-consult{
+  order:-2;
+  font-weight:900;
+}
+
+.jb-source-verification{
+  margin-top:13px;
+  border:1px solid rgba(37,93,126,.22);
+  border-radius:14px;
+  padding:13px 14px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:11px;
+  align-items:center;
+  background:rgba(239,247,251,.72);
+}
+
+.jb-source-verification-icon{
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#e9f4ee;
+  color:#197342;
+  font-size:17px;
+  font-weight:1000;
+  border:1px solid rgba(25,115,66,.16);
+}
+
+.jb-source-verification-copy{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.jb-source-verification-copy strong{
+  color:#102f4a;
+  font-size:15px;
+  line-height:1.45;
+  font-weight:900;
+}
+
+.jb-source-verification-copy span{
+  color:#516779;
+  font-size:14px;
+  line-height:1.55;
+  font-weight:600;
+}
+
+.jb-source-reference-link{
+  color:#35566f;
+  font-size:14px;
+  line-height:1.45;
+  font-weight:800;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  white-space:nowrap;
+}
+
+.jb-source-reference-link:hover{
+  color:#102f4a;
+}
+
+@media(max-width:760px){
+  .jb-source-verification{
+    grid-template-columns:auto 1fr;
+  }
+
+  .jb-source-reference-link{
+    grid-column:2;
+    justify-self:start;
+    white-space:normal;
+  }
+
+  .profile-actions-primary .btn{
+    flex:1 1 100%;
+    justify-content:center;
+  }
+}
