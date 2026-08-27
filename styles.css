@@ -2848,3 +2848,68 @@ html[lang="en"] .finder-result-copy{
   .project-media-thumb img{height:70px}
   .project-media-overlay{align-items:flex-end}
 }
+
+
+/* =========================================================
+   JB PUBLIC UX STABILITY V1.1 — PERMANENT UX INVARIANTS
+   ========================================================= */
+
+/* Contact methods MUST remain dark/high-contrast on the pale preference panel. */
+.preference-panel .contact-methods label,
+.preference-panel .contact-methods label span,
+.preference-panel .contact-methods,
+.lead-capture-form .contact-methods label,
+.lead-capture-form .contact-methods label span{
+  color:#102F4A !important;
+  opacity:1 !important;
+  -webkit-text-fill-color:#102F4A !important;
+  font-weight:800 !important;
+}
+
+.preference-panel .contact-methods input[type="checkbox"],
+.lead-capture-form .contact-methods input[type="checkbox"]{
+  accent-color:#144D73;
+}
+
+/* Gallery now supports visible navigation + automatic movement. */
+.project-media-nav{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:4;
+  width:44px;
+  height:44px;
+  border:1px solid rgba(255,255,255,.6);
+  border-radius:50%;
+  background:rgba(8,27,43,.78);
+  color:#fff;
+  font-size:30px;
+  line-height:1;
+  font-weight:900;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+}
+.project-media-prev{left:14px}
+.project-media-next{right:14px}
+html[dir="rtl"] .project-media-prev{left:14px}
+html[dir="rtl"] .project-media-next{right:14px}
+
+.project-media-main img{
+  transition:opacity .22s ease, transform .35s ease;
+}
+.project-media-main img.is-changing{
+  opacity:.35;
+  transform:scale(1.01);
+}
+
+@media(max-width:760px){
+  .project-media-nav{
+    width:40px;
+    height:40px;
+    font-size:27px;
+  }
+  .project-media-prev{left:8px}
+  .project-media-next{right:8px}
+}
