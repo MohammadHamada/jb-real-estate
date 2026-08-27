@@ -515,17 +515,20 @@ async function loadMarketData() {
         'jb_public_projects_v1?select=project_id,slug,name_ar,name_en,project_type,description_ar,description_en,overview_ar,overview_en,cover_image_url,website_url,developer_id,developer_slug,developer_name_ar,developer_name_en,developer_logo_url,location_id,city,area,official_starting_price,market_starting_price,display_starting_price,currency,price_evidence_type,delivery_date,completion_year,construction_status,handover_status,property_type_slugs,property_types_en,property_types_ar,market_min_area,market_max_area,min_down_payment_percentage,max_installment_years,payment_evidence_type,readiness_score,readiness,production_status,evidence_source_count,verification_status,last_verified_at&order=name_en.asc'
       ),
       supabaseRpc('jb_get_filter_options_v1', {}),
-      supabaseGet('jb_public_project_cover_v1?select=project_id,public_url,thumbnail_url&order=project_id.asc')
-        .catch(() => [])
+      supabaseGet(
+        'jb_public_project_media_v1?select=project_id,media_type,public_url,thumbnail_url,sort_order&media_type=in.(cover,gallery)&order=project_id.asc,sort_order.asc'
+      ).catch(() => [])
     ]);
 
     const rows = Array.isArray(publicProjectData) ? publicProjectData : [];
-    const mediaCoverMap = new Map(
-      (Array.isArray(coverRows) ? coverRows : []).map(item => [
-        item.project_id,
-        item.thumbnail_url || item.public_url || null
-      ])
-    );
+    const projectCardMediaMap = new Map();
+    (Array.isArray(coverRows) ? coverRows : []).forEach(item => {
+      const url = item.thumbnail_url || item.public_url || null;
+      if (!url) return;
+      const list = projectCardMediaMap.get(item.project_id) || [];
+      if (!list.includes(url)) list.push(url);
+      projectCardMediaMap.set(item.project_id, list);
+    });
     filterOptions = options || null;
     productionApiOnline = true;
 
@@ -543,7 +546,8 @@ async function loadMarketData() {
         description_en: row.description_en,
         overview_ar: row.overview_ar,
         overview_en: row.overview_en,
-        cover_image_url: mediaCoverMap.get(row.project_id) || row.cover_image_url,
+        card_media_urls: projectCardMediaMap.get(row.project_id) || (row.cover_image_url ? [row.cover_image_url] : []),
+        cover_image_url: (projectCardMediaMap.get(row.project_id) || [])[0] || row.cover_image_url,
         website_url: row.website_url,
 
         developer_id: row.developer_id,
@@ -692,12 +696,33 @@ function projectInitials(project) {
 }
 
 function projectVisual(project) {
-  if (project.cover_image_url) {
+  const media = Array.isArray(project.card_media_urls) && project.card_media_urls.length
+    ? project.card_media_urls
+    : (project.cover_image_url ? [project.cover_image_url] : []);
+
+  if (media.length) {
     return `
-      <div class="project-image dynamic-project-image has-photo"
-           style="background-image:
-             linear-gradient(180deg,rgba(6,23,38,.05),rgba(6,23,38,.58)),
-             url('${escapeHtml(project.cover_image_url)}')">
+      <div class="project-image dynamic-project-image has-photo project-card-carousel"
+           data-project-card-carousel
+           data-media-count="${media.length}">
+        ${media.map((url,index) => `
+          <img
+            class="project-card-slide ${index===0?'is-active':''}"
+            src="${escapeHtml(url)}"
+            alt="${escapeHtml(projectName(project))}"
+            loading="lazy"
+            decoding="async"
+            data-card-media-index="${index}">
+        `).join('')}
+
+        ${media.length > 1 ? `
+          <div class="project-card-dots" aria-hidden="true">
+            ${media.map((_,index) => `
+              <span class="${index===0?'is-active':''}" data-card-dot="${index}"></span>
+            `).join('')}
+          </div>
+        ` : ''}
+
         <span class="project-image-location">${escapeHtml(projectLocation(project))}</span>
       </div>
     `;
@@ -813,6 +838,45 @@ function projectCard(project) {
   `;
 }
 
+
+let projectCardCarouselTimer = null;
+
+function startProjectCardCarousels() {
+  if (projectCardCarouselTimer) {
+    window.clearInterval(projectCardCarouselTimer);
+    projectCardCarouselTimer = null;
+  }
+
+  const cards = [...document.querySelectorAll('[data-project-card-carousel]')]
+    .filter(card => Number(card.dataset.mediaCount || 0) > 1);
+
+  if (!cards.length) return;
+
+  projectCardCarouselTimer = window.setInterval(() => {
+    cards.forEach(card => {
+      if (card.matches(':hover') || card.dataset.carouselPaused === 'true') return;
+
+      const slides = [...card.querySelectorAll('.project-card-slide')];
+      const dots = [...card.querySelectorAll('[data-card-dot]')];
+      if (slides.length < 2) return;
+
+      let current = slides.findIndex(slide => slide.classList.contains('is-active'));
+      if (current < 0) current = 0;
+      const next = (current + 1) % slides.length;
+
+      slides[current].classList.remove('is-active');
+      slides[next].classList.add('is-active');
+      dots[current]?.classList.remove('is-active');
+      dots[next]?.classList.add('is-active');
+    });
+  }, 4500);
+
+  cards.forEach(card => {
+    card.addEventListener('focusin', () => { card.dataset.carouselPaused = 'true'; });
+    card.addEventListener('focusout', () => { card.dataset.carouselPaused = 'false'; });
+  });
+}
+
 function renderProjects(list = projects) {
   const grid = document.getElementById('projectsGrid');
   const count = document.getElementById('projectCount');
@@ -835,6 +899,7 @@ function renderProjects(list = projects) {
   const visible = list.slice(0, visibleProjects);
 
   grid.innerHTML = visible.map(projectCard).join('');
+  startProjectCardCarousels();
 
   if (count) {
     count.textContent =
@@ -1408,6 +1473,20 @@ async function shareProject(project, channel='copy') {
   if (status) status.textContent = lang === 'ar' ? 'تم نسخ الرابط' : 'Link copied';
 }
 
+
+function trackOfficialSourceExit(projectId) {
+  try {
+    const key = 'jb_official_source_exit_v1';
+    const data = JSON.parse(localStorage.getItem(key) || '{}');
+    data[projectId] = (Number(data[projectId]) || 0) + 1;
+    data._last_project_id = projectId;
+    data._last_clicked_at = new Date().toISOString();
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn('Official source exit tracking skipped:', error);
+  }
+}
+
 function bindProjectShare(project) {
   document.querySelectorAll('[data-project-share-channel]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1624,37 +1703,67 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
       </div>
     </div>
 
-    <div class="profile-actions">
-      <button class="btn btn-outline-dark" type="button" data-project-save="${project.id}">
-        ${isProjectSaved(project.id)
-          ? (lang === 'ar' ? '♥ محفوظ في قائمتي' : '♥ Saved')
-          : (lang === 'ar' ? '♡ حفظ المشروع' : '♡ Save project')}
-      </button>
+    <section class="jb-decision-layer">
+      <div class="jb-decision-copy">
+        <strong>
+          ${lang === 'ar'
+            ? 'قبل التواصل المباشر مع المطور، قارن هذا المشروع بخيارات أخرى تناسب ميزانيتك.'
+            : 'Before contacting the developer directly, compare this project with other options that fit your budget.'}
+        </strong>
+        <span>
+          ${lang === 'ar'
+            ? 'المطور يعرض مشروعاته فقط، بينما JB يساعدك على المقارنة بين أكثر من مطور ومشروع قبل اتخاذ القرار.'
+            : 'A developer represents its own inventory. JB helps you compare multiple developers and projects before you decide.'}
+        </span>
+      </div>
 
-      <button class="btn btn-outline-dark" type="button" data-project-share-toggle>
-        ${lang === 'ar' ? 'مشاركة المشروع' : 'Share project'}
-      </button>
+      <div class="profile-actions profile-actions-primary">
+        <a class="btn btn-gold jb-primary-consult" href="#finder" data-project-consult="${project.id}">
+          ${lang === 'ar' ? 'اطلب استشارة من JB' : 'Ask JB about this project'}
+        </a>
 
-      <button class="btn btn-gold" type="button" data-project-compare="${project.id}">
-        ${comparison.some(item => item.id === project.id)
-          ? (lang === 'ar' ? '✓ موجود في المقارنة' : '✓ In comparison')
-          : (lang === 'ar' ? 'أضف للمقارنة' : 'Add to comparison')}
-      </button>
+        <button class="btn btn-outline-dark" type="button" data-project-compare="${project.id}">
+          ${comparison.some(item => item.id === project.id)
+            ? (lang === 'ar' ? '✓ موجود في المقارنة' : '✓ In comparison')
+            : (lang === 'ar' ? 'قارن المشروع' : 'Compare project')}
+        </button>
 
-      <a class="btn btn-outline-dark" href="#finder" data-project-consult="${project.id}">
-        ${lang === 'ar' ? 'اطلب استشارة من JB' : 'Ask JB about this project'}
-      </a>
+        <button class="btn btn-outline-dark" type="button" data-project-save="${project.id}">
+          ${isProjectSaved(project.id)
+            ? (lang === 'ar' ? '♥ محفوظ في قائمتي' : '♥ Saved')
+            : (lang === 'ar' ? '♡ حفظ المشروع' : '♡ Save project')}
+        </button>
 
-      ${
-        project.website_url
-          ? `<a class="btn btn-navy"
+        <button class="btn btn-outline-dark" type="button" data-project-share-toggle>
+          ${lang === 'ar' ? 'مشاركة المشروع' : 'Share project'}
+        </button>
+      </div>
+    </section>
+
+    ${
+      project.website_url
+        ? `<section class="jb-source-verification" aria-label="${lang === 'ar' ? 'التحقق من المصدر' : 'Source verification'}">
+             <div class="jb-source-verification-icon" aria-hidden="true">✓</div>
+             <div class="jb-source-verification-copy">
+               <strong>
+                 ${lang === 'ar' ? 'تم التحقق من المصدر الرسمي' : 'Verified from an official source'}
+               </strong>
+               <span>
+                 ${lang === 'ar'
+                   ? 'نستخدم المصدر الرسمي للتحقق من المعلومات، وليس كبديل عن المقارنة والاستشارة المستقلة.'
+                   : 'JB uses the official source to verify information, not as a substitute for independent comparison and advice.'}
+               </span>
+             </div>
+             <a class="jb-source-reference-link"
                 href="${escapeHtml(project.website_url)}"
-                target="_blank" rel="noopener">
-                ${lang === 'ar' ? 'المصدر الرسمي' : 'Official source'}
-             </a>`
-          : ''
-      }
-    </div>
+                target="_blank"
+                rel="noopener"
+                data-official-source-link="${project.id}">
+                ${lang === 'ar' ? 'عرض المصدر المرجعي ↗' : 'View reference source ↗'}
+             </a>
+           </section>`
+        : ''
+    }
   `, {
     type: 'project',
     id,
@@ -1668,6 +1777,10 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
   document.querySelector('[data-project-share-toggle]')?.addEventListener('click', () => {
     const panel = document.getElementById('projectSharePanel');
     if (panel) panel.hidden = !panel.hidden;
+  });
+
+  document.querySelector('[data-official-source-link]')?.addEventListener('click', (event) => {
+    trackOfficialSourceExit(event.currentTarget.dataset.officialSourceLink);
   });
 }
 
