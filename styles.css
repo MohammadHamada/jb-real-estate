@@ -3182,3 +3182,24 @@ html[dir="rtl"] .client-account-close{right:auto;left:14px}
 .compare-save-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px}
 .finder-account-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0 8px}.finder-save-status{color:#fff;font-size:14px;font-weight:700}
 @media(max-width:760px){.nav-actions{flex-wrap:wrap}.client-account-card{padding:22px 15px}.client-account-stats{grid-template-columns:repeat(2,1fr)}.client-account-projects{grid-template-columns:1fr}.client-account-head{display:grid}}
+
+
+/* CLIENT AUTH RECOVERY V1.1 */
+.client-forgot-password,
+.client-auth-back{
+  border:0;
+  background:transparent;
+  color:#234f6d;
+  font:inherit;
+  font-size:14px;
+  font-weight:800;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  cursor:pointer;
+  justify-self:center;
+  padding:5px 8px;
+}
+.client-forgot-password:hover,
+.client-auth-back:hover{
+  color:#102f4a;
+}
