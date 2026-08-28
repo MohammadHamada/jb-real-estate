@@ -822,18 +822,3 @@ html[dir="rtl"] .contact-value{
   .journey-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .journey-signal-grid,.journey-columns{grid-template-columns:1fr}
 }
-
-
-/* STAFF AUTH RECOVERY V1 */
-.staff-auth-link{border:0;background:transparent;color:#244f6b;font:inherit;font-size:13px;font-weight:800;text-decoration:underline;text-underline-offset:3px;cursor:pointer;margin-top:8px}
-.staff-auth-link:hover{color:#0c3450}
-.staff-recovery-panel.hidden{display:none}
-.staff-recovery-panel{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:18px}
-.staff-recovery-backdrop{position:absolute;inset:0;background:rgba(4,22,35,.7);backdrop-filter:blur(6px)}
-.staff-recovery-card{position:relative;z-index:1;width:min(440px,94vw);background:#fff;border-radius:18px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.28);color:#0c3450}
-.staff-recovery-card h2{margin:3px 0 18px;font-size:24px}
-.staff-recovery-close{position:absolute;top:10px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:#f1f4f6;color:#0c3450;font-size:23px;cursor:pointer}
-.staff-recovery-form{display:grid;gap:12px}.staff-recovery-form.hidden{display:none}
-.staff-recovery-form label{display:grid;gap:6px;font-size:13px;font-weight:800}
-.staff-recovery-form input{min-height:44px;border:1px solid #ccd8df;border-radius:9px;padding:8px 10px;font:inherit;color:#0c3450}
-.staff-recovery-form small{font-size:12px;color:#647987;line-height:1.5}
