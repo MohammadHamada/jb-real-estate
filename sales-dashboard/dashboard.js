@@ -101,7 +101,35 @@ const I18N = {
     searchInsightType:"for",
     searchInsightTimeline:"with a buying timeline of",
     searchInsightFallback:"Use this saved search as a practical guide for the next call.",
-    valueMillion:"M EGP"
+    valueMillion:"M EGP",
+    behaviorIntel:"BEHAVIORAL INTEREST INTELLIGENCE",
+    observedIntent:"Observed purchase intent",
+    strongestInterest:"Strongest observed interest",
+    behaviorScore:"Behavior score",
+    dominantArea:"Dominant area",
+    dominantType:"Dominant property type",
+    profileBehaviorAlignment:"Profile vs behavior",
+    aligned:"Aligned",
+    divergent:"Needs validation",
+    unknownAlignment:"Not enough data",
+    behaviorSignals:"Behavior signals",
+    repeatedView:"Repeated viewing",
+    savedSignal:"Saved by customer",
+    comparedSignal:"Included in comparison",
+    recentReturn:"Recent return",
+    top3Included:"Observed favorite is already in Top 3",
+    top3Missing:"Observed favorite is NOT in current Top 3",
+    salesImplication:"Recommended sales approach",
+    validatePreference:"Validate whether the customer's preference has changed before presenting options.",
+    leadWithFavorite:"Open the conversation with the customer's observed favorite, then compare it with the formal Top 3.",
+    useComparison:"Use the customer's saved comparison as the main discussion frame.",
+    useBehaviorContext:"Use observed browsing behavior as context, but keep the current qualification flow.",
+    noBehaviorData:"No meaningful behavioral signal is available yet.",
+    intentProjects:"Highest-intent projects",
+    behaviorViews:"Views",
+    behaviorSaved:"Saved",
+    behaviorCompared:"Compared",
+    recommendationAlignment:"Recommendation alignment"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -191,7 +219,35 @@ const I18N = {
     searchInsightType:"عن",
     searchInsightTimeline:"وموعد شراء",
     searchInsightFallback:"استخدم هذا البحث المحفوظ كمرجع عملي في المكالمة التالية.",
-    valueMillion:"مليون جنيه"
+    valueMillion:"مليون جنيه",
+    behaviorIntel:"ذكاء الاهتمام السلوكي",
+    observedIntent:"نية الشراء المستنتجة من السلوك",
+    strongestInterest:"أقوى اهتمام فعلي",
+    behaviorScore:"درجة السلوك",
+    dominantArea:"المنطقة الأكثر اهتمامًا",
+    dominantType:"نوع العقار الأكثر اهتمامًا",
+    profileBehaviorAlignment:"توافق البيانات مع السلوك",
+    aligned:"متوافق",
+    divergent:"يحتاج تحقق",
+    unknownAlignment:"بيانات غير كافية",
+    behaviorSignals:"إشارات السلوك",
+    repeatedView:"مشاهدة متكررة",
+    savedSignal:"حفظه العميل",
+    comparedSignal:"أدخله في المقارنة",
+    recentReturn:"عاد إليه مؤخرًا",
+    top3Included:"المشروع المفضل سلوكيًا موجود ضمن أفضل 3",
+    top3Missing:"المشروع المفضل سلوكيًا غير موجود ضمن أفضل 3 الحالية",
+    salesImplication:"الأسلوب البيعي المقترح",
+    validatePreference:"تحقق أولًا هل تغير تفضيل العميل قبل عرض الخيارات النهائية.",
+    leadWithFavorite:"ابدأ الحديث بالمشروع الذي أظهر العميل اهتمامًا فعليًا به، ثم قارنه بأفضل 3 ترشيحات.",
+    useComparison:"استخدم المقارنة التي حفظها العميل كإطار رئيسي للمناقشة.",
+    useBehaviorContext:"استخدم السلوك الفعلي كسياق مساعد مع الاستمرار في مسار التأهيل الحالي.",
+    noBehaviorData:"لا توجد إشارة سلوكية قوية حتى الآن.",
+    intentProjects:"المشروعات الأعلى نية",
+    behaviorViews:"المشاهدات",
+    behaviorSaved:"محفوظ",
+    behaviorCompared:"مقارنة",
+    recommendationAlignment:"توافق الترشيحات"
   }
 };
 
@@ -634,14 +690,18 @@ async function openLead(id){
   currentLeadId=id; $("leadDrawer").classList.remove("hidden"); $("leadDrawer").setAttribute("aria-hidden","false");
   $("leadDetail").innerHTML=`<p>${tr("loadingLead")}</p>`;
   try{
-    const [detail,journey]=await Promise.all([
+    const [detail,journey,behavior]=await Promise.all([
       rpc("jb_sales_dashboard_lead_detail_v1",{p_lead_id:id}),
       rpc("jb_sales_client_journey_v1",{p_lead_id:id}).catch(e=>{
         console.warn("Client journey unavailable:",e);
         return null;
+      }),
+      rpc("jb_sales_behavioral_interest_v1",{p_lead_id:id}).catch(e=>{
+        console.warn("Behavioral interest unavailable:",e);
+        return null;
       })
     ]);
-    renderLeadDetail(detail,journey);
+    renderLeadDetail(detail,journey,behavior);
   }
   catch(e){$("leadDetail").innerHTML=`<p class="status">${esc(e.message||tr("failedLoadLead"))}</p>`;}
 }
@@ -872,7 +932,94 @@ function renderClientJourney(j){
   </section>`;
 }
 
-function renderLeadDetail(d,journey=null){
+
+function alignmentLabel(value){
+  const v=String(value||"UNKNOWN").toUpperCase();
+  if(v==="ALIGNED") return tr("aligned");
+  if(v==="DIVERGENT") return tr("divergent");
+  return tr("unknownAlignment");
+}
+
+function behaviorActionText(code){
+  const map={
+    VALIDATE_CHANGED_PREFERENCE:"validatePreference",
+    LEAD_WITH_OBSERVED_FAVORITE:"leadWithFavorite",
+    USE_COMPARISON_CLOSE:"useComparison",
+    USE_BEHAVIOR_AS_CONTEXT:"useBehaviorContext"
+  };
+  return tr(map[code]||"useBehaviorContext");
+}
+
+function renderBehavioralInterest(b){
+  if(!b || !b.linked || !Array.isArray(b.projects) || !b.projects.length){
+    return `<section class="behavior-intel">
+      <p class="eyebrow">${tr("behaviorIntel")}</p>
+      <div class="behavior-empty">${tr("noBehaviorData")}</div>
+    </section>`;
+  }
+
+  const s=b.summary||{};
+  const signals=(b.signals||[]).map(sig=>{
+    const key={
+      REPEATED_VIEW:"repeatedView",
+      SAVED_PROJECT:"savedSignal",
+      COMPARED_PROJECT:"comparedSignal",
+      RECENT_RETURN:"recentReturn"
+    }[sig]||sig;
+    return `<span class="behavior-signal-chip">${esc(tr(key)||sig)}</span>`;
+  }).join("");
+
+  const projects=(b.projects||[]).slice(0,5).map((p,index)=>`
+    <article class="behavior-project-card ${index===0?"is-top":""}">
+      <div>
+        <strong>#${index+1} ${esc((currentLang==="ar"?p.name_ar:p.name_en)||p.name_en||p.name_ar||"—")}</strong>
+        <small>${esc(p.city||"")}${p.area?` · ${esc(p.area)}`:""}</small>
+      </div>
+      <div class="behavior-project-metrics">
+        <span>${tr("behaviorViews")}: <b>${esc(p.view_count||0)}</b></span>
+        ${p.saved?`<span>✓ ${tr("behaviorSaved")}</span>`:""}
+        ${p.compared?`<span>✓ ${tr("behaviorCompared")}</span>`:""}
+        <span>${tr("behaviorScore")}: <b>${esc(p.behavior_score||0)}</b></span>
+      </div>
+    </article>`).join("");
+
+  const alignment=String(s.profile_behavior_alignment||"UNKNOWN").toLowerCase();
+  const top3Aligned=s.top_project_in_top3===true;
+
+  return `<section class="behavior-intel">
+    <div class="behavior-head">
+      <div>
+        <p class="eyebrow">${tr("behaviorIntel")}</p>
+        <h3>${tr("observedIntent")}</h3>
+      </div>
+      <span class="behavior-alignment ${esc(alignment)}">${tr("profileBehaviorAlignment")}: ${esc(alignmentLabel(s.profile_behavior_alignment))}</span>
+    </div>
+
+    <div class="behavior-summary-grid">
+      <div><span>${tr("strongestInterest")}</span><strong>${esc((currentLang==="ar"?s.top_project_name_ar:s.top_project_name_en)||s.top_project_name_en||s.top_project_name_ar||"—")}</strong></div>
+      <div><span>${tr("dominantArea")}</span><strong>${esc(s.dominant_area||"—")}</strong></div>
+      <div><span>${tr("dominantType")}</span><strong>${esc(s.dominant_type||"—")}</strong></div>
+      <div><span>${tr("recommendationAlignment")}</span><strong class="${top3Aligned?"behavior-good":"behavior-alert"}">${top3Aligned?tr("top3Included"):tr("top3Missing")}</strong></div>
+    </div>
+
+    <div class="behavior-signals">
+      <b>${tr("behaviorSignals")}</b>
+      <div>${signals||`<span class="muted">${tr("noData")}</span>`}</div>
+    </div>
+
+    <div class="behavior-sales-implication">
+      <span>${tr("salesImplication")}</span>
+      <p>${esc(behaviorActionText(s.recommended_action))}</p>
+    </div>
+
+    <div class="behavior-projects">
+      <h4>${tr("intentProjects")}</h4>
+      ${projects}
+    </div>
+  </section>`;
+}
+
+function renderLeadDetail(d,journey=null,behavior=null){
   const l=d.lead||{}, p=l.search_profile||{}, cp=l.customer_preferences||{}, wa=l.whatsapp_phone||l.phone;
   const contactButtons=[
     wa?`<a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/${esc(waHref(wa))}">${tr("whatsapp")}</a>`:"",
@@ -936,6 +1083,7 @@ function renderLeadDetail(d,journey=null){
       <div class="lead-actions">${contactButtons}</div>
     </section>
     ${renderClientJourney(journey)}
+    ${renderBehavioralInterest(behavior)}
     <div class="detail-grid">
       <article class="detail-card"><h3>${tr("searchProfile")}</h3><div class="kv">
         <b>${tr("location")}</b><span>${esc(p.location||"—")}</span><b>${tr("budget")}</b><span>${esc(p.budget||"—")}</span>
@@ -952,6 +1100,11 @@ function renderLeadDetail(d,journey=null){
       </div></article>
     </div>
     <p class="eyebrow">${tr("top3Support")}</p><div class="top3">${top3}</div>
+    ${behavior?.summary?.top_project_in_top3===false ? `
+      <div class="behavior-top3-warning">
+        <strong>${tr("top3Missing")}</strong>
+        <span>${tr("leadWithFavorite")}</span>
+      </div>` : ""}
     <article class="whatsapp-assistant">
       <div class="wa-assistant-head">
         <div><p class="eyebrow">${tr("whatsappAssistant")}</p><h3>${tr("messagePreview")}</h3></div>
