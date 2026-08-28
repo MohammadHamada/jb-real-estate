@@ -3203,3 +3203,318 @@ html[dir="rtl"] .client-account-close{right:auto;left:14px}
 .client-auth-back:hover{
   color:#102f4a;
 }
+
+
+/* =========================================================
+   JB PUBLIC PROJECT RICH PROFILE V1
+   Generic dynamic Unit Inventory layer
+   ========================================================= */
+
+.rich-units-shell{
+  margin:18px 0;
+  padding:18px;
+  border:1px solid #d7e2e9;
+  border-radius:18px;
+  background:#fbfcfd;
+}
+
+.rich-section-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:18px;
+  margin-bottom:15px;
+}
+
+.rich-section-heading h3{
+  margin:5px 0 6px;
+  color:#0c3450;
+  font-size:23px;
+  line-height:1.35;
+}
+
+.rich-section-heading p{
+  margin:0;
+  max-width:650px;
+  color:#667d8e;
+  font-size:15px;
+  line-height:1.65;
+}
+
+.rich-units-overview{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(100px,1fr));
+  gap:8px;
+  min-width:min(390px,100%);
+}
+
+.rich-units-overview>div{
+  border:1px solid #dfe7ec;
+  border-radius:12px;
+  background:#fff;
+  padding:10px;
+  display:grid;
+  gap:4px;
+}
+
+.rich-units-overview span{
+  color:#718493;
+  font-size:12px;
+  font-weight:700;
+}
+
+.rich-units-overview strong{
+  color:#0c3450;
+  font-size:16px;
+  line-height:1.35;
+}
+
+.rich-phase-list{
+  display:grid;
+  gap:10px;
+}
+
+.rich-phase-card{
+  border:1px solid #dfe7ec;
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.rich-phase-card.is-open{
+  border-color:#c7d9e4;
+  box-shadow:0 5px 18px rgba(9,50,77,.05);
+}
+
+.rich-phase-head{
+  width:100%;
+  border:0;
+  background:#fff;
+  color:inherit;
+  padding:13px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  text-align:start;
+  cursor:pointer;
+}
+
+.rich-phase-head>div:first-child{
+  display:grid;
+  gap:3px;
+}
+
+.rich-phase-kicker{
+  color:#c38d00;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+.rich-phase-head strong{
+  color:#0c3450;
+  font-size:17px;
+  line-height:1.4;
+}
+
+.rich-phase-head small{
+  color:#6b7f8e;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.rich-phase-summary{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:9px;
+  color:#49697c;
+}
+
+.rich-phase-summary span{
+  font-size:13px;
+  font-weight:750;
+}
+
+.rich-phase-summary b{
+  min-width:30px;
+  height:30px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:#eef4f7;
+  color:#0c3450;
+  font-size:13px;
+}
+
+.rich-phase-summary i{
+  font-style:normal;
+  font-size:22px;
+  transition:transform .18s ease;
+}
+
+.rich-phase-card.is-open .rich-phase-summary i{
+  transform:rotate(180deg);
+}
+
+.rich-phase-body{
+  padding:0 14px 14px;
+}
+
+.rich-unit-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+
+.rich-unit-card{
+  border:1px solid #e0e8ed;
+  border-radius:12px;
+  background:#fff;
+  padding:12px;
+}
+
+.rich-unit-title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:9px;
+  border-bottom:1px solid #edf1f4;
+}
+
+.rich-unit-title>div{
+  display:grid;
+  gap:2px;
+}
+
+.rich-unit-title strong{
+  color:#0c3450;
+  font-size:16px;
+}
+
+.rich-unit-title small{
+  color:#6a7d8c;
+  font-size:12px;
+}
+
+.rich-unit-title>span{
+  border-radius:999px;
+  background:#fff6d8;
+  color:#8b6400;
+  padding:6px 8px;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.rich-unit-facts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+  margin-top:9px;
+}
+
+.rich-unit-facts span{
+  display:grid;
+  gap:2px;
+  border-radius:8px;
+  background:#f7f9fa;
+  padding:7px 8px;
+  color:#234b63;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.rich-unit-facts span.wide{
+  grid-column:1/-1;
+}
+
+.rich-unit-facts b{
+  color:#738594;
+  font-size:11px;
+}
+
+.rich-unit-details{
+  margin-top:8px;
+  border-top:1px solid #edf1f4;
+  padding-top:7px;
+}
+
+.rich-unit-details summary{
+  color:#315b73;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.rich-unit-details>div{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+  margin-top:7px;
+}
+
+.rich-unit-details span{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  color:#607586;
+  font-size:12px;
+}
+
+.rich-unit-details b{
+  color:#153c55;
+}
+
+.rich-unit-source{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-top:9px;
+  padding-top:8px;
+  border-top:1px solid #edf1f4;
+  color:#2c6f4e;
+  font-size:11.5px;
+  font-weight:750;
+}
+
+.rich-unit-source small{
+  color:#7a8d99;
+  font-weight:600;
+}
+
+.rich-units-note{
+  margin-top:12px;
+  border-radius:11px;
+  background:#f1f7fa;
+  padding:10px 11px;
+  display:flex;
+  gap:8px;
+  color:#506d7e;
+}
+
+.rich-units-note p{
+  margin:0;
+  font-size:13px;
+  line-height:1.55;
+}
+
+@media(max-width:850px){
+  .rich-section-heading{display:grid}
+  .rich-units-overview{min-width:0;width:100%}
+}
+
+@media(max-width:650px){
+  .rich-units-shell{padding:13px}
+  .rich-units-overview{grid-template-columns:1fr}
+  .rich-phase-head{align-items:flex-start}
+  .rich-phase-summary{display:grid;text-align:end}
+  .rich-unit-grid{grid-template-columns:1fr}
+  .rich-unit-facts{grid-template-columns:1fr}
+  .rich-unit-facts span.wide{grid-column:auto}
+  .rich-unit-details>div{grid-template-columns:1fr}
+  .rich-unit-source{display:grid}
+}
