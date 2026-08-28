@@ -78,7 +78,30 @@ const I18N = {
     mostViewedProject:"Most viewed project", recentProject:"Most recent project",
     customerSelectedProjects:"Customer-selected projects", customerBehavior:"Observed customer behavior",
     noCustomerJourney:"No saved customer journey data yet.", views:"views",
-    accountMatchNote:"Account linkage uses exact normalized email match in V1; no identity is inferred."
+    accountMatchNote:"Account verified by matching email.",
+    accountVerified:"Account verified",
+    salesInsight:"Sales insight",
+    notSpecified:"Not specified",
+    searchLocation:"Location",
+    searchBudget:"Budget",
+    searchType:"Property type",
+    searchPurpose:"Purpose",
+    searchBedrooms:"Bedrooms",
+    searchDelivery:"Delivery",
+    searchPayment:"Payment",
+    searchTimeline:"Timeline",
+    searchReadiness:"Search readiness",
+    searchSummaryTitle:"Saved search",
+    comparisonProjects:"Compared projects",
+    systemDetails:"System details",
+    linkMethodTechnical:"Exact email match",
+    searchInsightPrefix:"Customer is actively searching",
+    searchInsightLocation:"in",
+    searchInsightBudget:"with a budget of",
+    searchInsightType:"for",
+    searchInsightTimeline:"with a buying timeline of",
+    searchInsightFallback:"Use this saved search as a practical guide for the next call.",
+    valueMillion:"M EGP"
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -145,7 +168,30 @@ const I18N = {
     mostViewedProject:"أكثر مشروع مشاهدة", recentProject:"أحدث مشروع تمت مشاهدته",
     customerSelectedProjects:"المشروعات التي اختارها العميل", customerBehavior:"السلوك الفعلي للعميل",
     noCustomerJourney:"لا توجد رحلة محفوظة للعميل حتى الآن.", views:"مشاهدات",
-    accountMatchNote:"في V1 يتم ربط الحساب بالـLead فقط عند تطابق البريد الإلكتروني بشكل صريح، بدون استنتاج للهوية."
+    accountMatchNote:"تم التحقق من حساب العميل بالبريد الإلكتروني المطابق.",
+    accountVerified:"تم التحقق من الحساب",
+    salesInsight:"معلومة بيعية",
+    notSpecified:"غير محدد",
+    searchLocation:"المنطقة",
+    searchBudget:"الميزانية",
+    searchType:"نوع الوحدة",
+    searchPurpose:"الغرض",
+    searchBedrooms:"عدد الغرف",
+    searchDelivery:"التسليم",
+    searchPayment:"طريقة السداد",
+    searchTimeline:"موعد الشراء",
+    searchReadiness:"اكتمال البحث",
+    searchSummaryTitle:"بحث محفوظ",
+    comparisonProjects:"المشروعات المقارنة",
+    systemDetails:"تفاصيل النظام",
+    linkMethodTechnical:"تطابق البريد الإلكتروني",
+    searchInsightPrefix:"العميل يبحث فعليًا",
+    searchInsightLocation:"في",
+    searchInsightBudget:"بميزانية",
+    searchInsightType:"عن",
+    searchInsightTimeline:"وموعد شراء",
+    searchInsightFallback:"استخدم هذا البحث المحفوظ كمرجع عملي في المكالمة التالية.",
+    valueMillion:"مليون جنيه"
   }
 };
 
@@ -633,6 +679,115 @@ function engagementLabel(value){
   return tr("lowEngagement");
 }
 
+
+function humanizeSearchValue(key,value){
+  if(value===null || value===undefined || value==="") return "";
+  const raw=String(value);
+
+  const budgetMap={
+    "under5": currentLang==="ar"?"أقل من 5 مليون EGP":"Under 5M EGP",
+    "5to10": currentLang==="ar"?"5–10 مليون EGP":"5–10M EGP",
+    "10to20": currentLang==="ar"?"10–20 مليون EGP":"10–20M EGP",
+    "20plus": currentLang==="ar"?"أكثر من 20 مليون EGP":"20M+ EGP"
+  };
+
+  const commonMap={
+    "both": currentLang==="ar"?"سكن أو استثمار":"Home or investment",
+    "investment": currentLang==="ar"?"استثمار":"Investment",
+    "home": currentLang==="ar"?"سكن":"Home",
+    "cash": currentLang==="ar"?"كاش":"Cash",
+    "installments": currentLang==="ar"?"تقسيط":"Installments",
+    "now": currentLang==="ar"?"الآن":"Now",
+    "3months": currentLang==="ar"?"خلال 3 أشهر":"Within 3 months",
+    "6months": currentLang==="ar"?"خلال 6 أشهر":"Within 6 months",
+    "12months": currentLang==="ar"?"خلال 12 شهرًا":"Within 12 months",
+    "apartment": currentLang==="ar"?"شقة":"Apartment",
+    "villa": currentLang==="ar"?"فيلا":"Villa",
+    "townhouse": currentLang==="ar"?"تاون هاوس":"Townhouse",
+    "chalet": currentLang==="ar"?"شاليه":"Chalet"
+  };
+
+  if(key==="budget" && budgetMap[raw]) return budgetMap[raw];
+  const mapped=commonMap[raw.toLowerCase()];
+  if(mapped) return mapped;
+
+  return raw.replace(/_/g," ");
+}
+
+function searchFieldLabel(key){
+  const map={
+    location:"searchLocation",
+    budget:"searchBudget",
+    type:"searchType",
+    purpose:"searchPurpose",
+    bedrooms:"searchBedrooms",
+    delivery:"searchDelivery",
+    payment:"searchPayment",
+    timeline:"searchTimeline",
+    readiness:"searchReadiness"
+  };
+  return tr(map[key]||key);
+}
+
+function normalizedSearchEntries(profile){
+  const p=profile||{};
+  const order=["location","budget","type","purpose","bedrooms","delivery","payment","timeline","readiness"];
+  return order
+    .map(key=>({key,label:searchFieldLabel(key),value:humanizeSearchValue(key,p[key])}))
+    .filter(item=>item.value!=="" && item.value!==tr("notSpecified"));
+}
+
+function buildSavedSearchInsight(profile){
+  const p=profile||{};
+  const parts=[];
+  if(p.type) parts.push(humanizeSearchValue("type",p.type));
+  if(p.location) parts.push(`${tr("searchInsightLocation")} ${humanizeSearchValue("location",p.location)}`);
+  if(p.budget) parts.push(`${tr("searchInsightBudget")} ${humanizeSearchValue("budget",p.budget)}`);
+  if(p.timeline) parts.push(`${tr("searchInsightTimeline")} ${humanizeSearchValue("timeline",p.timeline)}`);
+
+  if(!parts.length) return tr("searchInsightFallback");
+
+  return `${tr("searchInsightPrefix")} ${parts.join(" · ")}.`;
+}
+
+function renderSavedSearchCard(x){
+  const entries=normalizedSearchEntries(x.search_profile);
+  const fields=entries.length ? entries.map(item=>`
+    <div class="saved-search-field">
+      <span>${esc(item.label)}</span>
+      <strong>${esc(item.value)}</strong>
+    </div>`).join("") : `<p class="muted">${tr("noData")}</p>`;
+
+  return `<article class="saved-search-card">
+    <div class="saved-search-head">
+      <strong>${esc(x.name||tr("searchSummaryTitle"))}</strong>
+      <small>${esc(fmtDate(x.updated_at||x.created_at))}</small>
+    </div>
+
+    <div class="saved-search-grid">${fields}</div>
+
+    <div class="saved-search-insight">
+      <span>${tr("salesInsight")}</span>
+      <p>${esc(buildSavedSearchInsight(x.search_profile))}</p>
+    </div>
+  </article>`;
+}
+
+function renderSavedComparisonCard(x){
+  const names=(x.project_names||[]).filter(Boolean);
+  return `<article class="saved-comparison-card">
+    <div class="saved-search-head">
+      <strong>${esc(x.name||tr("savedComparisons"))}</strong>
+      <small>${esc(fmtDate(x.updated_at||x.created_at))}</small>
+    </div>
+    <div class="comparison-project-tags">
+      ${names.length
+        ? names.map(name=>`<span>${esc(name)}</span>`).join("")
+        : `<span class="muted">${tr("noData")}</span>`}
+    </div>
+  </article>`;
+}
+
 function renderClientJourney(j){
   if(!j || !j.linked){
     return `<section class="client-journey-intel">
@@ -659,17 +814,9 @@ function renderClientJourney(j){
       <span class="journey-chip">${esc(p.view_count||0)} ${tr("views")}</span>
     </div>`).join("");
 
-  const searches=(j.saved_searches||[]).slice(0,4).map(x=>`
-    <div class="journey-saved-box">
-      <strong>${esc(x.name||tr("savedSearches"))}</strong>
-      <small>${esc(JSON.stringify(x.search_profile||{}))}</small>
-    </div>`).join("");
+  const searches=(j.saved_searches||[]).slice(0,4).map(renderSavedSearchCard).join("");
 
-  const comparisons=(j.saved_comparisons||[]).slice(0,4).map(x=>`
-    <div class="journey-saved-box">
-      <strong>${esc(x.name||tr("savedComparisons"))}</strong>
-      <small>${esc((x.project_names||[]).join(" · "))}</small>
-    </div>`).join("");
+  const comparisons=(j.saved_comparisons||[]).slice(0,4).map(renderSavedComparisonCard).join("");
 
   return `<section class="client-journey-intel">
     <div class="journey-title-row">
@@ -679,10 +826,16 @@ function renderClientJourney(j){
       </span>
     </div>
 
-    <div class="journey-account-note">
-      <strong>${tr("linkedAccount")}</strong>
-      <span>${esc(j.account?.email||"—")}</span>
-      <small>${tr("linkMethod")}: ${esc(j.account?.link_method||"EMAIL_EXACT")} · ${tr("accountCreated")}: ${esc(fmtDate(j.account?.created_at))} · ${tr("lastSignIn")}: ${esc(fmtDate(j.account?.last_sign_in_at))}</small>
+    <div class="journey-account-note journey-account-verified">
+      <div class="journey-verified-icon">✓</div>
+      <div class="journey-account-main">
+        <strong>${tr("accountVerified")}</strong>
+        <span>${esc(j.account?.email||"—")}</span>
+      </div>
+      <div class="journey-account-meta">
+        <span>${tr("accountCreated")}: ${esc(fmtDate(j.account?.created_at))}</span>
+        <span>${tr("lastSignIn")}: ${esc(fmtDate(j.account?.last_sign_in_at))}</span>
+      </div>
     </div>
 
     <div class="journey-metrics">
@@ -709,7 +862,13 @@ function renderClientJourney(j){
       <div><h4>${tr("savedComparisons")}</h4>${comparisons||`<p class="muted">${tr("noData")}</p>`}</div>
     </div>`:""}
 
-    <p class="journey-match-note">${tr("accountMatchNote")}</p>
+    <details class="journey-system-details">
+      <summary>${tr("systemDetails")}</summary>
+      <div>
+        <span>${tr("accountMatchNote")}</span>
+        <small>${tr("linkMethod")}: ${tr("linkMethodTechnical")}</small>
+      </div>
+    </details>
   </section>`;
 }
 
