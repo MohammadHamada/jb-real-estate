@@ -60,7 +60,25 @@ const I18N = {
     followupContactNow:"Contact now", followupDueToday:"Due today", followupOverdue:"Overdue",
     followupNoSchedule:"No follow-up scheduled", followupNurture:"Nurture", quickFollowup:"Quick follow-up",
     tomorrow:"Tomorrow", in3Days:"In 3 days", in7Days:"In 7 days", in14Days:"In 14 days", smartSuggested:"Suggested",
-    noQueueItems:"No leads in this queue."
+    noQueueItems:"No leads in this queue.",
+    acquisitionAnalytics:"ACQUISITION & REFERRAL INTELLIGENCE",
+    whereBestLeadsComeFrom:"Where do the best leads come from?",
+    referralShares:"Referral shares", referralVisits:"Referral visits", referredLeads:"Referred leads",
+    visitToLead:"Visit → Lead", referralWins:"Referral wins", leadsBySource:"Leads by source",
+    referralChannels:"Referral sharing channels", topLandingPages:"Top lead pages",
+    source:"Source", leads:"Leads", won:"Won", conversion:"Conversion", value:"Value",
+    shares:"Shares", visits:"Visits",
+    attributionNote:"V1 reports only attribution already captured by JB; it does not infer missing campaign data.",
+    clientJourney:"CLIENT JOURNEY INTELLIGENCE", linkedAccount:"Linked client account",
+    noLinkedAccount:"No client account linked to this lead yet.", linkMethod:"Link method",
+    accountCreated:"Account created", lastSignIn:"Last sign-in", engagement:"Engagement",
+    highEngagement:"High", mediumEngagement:"Medium", lowEngagement:"Low",
+    savedProjects:"Saved projects", recentViews:"Recent views", savedSearches:"Saved searches",
+    savedComparisons:"Saved comparisons", totalViews:"Total project views", lastClientActivity:"Last client activity",
+    mostViewedProject:"Most viewed project", recentProject:"Most recent project",
+    customerSelectedProjects:"Customer-selected projects", customerBehavior:"Observed customer behavior",
+    noCustomerJourney:"No saved customer journey data yet.", views:"views",
+    accountMatchNote:"Account linkage uses exact normalized email match in V1; no identity is inferred."
   },
   ar: {
     brand:"مجموعة JB العقارية", salesIntelligence:"ذكاء المبيعات", privateAccess:"دخول خاص بفريق العمل.",
@@ -109,7 +127,25 @@ const I18N = {
     followupContactNow:"تواصل الآن", followupDueToday:"مستحقة اليوم", followupOverdue:"متأخرة",
     followupNoSchedule:"بدون متابعة مجدولة", followupNurture:"متابعة طويلة", quickFollowup:"متابعة سريعة",
     tomorrow:"غدًا", in3Days:"بعد 3 أيام", in7Days:"بعد أسبوع", in14Days:"بعد أسبوعين", smartSuggested:"مقترح",
-    noQueueItems:"لا توجد حالات في هذه القائمة."
+    noQueueItems:"لا توجد حالات في هذه القائمة.",
+    acquisitionAnalytics:"تحليل مصادر العملاء والإحالات",
+    whereBestLeadsComeFrom:"من أين يأتي أفضل العملاء؟",
+    referralShares:"مشاركات الإحالة", referralVisits:"زيارات الإحالة", referredLeads:"عملاء الإحالة",
+    visitToLead:"من الزيارة إلى العميل", referralWins:"صفقات الإحالة", leadsBySource:"العملاء حسب المصدر",
+    referralChannels:"قنوات مشاركة الإحالات", topLandingPages:"أهم صفحات جذب العملاء",
+    source:"المصدر", leads:"العملاء", won:"تم البيع", conversion:"التحويل", value:"القيمة",
+    shares:"المشاركات", visits:"الزيارات",
+    attributionNote:"يعرض الإصدار V1 فقط بيانات المصدر التي سجلها JB فعليًا، ولا يفترض بيانات حملات غير موجودة.",
+    clientJourney:"ذكاء رحلة العميل", linkedAccount:"حساب العميل المرتبط",
+    noLinkedAccount:"لا يوجد حساب عميل مرتبط بهذا الـLead حتى الآن.", linkMethod:"طريقة الربط",
+    accountCreated:"تاريخ إنشاء الحساب", lastSignIn:"آخر تسجيل دخول", engagement:"درجة التفاعل",
+    highEngagement:"مرتفع", mediumEngagement:"متوسط", lowEngagement:"منخفض",
+    savedProjects:"مشروعات محفوظة", recentViews:"مشاهدات حديثة", savedSearches:"بحوث محفوظة",
+    savedComparisons:"مقارنات محفوظة", totalViews:"إجمالي مشاهدات المشروعات", lastClientActivity:"آخر نشاط للعميل",
+    mostViewedProject:"أكثر مشروع مشاهدة", recentProject:"أحدث مشروع تمت مشاهدته",
+    customerSelectedProjects:"المشروعات التي اختارها العميل", customerBehavior:"السلوك الفعلي للعميل",
+    noCustomerJourney:"لا توجد رحلة محفوظة للعميل حتى الآن.", views:"مشاهدات",
+    accountMatchNote:"في V1 يتم ربط الحساب بالـLead فقط عند تطابق البريد الإلكتروني بشكل صريح، بدون استنتاج للهوية."
   }
 };
 
@@ -322,6 +358,74 @@ function conversionStageLabel(stage){
 }
 
 
+
+function acquisitionChannelLabel(v){
+  const map={
+    direct:{en:"Direct",ar:"مباشر"},
+    google_organic:{en:"Google organic",ar:"Google عضوي"},
+    facebook:{en:"Facebook",ar:"Facebook"},
+    instagram:{en:"Instagram",ar:"Instagram"},
+    whatsapp:{en:"WhatsApp",ar:"WhatsApp"},
+    other_referral:{en:"Other referral",ar:"إحالة خارجية"},
+    referral_whatsapp:{en:"Referral · WhatsApp",ar:"إحالة · واتساب"},
+    referral_email:{en:"Referral · Email",ar:"إحالة · بريد"},
+    referral_native:{en:"Referral · Share",ar:"إحالة · مشاركة"},
+    referral_copy:{en:"Referral · Copied link",ar:"إحالة · رابط منسوخ"},
+    referral_shared_link:{en:"Referral · Shared link",ar:"إحالة · رابط مشترك"}
+  };
+  return map[v]?.[currentLang] || v || "—";
+}
+
+function referralChannelLabel(v){
+  const map={
+    whatsapp:{en:"WhatsApp",ar:"واتساب"},
+    email:{en:"Email",ar:"البريد الإلكتروني"},
+    native:{en:"Native share",ar:"مشاركة الجهاز"},
+    copy:{en:"Copy link",ar:"نسخ الرابط"},
+    shared_link:{en:"Shared link",ar:"رابط مشترك"},
+    unknown:{en:"Unknown",ar:"غير محدد"}
+  };
+  return map[v]?.[currentLang] || v || "—";
+}
+
+async function loadAcquisitionAnalytics(){
+  $("acquisitionStatus").textContent=tr("loading");
+  try{
+    const d=await rpc("jb_sales_acquisition_analytics_v1");
+    const s=d.summary||{};
+    $("aShares").textContent=s.referral_shares??0;
+    $("aVisits").textContent=s.referral_visits??0;
+    $("aReferralLeads").textContent=s.referred_leads??0;
+    $("aVisitLead").textContent=`${s.visit_to_lead_rate??0}%`;
+    $("aReferralWins").textContent=s.referred_wins??0;
+
+    $("acquisitionChannels").innerHTML=(d.channels||[]).map(x=>`
+      <div class="analytics-row">
+        <div><strong>${esc(acquisitionChannelLabel(x.channel))}</strong><small>${tr("leads")}: ${esc(x.leads)}</small></div>
+        <div><span>${tr("won")}: <b>${esc(x.won)}</b></span><span>${tr("conversion")}: <b>${esc(x.lead_to_won_rate)}%</b></span></div>
+      </div>
+    `).join("") || `<p class="muted">${tr("noData")}</p>`;
+
+    $("referralChannels").innerHTML=(d.referral_channels||[]).map(x=>`
+      <div class="analytics-row">
+        <strong>${esc(referralChannelLabel(x.channel))}</strong>
+        <div><span>${tr("shares")}: <b>${esc(x.shares)}</b></span><span>${tr("visits")}: <b>${esc(x.visits)}</b></span></div>
+      </div>
+    `).join("") || `<p class="muted">${tr("noData")}</p>`;
+
+    $("landingPages").innerHTML=(d.landing_pages||[]).map(x=>`
+      <div class="analytics-row">
+        <div><strong>${esc(x.page_path||"/")}</strong><small>${tr("leads")}: ${esc(x.leads)}</small></div>
+        <div><span>${tr("won")}: <b>${esc(x.won)}</b></span><span>${tr("conversion")}: <b>${esc(x.lead_to_won_rate)}%</b></span></div>
+      </div>
+    `).join("") || `<p class="muted">${tr("noData")}</p>`;
+
+    $("acquisitionStatus").textContent="";
+  }catch(e){
+    $("acquisitionStatus").textContent=e.message||"Failed to load acquisition analytics.";
+  }
+}
+
 function followupQueueCard(titleKey,items,kind){
   const rows=(items||[]).map(x=>{
     const project=(currentLang==="ar"?x.best_project_name_ar:x.best_project_name_en)
@@ -483,7 +587,16 @@ async function loadLeads(){
 async function openLead(id){
   currentLeadId=id; $("leadDrawer").classList.remove("hidden"); $("leadDrawer").setAttribute("aria-hidden","false");
   $("leadDetail").innerHTML=`<p>${tr("loadingLead")}</p>`;
-  try{renderLeadDetail(await rpc("jb_sales_dashboard_lead_detail_v1",{p_lead_id:id}));}
+  try{
+    const [detail,journey]=await Promise.all([
+      rpc("jb_sales_dashboard_lead_detail_v1",{p_lead_id:id}),
+      rpc("jb_sales_client_journey_v1",{p_lead_id:id}).catch(e=>{
+        console.warn("Client journey unavailable:",e);
+        return null;
+      })
+    ]);
+    renderLeadDetail(detail,journey);
+  }
   catch(e){$("leadDetail").innerHTML=`<p class="status">${esc(e.message||tr("failedLoadLead"))}</p>`;}
 }
 document.querySelectorAll("[data-close-drawer]").forEach(x=>x.addEventListener("click",closeDrawer));
@@ -512,7 +625,95 @@ function buildWhatsAppMessage(lead, top3){
   return msg;
 }
 
-function renderLeadDetail(d){
+
+function engagementLabel(value){
+  const v=String(value||"LOW").toUpperCase();
+  if(v==="HIGH") return tr("highEngagement");
+  if(v==="MEDIUM") return tr("mediumEngagement");
+  return tr("lowEngagement");
+}
+
+function renderClientJourney(j){
+  if(!j || !j.linked){
+    return `<section class="client-journey-intel">
+      <p class="eyebrow">${tr("clientJourney")}</p>
+      <div class="journey-empty">
+        <strong>${tr("noLinkedAccount")}</strong>
+        <small>${tr("accountMatchNote")}</small>
+      </div>
+    </section>`;
+  }
+
+  const s=j.summary||{};
+  const saved=(j.saved_projects||[]).map(p=>`
+    <button type="button" class="journey-project-row" data-project-name="${esc((currentLang==="ar"?p.name_ar:p.name_en)||p.name_en||p.name_ar||"")}">
+      <span><strong>${esc((currentLang==="ar"?p.name_ar:p.name_en)||p.name_en||p.name_ar||"")}</strong>
+      <small>${esc(p.city||"")}${p.area?` · ${esc(p.area)}`:""}</small></span>
+      <span class="journey-chip">${tr("savedProjects")}</span>
+    </button>`).join("");
+
+  const recent=(j.recent_projects||[]).slice(0,6).map(p=>`
+    <div class="journey-project-row">
+      <span><strong>${esc((currentLang==="ar"?p.name_ar:p.name_en)||p.name_en||p.name_ar||"")}</strong>
+      <small>${esc(fmtDate(p.viewed_at))}</small></span>
+      <span class="journey-chip">${esc(p.view_count||0)} ${tr("views")}</span>
+    </div>`).join("");
+
+  const searches=(j.saved_searches||[]).slice(0,4).map(x=>`
+    <div class="journey-saved-box">
+      <strong>${esc(x.name||tr("savedSearches"))}</strong>
+      <small>${esc(JSON.stringify(x.search_profile||{}))}</small>
+    </div>`).join("");
+
+  const comparisons=(j.saved_comparisons||[]).slice(0,4).map(x=>`
+    <div class="journey-saved-box">
+      <strong>${esc(x.name||tr("savedComparisons"))}</strong>
+      <small>${esc((x.project_names||[]).join(" · "))}</small>
+    </div>`).join("");
+
+  return `<section class="client-journey-intel">
+    <div class="journey-title-row">
+      <div><p class="eyebrow">${tr("clientJourney")}</p><h3>${tr("customerBehavior")}</h3></div>
+      <span class="journey-engagement ${esc(String(s.engagement_signal||"low").toLowerCase())}">
+        ${tr("engagement")}: ${esc(engagementLabel(s.engagement_signal))}
+      </span>
+    </div>
+
+    <div class="journey-account-note">
+      <strong>${tr("linkedAccount")}</strong>
+      <span>${esc(j.account?.email||"—")}</span>
+      <small>${tr("linkMethod")}: ${esc(j.account?.link_method||"EMAIL_EXACT")} · ${tr("accountCreated")}: ${esc(fmtDate(j.account?.created_at))} · ${tr("lastSignIn")}: ${esc(fmtDate(j.account?.last_sign_in_at))}</small>
+    </div>
+
+    <div class="journey-metrics">
+      <div><span>${tr("savedProjects")}</span><strong>${esc(s.saved_projects??0)}</strong></div>
+      <div><span>${tr("recentViews")}</span><strong>${esc(s.recent_projects??0)}</strong></div>
+      <div><span>${tr("savedSearches")}</span><strong>${esc(s.saved_searches??0)}</strong></div>
+      <div><span>${tr("savedComparisons")}</span><strong>${esc(s.saved_comparisons??0)}</strong></div>
+      <div><span>${tr("totalViews")}</span><strong>${esc(s.total_project_views??0)}</strong></div>
+      <div><span>${tr("lastClientActivity")}</span><strong class="small-date">${esc(fmtDate(s.last_activity_at))}</strong></div>
+    </div>
+
+    <div class="journey-signal-grid">
+      <div><b>${tr("mostViewedProject")}</b><span>${esc((currentLang==="ar"?s.most_viewed_project_name_ar:s.most_viewed_project_name_en)||s.most_viewed_project_name_en||s.most_viewed_project_name_ar||"—")}</span></div>
+      <div><b>${tr("recentProject")}</b><span>${esc((currentLang==="ar"?s.most_recent_project_name_ar:s.most_recent_project_name_en)||s.most_recent_project_name_en||s.most_recent_project_name_ar||"—")}</span></div>
+    </div>
+
+    <div class="journey-columns">
+      <div><h4>${tr("customerSelectedProjects")}</h4>${saved||`<p class="muted">${tr("noCustomerJourney")}</p>`}</div>
+      <div><h4>${tr("recentViews")}</h4>${recent||`<p class="muted">${tr("noCustomerJourney")}</p>`}</div>
+    </div>
+
+    ${(searches||comparisons)?`<div class="journey-columns journey-secondary">
+      <div><h4>${tr("savedSearches")}</h4>${searches||`<p class="muted">${tr("noData")}</p>`}</div>
+      <div><h4>${tr("savedComparisons")}</h4>${comparisons||`<p class="muted">${tr("noData")}</p>`}</div>
+    </div>`:""}
+
+    <p class="journey-match-note">${tr("accountMatchNote")}</p>
+  </section>`;
+}
+
+function renderLeadDetail(d,journey=null){
   const l=d.lead||{}, p=l.search_profile||{}, cp=l.customer_preferences||{}, wa=l.whatsapp_phone||l.phone;
   const contactButtons=[
     wa?`<a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/${esc(waHref(wa))}">${tr("whatsapp")}</a>`:"",
@@ -575,6 +776,7 @@ function renderLeadDetail(d){
       ${contactDetails}
       <div class="lead-actions">${contactButtons}</div>
     </section>
+    ${renderClientJourney(journey)}
     <div class="detail-grid">
       <article class="detail-card"><h3>${tr("searchProfile")}</h3><div class="kv">
         <b>${tr("location")}</b><span>${esc(p.location||"—")}</span><b>${tr("budget")}</b><span>${esc(p.budget||"—")}</span>
@@ -716,7 +918,7 @@ async function saveLeadUpdate(e){
   }catch(e2){$("updateStatus").textContent=e2.message||tr("updateFailed");}
 }
 
-async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadFollowupQueue(),loadConversionAnalytics(),loadLeads()]);}catch(e){console.error(e);}}
+async function loadAll(){try{await Promise.all([loadSummary(),loadActionCenter(),loadOutcomes(),loadAcquisitionAnalytics(),loadFollowupQueue(),loadConversionAnalytics(),loadLeads()]);}catch(e){console.error(e);}}
 
 applyLang();
 (async()=>{if(await checkAccess()) await loadAll();})();
