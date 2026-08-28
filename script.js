@@ -9,6 +9,10 @@
 const SUPABASE_URL = "https://cmjeijjkdztlvhqzcjrg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_foGnQkjteOAQ7XL6SBqAVA_fQACuQ7a";
 const SUPABASE_REST = `${SUPABASE_URL}/rest/v1`;
+const SUPABASE_AUTH = `${SUPABASE_URL}/auth/v1`;
+const JB_CLIENT_SESSION_KEY = 'jb_client_session_v1';
+let clientSession = null;
+let clientJourney = {savedProjects:[],recentProjects:[],savedSearches:[],savedComparisons:[]};
 
 const translations = {
   en: {
@@ -19,6 +23,7 @@ const translations = {
     'nav.investment':'Investment',
     'nav.about':'About JB',
     'nav.cta':'Find My Property',
+    'nav.account':'My Account',
 
     'hero.eyebrow':'JB REAL ESTATE GROUP',
     'hero.title':'Find. Compare. Decide. Invest.',
@@ -149,6 +154,7 @@ const translations = {
     'nav.investment':'الاستثمار',
     'nav.about':'عن JB',
     'nav.cta':'ابحث عن عقارك',
+    'nav.account':'حسابي',
 
     'hero.eyebrow':'مجموعة JB للعقارات',
     'hero.title':'ابحث. قارن. اختر. استثمر.',
@@ -352,6 +358,85 @@ async function supabasePost(path, payload) {
   }
 
   return true;
+}
+
+/* CLIENT ACCOUNT V1 */
+function clientAuthHeaders(token=null){
+  const h={apikey:SUPABASE_KEY,'Content-Type':'application/json'};
+  if(token) h.Authorization=`Bearer ${token}`;
+  return h;
+}
+function saveClientSession(s){
+  clientSession=s||null;
+  if(s) localStorage.setItem(JB_CLIENT_SESSION_KEY,JSON.stringify(s));
+  else localStorage.removeItem(JB_CLIENT_SESSION_KEY);
+  updateClientAccountButton();
+}
+function loadStoredClientSession(){
+  try{clientSession=JSON.parse(localStorage.getItem(JB_CLIENT_SESSION_KEY)||'null');}
+  catch{clientSession=null;}
+  return clientSession;
+}
+function currentClientUser(){return clientSession?.user||null;}
+function jwtExp(token){
+  try{
+    const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return Number(JSON.parse(atob(p)).exp||0);
+  }catch{return 0;}
+}
+async function clientAuthRequest(path,body=null,method='POST',token=null){
+  const r=await fetch(`${SUPABASE_AUTH}${path}`,{
+    method,headers:clientAuthHeaders(token),
+    body:body===null?undefined:JSON.stringify(body)
+  });
+  const t=await r.text(); let d=null;
+  try{d=t?JSON.parse(t):null;}catch{d={message:t};}
+  if(!r.ok) throw new Error(d?.msg||d?.message||d?.error_description||`AUTH_${r.status}`);
+  return d;
+}
+async function ensureClientSession(){
+  if(!clientSession) loadStoredClientSession();
+  if(!clientSession?.access_token) return null;
+  const exp=jwtExp(clientSession.access_token);
+  if(exp && exp*1000<Date.now()+60000 && clientSession.refresh_token){
+    try{
+      const d=await clientAuthRequest('/token?grant_type=refresh_token',{refresh_token:clientSession.refresh_token});
+      saveClientSession(d);
+    }catch{saveClientSession(null);return null;}
+  }
+  return clientSession;
+}
+async function clientRest(path,{method='GET',body,prefer=''}={}){
+  const s=await ensureClientSession();
+  if(!s?.access_token) throw new Error('AUTH_REQUIRED');
+  const r=await fetch(`${SUPABASE_REST}/${path}`,{
+    method,
+    headers:{...clientAuthHeaders(s.access_token),Prefer:prefer},
+    body:body===undefined?undefined:JSON.stringify(body)
+  });
+  const t=await r.text();
+  if(!r.ok){
+    let m=t; try{const d=JSON.parse(t);m=d.message||d.hint||d.details||t;}catch{}
+    throw new Error(m||`CLIENT_REST_${r.status}`);
+  }
+  if(!t) return null;
+  try{return JSON.parse(t);}catch{return t;}
+}
+async function clientSignup(email,password,fullName){
+  const d=await clientAuthRequest('/signup',{email,password,data:{full_name:fullName||''}});
+  if(d?.access_token){saveClientSession(d);await syncGuestJourneyToAccount();await loadClientJourney();}
+  return d;
+}
+async function clientLogin(email,password){
+  const d=await clientAuthRequest('/token?grant_type=password',{email,password});
+  saveClientSession(d);await syncGuestJourneyToAccount();await loadClientJourney();return d;
+}
+async function clientLogout(){
+  const token=clientSession?.access_token;
+  if(token){try{await clientAuthRequest('/logout',null,'POST',token);}catch{}}
+  saveClientSession(null);
+  clientJourney={savedProjects:[],recentProjects:[],savedSearches:[],savedComparisons:[]};
+  closeClientAccount();
 }
 
 
@@ -1022,6 +1107,9 @@ function toggleSavedProject(id) {
   const exists = list.includes(id);
   const next = exists ? list.filter(item => item !== id) : [id, ...list];
   writeIdList(JB_SAVED_PROJECTS_KEY, next);
+  if(clientSession?.access_token){
+    syncSavedProjectCloud(id,!exists).catch(e=>console.warn('Cloud save sync skipped:',e));
+  }
   renderProjects();
   renderRecentProjects();
 
@@ -1037,6 +1125,9 @@ function toggleSavedProject(id) {
 function addRecentlyViewedProject(id) {
   const list = readIdList(JB_RECENT_PROJECTS_KEY).filter(item => item !== id);
   writeIdList(JB_RECENT_PROJECTS_KEY, [id, ...list].slice(0, JB_RECENT_PROJECTS_MAX));
+  if(clientSession?.access_token){
+    recordProjectViewCloud(id).catch(e=>console.warn('Cloud recent sync skipped:',e));
+  }
   renderRecentProjects();
 }
 
@@ -1071,6 +1162,179 @@ document.getElementById('clearRecentProjects')?.addEventListener('click', () => 
   renderRecentProjects();
 });
 
+
+
+async function syncSavedProjectCloud(projectId,shouldSave){
+  const u=currentClientUser(); if(!u?.id)return;
+  if(shouldSave){
+    await clientRest('client_saved_projects?on_conflict=user_id,project_id',{
+      method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+      body:{user_id:u.id,project_id:projectId}
+    });
+  }else{
+    await clientRest(`client_saved_projects?user_id=eq.${encodeURIComponent(u.id)}&project_id=eq.${encodeURIComponent(projectId)}`,{method:'DELETE'});
+  }
+}
+async function recordProjectViewCloud(projectId){
+  await clientRest('rpc/jb_client_record_project_view_v1',{method:'POST',body:{p_project_id:projectId}});
+}
+async function syncGuestJourneyToAccount(){
+  const u=currentClientUser(); if(!u?.id)return;
+  const saved=readIdList(JB_SAVED_PROJECTS_KEY);
+  if(saved.length){
+    await clientRest('client_saved_projects?on_conflict=user_id,project_id',{
+      method:'POST',prefer:'resolution=merge-duplicates,return=minimal',
+      body:saved.map(project_id=>({user_id:u.id,project_id}))
+    });
+  }
+  for(const id of readIdList(JB_RECENT_PROJECTS_KEY).slice(0,JB_RECENT_PROJECTS_MAX)){
+    try{await recordProjectViewCloud(id);}catch{}
+  }
+}
+async function loadClientJourney(){
+  const u=currentClientUser(); if(!u?.id)return clientJourney;
+  const uid=encodeURIComponent(u.id);
+  const [a,b,c,d]=await Promise.all([
+    clientRest(`client_saved_projects?user_id=eq.${uid}&select=project_id,saved_at&order=saved_at.desc`),
+    clientRest(`client_recent_projects?user_id=eq.${uid}&select=project_id,viewed_at,view_count&order=viewed_at.desc&limit=20`),
+    clientRest(`client_saved_searches?user_id=eq.${uid}&select=id,name,search_profile,created_at,updated_at&order=updated_at.desc&limit=20`),
+    clientRest(`client_saved_comparisons?user_id=eq.${uid}&select=id,name,project_ids,created_at,updated_at&order=updated_at.desc&limit=20`)
+  ]);
+  clientJourney={
+    savedProjects:Array.isArray(a)?a:[],recentProjects:Array.isArray(b)?b:[],
+    savedSearches:Array.isArray(c)?c:[],savedComparisons:Array.isArray(d)?d:[]
+  };
+  writeIdList(JB_SAVED_PROJECTS_KEY,clientJourney.savedProjects.map(x=>x.project_id));
+  writeIdList(JB_RECENT_PROJECTS_KEY,clientJourney.recentProjects.map(x=>x.project_id).slice(0,JB_RECENT_PROJECTS_MAX));
+  renderProjects();renderRecentProjects();updateClientAccountButton();return clientJourney;
+}
+function updateClientAccountButton(){
+  const b=document.getElementById('clientAccountButton');if(!b)return;
+  const u=currentClientUser();
+  b.textContent=u?(u.user_metadata?.full_name||u.email?.split('@')[0]||'Account'):(lang==='ar'?'حسابي':'My Account');
+  b.classList.toggle('is-signed-in',!!u);
+}
+function openClientAccount(message=''){
+  const m=document.getElementById('clientAccountModal');if(!m)return;
+  m.hidden=false;document.body.classList.add('modal-open');renderClientAccount(message);
+}
+function closeClientAccount(){
+  const m=document.getElementById('clientAccountModal');if(!m)return;
+  m.hidden=true;
+  if(document.getElementById('profileModal')?.hidden!==false)document.body.classList.remove('modal-open');
+}
+function accountProjectRows(ids,emptyText){
+  const items=ids.map(id=>projects.find(p=>p.id===id)).filter(Boolean);
+  if(!items.length)return `<p class="client-account-empty">${escapeHtml(emptyText)}</p>`;
+  return items.map(p=>`<button type="button" class="client-journey-project" data-account-project="${escapeHtml(p.id)}">
+    <span class="client-journey-thumb">${p.cover_image_url?`<img src="${escapeHtml(p.cover_image_url)}" alt="${escapeHtml(projectName(p))}">`:`<b>${escapeHtml(projectInitials(p))}</b>`}</span>
+    <span><strong>${escapeHtml(projectName(p))}</strong><small>${escapeHtml(projectLocation(p))}</small></span>
+  </button>`).join('');
+}
+function renderClientAccount(message=''){
+  const c=document.getElementById('clientAccountContent');if(!c)return;
+  const u=currentClientUser();
+  if(!u){
+    c.innerHTML=`<div class="client-auth-shell">
+      <span class="eyebrow dark">${lang==='ar'?'حساب العميل':'CLIENT ACCOUNT'}</span>
+      <h2 id="clientAccountTitle">${lang==='ar'?'احفظ رحلتك مع JB':'Save your journey with JB'}</h2>
+      <p>${lang==='ar'?'سجّل الدخول لتجد المشروعات المحفوظة وآخر ما شاهدته وعمليات البحث والمقارنة في مكان واحد.':'Sign in to keep saved projects, recent views, searches and comparisons in one place.'}</p>
+      ${message?`<div class="client-account-message">${escapeHtml(message)}</div>`:''}
+      <div class="client-auth-tabs">
+        <button class="client-auth-tab is-active" type="button" data-auth-tab="login">${lang==='ar'?'تسجيل الدخول':'Sign in'}</button>
+        <button class="client-auth-tab" type="button" data-auth-tab="signup">${lang==='ar'?'إنشاء حساب':'Create account'}</button>
+      </div>
+      <form id="clientLoginForm" class="client-auth-form">
+        <label>${lang==='ar'?'البريد الإلكتروني':'Email'}<input id="clientLoginEmail" type="email" required></label>
+        <label>${lang==='ar'?'كلمة المرور':'Password'}<input id="clientLoginPassword" type="password" minlength="6" required></label>
+        <button class="btn btn-gold" type="submit">${lang==='ar'?'دخول':'Sign in'}</button>
+      </form>
+      <form id="clientSignupForm" class="client-auth-form" hidden>
+        <label>${lang==='ar'?'الاسم':'Name'}<input id="clientSignupName" type="text" required></label>
+        <label>${lang==='ar'?'البريد الإلكتروني':'Email'}<input id="clientSignupEmail" type="email" required></label>
+        <label>${lang==='ar'?'كلمة المرور':'Password'}<input id="clientSignupPassword" type="password" minlength="6" required></label>
+        <button class="btn btn-gold" type="submit">${lang==='ar'?'إنشاء الحساب':'Create account'}</button>
+        <small>${lang==='ar'?'قد تحتاج إلى تأكيد بريدك الإلكتروني قبل أول تسجيل دخول.':'Email confirmation may be required before your first sign-in.'}</small>
+      </form>
+      <div id="clientAuthStatus" class="client-auth-status"></div>
+    </div>`;
+    bindClientAuthForms();return;
+  }
+  const saved=clientJourney.savedProjects.map(x=>x.project_id);
+  const recent=clientJourney.recentProjects.map(x=>x.project_id);
+  c.innerHTML=`<div class="client-account-dashboard">
+    <div class="client-account-head"><div><span class="eyebrow dark">${lang==='ar'?'رحلتي مع JB':'MY JB JOURNEY'}</span>
+    <h2 id="clientAccountTitle">${escapeHtml(u.user_metadata?.full_name||u.email||'')}</h2><p>${escapeHtml(u.email||'')}</p></div>
+    <button id="clientLogoutButton" class="btn btn-outline-dark">${lang==='ar'?'تسجيل الخروج':'Sign out'}</button></div>
+    <div class="client-account-stats">
+      <div><span>${lang==='ar'?'مشروعات محفوظة':'Saved projects'}</span><strong>${saved.length}</strong></div>
+      <div><span>${lang==='ar'?'شوهدت مؤخرًا':'Recent views'}</span><strong>${recent.length}</strong></div>
+      <div><span>${lang==='ar'?'بحوث محفوظة':'Saved searches'}</span><strong>${clientJourney.savedSearches.length}</strong></div>
+      <div><span>${lang==='ar'?'مقارنات محفوظة':'Saved comparisons'}</span><strong>${clientJourney.savedComparisons.length}</strong></div>
+    </div>
+    <section class="client-account-section"><h3>${lang==='ar'?'المشروعات المحفوظة':'Saved projects'}</h3>
+      <div class="client-account-projects">${accountProjectRows(saved,lang==='ar'?'لم تحفظ أي مشروع بعد.':'No saved projects yet.')}</div></section>
+    <section class="client-account-section"><h3>${lang==='ar'?'شوهدت مؤخرًا':'Recently viewed'}</h3>
+      <div class="client-account-projects">${accountProjectRows(recent.slice(0,8),lang==='ar'?'لا توجد مشروعات حديثة.':'No recent projects yet.')}</div></section>
+    <section class="client-account-section"><h3>${lang==='ar'?'عمليات البحث المحفوظة':'Saved searches'}</h3><div class="client-account-list">
+      ${clientJourney.savedSearches.length?clientJourney.savedSearches.map(x=>`<button class="client-saved-item" data-account-search="${x.id}"><strong>${escapeHtml(x.name||'Saved search')}</strong><small>${new Date(x.updated_at||x.created_at).toLocaleDateString()}</small></button>`).join(''):`<p class="client-account-empty">${lang==='ar'?'لا توجد عمليات بحث محفوظة.':'No saved searches yet.'}</p>`}</div></section>
+    <section class="client-account-section"><h3>${lang==='ar'?'المقارنات المحفوظة':'Saved comparisons'}</h3><div class="client-account-list">
+      ${clientJourney.savedComparisons.length?clientJourney.savedComparisons.map(x=>`<button class="client-saved-item" data-account-comparison="${x.id}"><strong>${escapeHtml(x.name||'Saved comparison')}</strong><small>${(x.project_ids||[]).length} ${lang==='ar'?'مشروعات':'projects'}</small></button>`).join(''):`<p class="client-account-empty">${lang==='ar'?'لا توجد مقارنات محفوظة.':'No saved comparisons yet.'}</p>`}</div></section>
+  </div>`;
+  document.getElementById('clientLogoutButton')?.addEventListener('click',clientLogout);
+  document.querySelectorAll('[data-account-project]').forEach(b=>b.addEventListener('click',()=>{closeClientAccount();showProjectProfile(b.dataset.accountProject,null,true);}));
+  document.querySelectorAll('[data-account-search]').forEach(b=>b.addEventListener('click',()=>restoreClientSavedSearch(b.dataset.accountSearch)));
+  document.querySelectorAll('[data-account-comparison]').forEach(b=>b.addEventListener('click',()=>restoreClientSavedComparison(b.dataset.accountComparison)));
+}
+function bindClientAuthForms(){
+  document.querySelectorAll('[data-auth-tab]').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('[data-auth-tab]').forEach(x=>x.classList.remove('is-active'));t.classList.add('is-active');
+    const s=t.dataset.authTab==='signup';document.getElementById('clientLoginForm').hidden=s;document.getElementById('clientSignupForm').hidden=!s;
+  }));
+  document.getElementById('clientLoginForm')?.addEventListener('submit',async e=>{
+    e.preventDefault();const st=document.getElementById('clientAuthStatus');st.textContent=lang==='ar'?'جارٍ تسجيل الدخول...':'Signing in...';
+    try{await clientLogin(document.getElementById('clientLoginEmail').value.trim(),document.getElementById('clientLoginPassword').value);renderClientAccount();}
+    catch(err){st.textContent=err.message;}
+  });
+  document.getElementById('clientSignupForm')?.addEventListener('submit',async e=>{
+    e.preventDefault();const st=document.getElementById('clientAuthStatus');st.textContent=lang==='ar'?'جارٍ إنشاء الحساب...':'Creating account...';
+    try{
+      const d=await clientSignup(document.getElementById('clientSignupEmail').value.trim(),document.getElementById('clientSignupPassword').value,document.getElementById('clientSignupName').value.trim());
+      if(d?.access_token)renderClientAccount();else st.textContent=lang==='ar'?'تم إنشاء الحساب. راجع بريدك للتأكيد ثم سجّل الدخول.':'Account created. Check your email to confirm it, then sign in.';
+    }catch(err){st.textContent=err.message;}
+  });
+}
+async function saveCurrentSearchToAccount(){
+  if(!currentSearchProfile)return;
+  if(!currentClientUser()){openClientAccount(lang==='ar'?'سجّل الدخول أولًا لحفظ هذا البحث.':'Sign in first to save this search.');return;}
+  await clientRest('client_saved_searches',{method:'POST',prefer:'return=representation',body:{user_id:currentClientUser().id,name:lang==='ar'?'بحث محفوظ':'Saved search',search_profile:currentSearchProfile}});
+  await loadClientJourney();const s=document.getElementById('clientSearchSaveStatus');if(s)s.textContent=lang==='ar'?'تم حفظ البحث.':'Search saved.';
+}
+async function saveComparisonToAccount(){
+  if(!comparison.length)return;
+  if(!currentClientUser()){openClientAccount(lang==='ar'?'سجّل الدخول أولًا لحفظ المقارنة.':'Sign in first to save the comparison.');return;}
+  await clientRest('client_saved_comparisons',{method:'POST',prefer:'return=representation',body:{user_id:currentClientUser().id,name:lang==='ar'?'مقارنة محفوظة':'Saved comparison',project_ids:comparison.map(p=>p.id)}});
+  await loadClientJourney();const s=document.getElementById('compareStatus');if(s)s.textContent=lang==='ar'?'تم حفظ المقارنة.':'Comparison saved.';
+}
+async function restoreClientSavedSearch(id){
+  const x=clientJourney.savedSearches.find(a=>a.id===id);if(!x?.search_profile)return;
+  const p=x.search_profile;const map={finderLocation:p.location,finderBudget:p.budget,finderType:p.type,finderPurpose:p.purpose,finderDelivery:p.delivery,finderPayment:p.payment,finderBedrooms:p.bedrooms,finderTimeline:p.timeline};
+  Object.entries(map).forEach(([id,v])=>{const e=document.getElementById(id);if(e&&v!=null)e.value=v;});
+  closeClientAccount();document.getElementById('finder')?.scrollIntoView({behavior:'smooth'});await renderFinderPreview(getFinderValues(),false);
+}
+async function restoreClientSavedComparison(id){
+  const x=clientJourney.savedComparisons.find(a=>a.id===id);if(!x?.project_ids?.length)return;
+  comparison=x.project_ids.map(id=>projects.find(p=>p.id===id)).filter(Boolean).slice(0,3);
+  await enrichComparison();renderComparison();renderProjects();closeClientAccount();document.getElementById('compare')?.scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('clientAccountButton')?.addEventListener('click',()=>openClientAccount());
+document.getElementById('clientAccountClose')?.addEventListener('click',closeClientAccount);
+document.querySelector('[data-close-client-account]')?.addEventListener('click',closeClientAccount);
+document.getElementById('saveComparisonToAccount')?.addEventListener('click',()=>saveComparisonToAccount().catch(console.warn));
+document.addEventListener('click',e=>{
+  const b=e.target?.closest?.('[data-client-save-search]');
+  if(b)saveCurrentSearchToAccount().catch(err=>{const s=document.getElementById('clientSearchSaveStatus');if(s)s.textContent=err.message;});
+});
 
 /* =========================================================
    PROFILES / NAVIGATION
@@ -1992,6 +2256,12 @@ function renderComparison() {
     clearButton.textContent =
       lang === 'ar' ? 'مسح المقارنة' : 'Clear comparison';
   }
+
+  const accountSaveButton = document.getElementById('saveComparisonToAccount');
+  if (accountSaveButton) {
+    accountSaveButton.hidden = false;
+    accountSaveButton.textContent = lang === 'ar' ? 'حفظ المقارنة في حسابي' : 'Save comparison';
+  }
 }
 
 document.getElementById('clearComparison')?.addEventListener('click', () => {
@@ -2910,6 +3180,12 @@ async function renderFinderPreview(values, shouldScroll = true) {
             : 'We rank projects using your current requirements. Official pricing is shown first, followed by verified market references where no official price is available. Projects that fit location and unit type but still need price verification are shown separately so a potentially suitable option is not lost.'
         }
       </p>
+      <div class="finder-account-actions">
+        <button type="button" class="btn btn-outline-light" data-client-save-search>
+          ${lang==='ar'?'♡ حفظ هذا البحث في حسابي':'♡ Save this search to my account'}
+        </button>
+        <span id="clientSearchSaveStatus" class="finder-save-status"></span>
+      </div>
 
       ${renderNewMatchesBanner(newMatchCount)}
 
@@ -3486,8 +3762,18 @@ document.addEventListener('DOMContentLoaded', () => {
   renderReturnSearchPrompt();
 });
 
-loadMarketData().then(() => {
+loadMarketData().then(async () => {
   renderReturnSearchPrompt();
   renderRecentProjects();
   openSharedProjectFromUrl();
+  loadStoredClientSession();
+  updateClientAccountButton();
+  if(clientSession?.access_token){
+    try{
+      await ensureClientSession();
+      if(clientSession?.access_token){await syncGuestJourneyToAccount();await loadClientJourney();}
+    }catch(e){console.warn('Client account initialization skipped:',e);}
+  }
 });
+
+document.getElementById('langToggle')?.addEventListener('click',()=>setTimeout(updateClientAccountButton,0));
