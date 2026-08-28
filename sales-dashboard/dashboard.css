@@ -653,3 +653,172 @@ html[dir="rtl"] .contact-value{
 .quick-followup-actions .btn{font-size:15px;min-height:38px}
 @media(max-width:1250px){.followup-summary{grid-template-columns:repeat(3,1fr)}.followup-queue-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.followup-summary{grid-template-columns:repeat(2,1fr)}.followup-queue-grid{grid-template-columns:1fr}}
+
+
+/* ============================================================
+   JB Lead Source & Referral Analytics V1
+   ============================================================ */
+.acquisition-kpis{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.acquisition-kpis article{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  display:grid;
+  gap:5px;
+  background:#fff;
+}
+.acquisition-kpis span{
+  font-size:15px;
+  line-height:1.5;
+  color:var(--muted);
+  font-weight:800;
+}
+.acquisition-kpis strong{
+  font-size:24px;
+  line-height:1.2;
+  color:var(--navy);
+  font-weight:900;
+}
+.acquisition-layout{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1.2fr;
+  gap:12px;
+}
+.acquisition-card{
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:15px;
+  background:#fff;
+}
+.acquisition-card h3{
+  margin:0 0 10px;
+  font-size:18px;
+  line-height:1.4;
+  font-weight:900;
+}
+.analytics-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:15px;
+  line-height:1.5;
+}
+.analytics-row:last-child{border-bottom:0}
+.analytics-row>div{display:grid;gap:4px}
+.analytics-row>div:last-child{
+  text-align:end;
+  white-space:nowrap;
+}
+.analytics-row strong{
+  font-size:15px;
+  font-weight:900;
+}
+.analytics-row small{
+  font-size:14px;
+  color:var(--muted);
+  font-weight:600;
+}
+.analytics-row span{
+  font-size:14px;
+  color:var(--muted);
+}
+.analytics-row b{
+  color:var(--text);
+  font-size:15px;
+}
+.analytics-note{
+  margin:12px 0 0;
+  font-size:14px;
+  line-height:1.6;
+  color:var(--muted);
+  font-weight:600;
+}
+
+@media(max-width:1100px){
+  .acquisition-kpis{grid-template-columns:repeat(3,1fr)}
+  .acquisition-layout{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .acquisition-kpis{grid-template-columns:repeat(2,1fr)}
+  .acquisition-layout{grid-template-columns:1fr}
+}
+
+
+/* =========================================================
+   CLIENT JOURNEY INTELLIGENCE V1
+   ========================================================= */
+.client-journey-intel{
+  margin:16px 0;
+  padding:16px;
+  border:1px solid #dbe4ea;
+  border-radius:16px;
+  background:#fbfcfd;
+}
+.journey-title-row{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px
+}
+.journey-title-row h3{margin:2px 0 0;font-size:20px;color:#082f4f}
+.journey-engagement{
+  border-radius:999px;padding:7px 11px;font-size:13px;font-weight:900;border:1px solid #dbe4ea
+}
+.journey-engagement.high{background:#fff0eb;color:#a2361f}
+.journey-engagement.medium{background:#fff7dd;color:#8b6300}
+.journey-engagement.low{background:#eef5f8;color:#365a70}
+.journey-empty{
+  display:grid;gap:5px;padding:12px;border-radius:12px;background:#f3f6f8;color:#23465d
+}
+.journey-empty strong{font-size:15px}.journey-empty small{font-size:13px;color:#5e7484}
+.journey-account-note{
+  display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:11px 12px;border-radius:12px;background:#f2f7fa;margin-bottom:12px
+}
+.journey-account-note strong{color:#082f4f}.journey-account-note span{font-weight:800}
+.journey-account-note small{grid-column:1/-1;color:#607486;font-size:13px;line-height:1.5}
+.journey-metrics{
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:12px
+}
+.journey-metrics>div{
+  border:1px solid #dde5eb;border-radius:11px;background:#fff;padding:10px;display:grid;gap:5px
+}
+.journey-metrics span{font-size:12px;color:#617586;font-weight:750;line-height:1.4}
+.journey-metrics strong{font-size:20px;color:#082f4f}
+.journey-metrics .small-date{font-size:12px;line-height:1.5}
+.journey-signal-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px
+}
+.journey-signal-grid>div{
+  display:grid;gap:4px;border:1px solid #dde5eb;border-radius:11px;background:#fff;padding:10px
+}
+.journey-signal-grid b{font-size:13px;color:#607486}.journey-signal-grid span{font-size:15px;font-weight:850;color:#082f4f}
+.journey-columns{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px
+}
+.journey-columns h4{margin:0 0 7px;font-size:15px;color:#082f4f}
+.journey-secondary{margin-top:10px}
+.journey-project-row{
+  width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border:1px solid #e0e7ec;border-radius:10px;background:#fff;padding:9px;margin-bottom:6px;text-align:start;color:#082f4f
+}
+.journey-project-row>span:first-child{display:grid;gap:2px}
+.journey-project-row strong{font-size:14px}.journey-project-row small{font-size:12px;color:#6a7d8c}
+.journey-chip{font-size:11px;font-weight:850;border-radius:999px;padding:5px 8px;background:#eef4f7;color:#31566e;white-space:nowrap}
+.journey-saved-box{
+  display:grid;gap:3px;border:1px solid #e0e7ec;border-radius:10px;background:#fff;padding:9px;margin-bottom:6px
+}
+.journey-saved-box strong{font-size:14px;color:#082f4f}.journey-saved-box small{font-size:12px;color:#667b8a;overflow-wrap:anywhere}
+.journey-match-note{margin:10px 0 0;color:#6b7f8e;font-size:12px;line-height:1.55}
+@media(max-width:900px){
+  .journey-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+  .journey-title-row,.journey-account-note{display:grid}
+  .journey-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .journey-signal-grid,.journey-columns{grid-template-columns:1fr}
+}
