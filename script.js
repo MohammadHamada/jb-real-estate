@@ -438,6 +438,96 @@ async function clientLogout(){
   clientJourney={savedProjects:[],recentProjects:[],savedSearches:[],savedComparisons:[]};
   closeClientAccount();
 }
+async function clientRequestPasswordReset(email){
+  const redirectTo = `${window.location.origin}${window.location.pathname}?auth=recovery`;
+  const response = await fetch(`${SUPABASE_AUTH}/recover?redirect_to=${encodeURIComponent(redirectTo)}`,{
+    method:'POST',
+    headers:clientAuthHeaders(),
+    body:JSON.stringify({email})
+  });
+
+  const text = await response.text();
+  let data = null;
+  try{ data = text ? JSON.parse(text) : null; }catch{ data = {message:text}; }
+
+  if(!response.ok){
+    throw new Error(data?.msg || data?.message || `AUTH_${response.status}`);
+  }
+  return data;
+}
+
+function getRecoveryContext(){
+  const query = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/,''));
+
+  const type = hash.get('type') || query.get('type') || query.get('auth');
+  const accessToken = hash.get('access_token') || query.get('access_token');
+  const refreshToken = hash.get('refresh_token') || query.get('refresh_token');
+
+  if(type === 'recovery' && accessToken){
+    return {accessToken,refreshToken};
+  }
+  return null;
+}
+
+async function clientUpdatePassword(accessToken,newPassword){
+  const response = await fetch(`${SUPABASE_AUTH}/user`,{
+    method:'PUT',
+    headers:clientAuthHeaders(accessToken),
+    body:JSON.stringify({password:newPassword})
+  });
+
+  const text = await response.text();
+  let data = null;
+  try{ data = text ? JSON.parse(text) : null; }catch{ data = {message:text}; }
+
+  if(!response.ok){
+    throw new Error(data?.msg || data?.message || `AUTH_${response.status}`);
+  }
+  return data;
+}
+
+function cleanRecoveryUrl(){
+  const url = new URL(window.location.href);
+  url.searchParams.delete('auth');
+  url.searchParams.delete('type');
+  url.searchParams.delete('access_token');
+  url.searchParams.delete('refresh_token');
+  url.hash = '';
+  window.history.replaceState({},'',`${url.pathname}${url.search}`);
+}
+
+function friendlyAuthError(error){
+  const raw = String(error?.message || error || '').toLowerCase();
+
+  if(raw.includes('invalid login credentials')){
+    return lang==='ar'
+      ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'
+      : 'The email or password is incorrect.';
+  }
+  if(raw.includes('email not confirmed')){
+    return lang==='ar'
+      ? 'يجب تأكيد البريد الإلكتروني أولًا. افتح رسالة التأكيد ثم حاول مرة أخرى.'
+      : 'Please confirm your email first, then try again.';
+  }
+  if(raw.includes('user already registered')){
+    return lang==='ar'
+      ? 'هذا البريد مسجل بالفعل. استخدم تسجيل الدخول أو "نسيت كلمة المرور".'
+      : 'This email is already registered. Sign in or use Forgot password.';
+  }
+  if(raw.includes('password should be at least') || raw.includes('weak_password')){
+    return lang==='ar'
+      ? 'كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل ويفضل مزيجًا من الحروف والأرقام.'
+      : 'Your password is too weak. Use at least 8 characters, preferably with letters and numbers.';
+  }
+  if(raw.includes('rate limit')){
+    return lang==='ar'
+      ? 'تم إجراء محاولات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.'
+      : 'Too many attempts. Please wait a little and try again.';
+  }
+
+  return error?.message || String(error || '');
+}
 
 
 function escapeHtml(value = '') {
@@ -1216,7 +1306,12 @@ function updateClientAccountButton(){
 }
 function openClientAccount(message=''){
   const m=document.getElementById('clientAccountModal');if(!m)return;
-  m.hidden=false;document.body.classList.add('modal-open');renderClientAccount(message);
+  m.hidden=false;
+  document.body.classList.add('modal-open');
+
+  const recovery=getRecoveryContext();
+  if(recovery) renderSetNewPassword(recovery);
+  else renderClientAccount(message);
 }
 function closeClientAccount(){
   const m=document.getElementById('clientAccountModal');if(!m)return;
@@ -1231,6 +1326,105 @@ function accountProjectRows(ids,emptyText){
     <span><strong>${escapeHtml(projectName(p))}</strong><small>${escapeHtml(projectLocation(p))}</small></span>
   </button>`).join('');
 }
+
+function renderPasswordResetRequest(prefillEmail=''){
+  const c=document.getElementById('clientAccountContent');if(!c)return;
+
+  c.innerHTML=`<div class="client-auth-shell">
+    <span class="eyebrow dark">${lang==='ar'?'استعادة الحساب':'ACCOUNT RECOVERY'}</span>
+    <h2 id="clientAccountTitle">${lang==='ar'?'إعادة تعيين كلمة المرور':'Reset your password'}</h2>
+    <p>${lang==='ar'
+      ?'أدخل بريدك الإلكتروني وسنرسل لك رابطًا آمنًا لتعيين كلمة مرور جديدة.'
+      :'Enter your email and we will send you a secure link to set a new password.'}</p>
+
+    <form id="clientResetRequestForm" class="client-auth-form">
+      <label>${lang==='ar'?'البريد الإلكتروني':'Email'}
+        <input id="clientResetEmail" type="email" value="${escapeHtml(prefillEmail)}" autocomplete="email" required>
+      </label>
+      <button class="btn btn-gold" type="submit">${lang==='ar'?'إرسال رابط الاستعادة':'Send reset link'}</button>
+      <button class="client-auth-back" type="button" data-back-to-login>${lang==='ar'?'العودة لتسجيل الدخول':'Back to sign in'}</button>
+    </form>
+
+    <div id="clientAuthStatus" class="client-auth-status" aria-live="polite"></div>
+  </div>`;
+
+  document.getElementById('clientResetRequestForm')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const st=document.getElementById('clientAuthStatus');
+    const email=document.getElementById('clientResetEmail').value.trim();
+
+    st.textContent=lang==='ar'?'جارٍ إرسال رابط الاستعادة...':'Sending reset link...';
+
+    try{
+      await clientRequestPasswordReset(email);
+      st.textContent=lang==='ar'
+        ?'تم إرسال رابط الاستعادة إذا كان البريد مسجلًا. افحص البريد الوارد وSpam.'
+        :'If this email is registered, a reset link has been sent. Check your inbox and spam folder.';
+    }catch(err){
+      st.textContent=friendlyAuthError(err);
+    }
+  });
+
+  document.querySelector('[data-back-to-login]')?.addEventListener('click',()=>renderClientAccount());
+}
+
+function renderSetNewPassword(recovery){
+  const c=document.getElementById('clientAccountContent');if(!c)return;
+
+  c.innerHTML=`<div class="client-auth-shell">
+    <span class="eyebrow dark">${lang==='ar'?'استعادة الحساب':'ACCOUNT RECOVERY'}</span>
+    <h2 id="clientAccountTitle">${lang==='ar'?'اختر كلمة مرور جديدة':'Choose a new password'}</h2>
+    <p>${lang==='ar'
+      ?'استخدم كلمة مرور جديدة للحفاظ على أمان حسابك.'
+      :'Use a new password to secure your account.'}</p>
+
+    <form id="clientSetPasswordForm" class="client-auth-form">
+      <label>${lang==='ar'?'كلمة المرور الجديدة':'New password'}
+        <input id="clientNewPassword" type="password" minlength="8" autocomplete="new-password" required>
+      </label>
+      <label>${lang==='ar'?'تأكيد كلمة المرور':'Confirm password'}
+        <input id="clientConfirmPassword" type="password" minlength="8" autocomplete="new-password" required>
+      </label>
+      <button class="btn btn-gold" type="submit">${lang==='ar'?'حفظ كلمة المرور':'Save new password'}</button>
+    </form>
+
+    <div id="clientAuthStatus" class="client-auth-status" aria-live="polite"></div>
+  </div>`;
+
+  document.getElementById('clientSetPasswordForm')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+
+    const st=document.getElementById('clientAuthStatus');
+    const p1=document.getElementById('clientNewPassword').value;
+    const p2=document.getElementById('clientConfirmPassword').value;
+
+    if(p1!==p2){
+      st.textContent=lang==='ar'?'كلمتا المرور غير متطابقتين.':'The passwords do not match.';
+      return;
+    }
+
+    st.textContent=lang==='ar'?'جارٍ تحديث كلمة المرور...':'Updating password...';
+
+    try{
+      await clientUpdatePassword(recovery.accessToken,p1);
+      st.textContent=lang==='ar'
+        ?'تم تحديث كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.'
+        :'Password updated successfully. You can now sign in.';
+
+      window.setTimeout(()=>{
+        cleanRecoveryUrl();
+        renderClientAccount(
+          lang==='ar'
+            ?'تم تحديث كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.'
+            :'Password updated. Sign in with your new password.'
+        );
+      },900);
+    }catch(err){
+      st.textContent=friendlyAuthError(err);
+    }
+  });
+}
+
 function renderClientAccount(message=''){
   const c=document.getElementById('clientAccountContent');if(!c)return;
   const u=currentClientUser();
@@ -1248,6 +1442,9 @@ function renderClientAccount(message=''){
         <label>${lang==='ar'?'البريد الإلكتروني':'Email'}<input id="clientLoginEmail" type="email" required></label>
         <label>${lang==='ar'?'كلمة المرور':'Password'}<input id="clientLoginPassword" type="password" minlength="6" required></label>
         <button class="btn btn-gold" type="submit">${lang==='ar'?'دخول':'Sign in'}</button>
+        <button class="client-forgot-password" type="button" data-client-forgot-password>
+          ${lang==='ar'?'نسيت كلمة المرور؟':'Forgot password?'}
+        </button>
       </form>
       <form id="clientSignupForm" class="client-auth-form" hidden>
         <label>${lang==='ar'?'الاسم':'Name'}<input id="clientSignupName" type="text" required></label>
@@ -1294,14 +1491,19 @@ function bindClientAuthForms(){
   document.getElementById('clientLoginForm')?.addEventListener('submit',async e=>{
     e.preventDefault();const st=document.getElementById('clientAuthStatus');st.textContent=lang==='ar'?'جارٍ تسجيل الدخول...':'Signing in...';
     try{await clientLogin(document.getElementById('clientLoginEmail').value.trim(),document.getElementById('clientLoginPassword').value);renderClientAccount();}
-    catch(err){st.textContent=err.message;}
+    catch(err){st.textContent=friendlyAuthError(err);}
   });
   document.getElementById('clientSignupForm')?.addEventListener('submit',async e=>{
     e.preventDefault();const st=document.getElementById('clientAuthStatus');st.textContent=lang==='ar'?'جارٍ إنشاء الحساب...':'Creating account...';
     try{
       const d=await clientSignup(document.getElementById('clientSignupEmail').value.trim(),document.getElementById('clientSignupPassword').value,document.getElementById('clientSignupName').value.trim());
       if(d?.access_token)renderClientAccount();else st.textContent=lang==='ar'?'تم إنشاء الحساب. راجع بريدك للتأكيد ثم سجّل الدخول.':'Account created. Check your email to confirm it, then sign in.';
-    }catch(err){st.textContent=err.message;}
+    }catch(err){st.textContent=friendlyAuthError(err);}
+  });
+
+  document.querySelector('[data-client-forgot-password]')?.addEventListener('click',()=>{
+    const email=document.getElementById('clientLoginEmail')?.value?.trim() || '';
+    renderPasswordResetRequest(email);
   });
 }
 async function saveCurrentSearchToAccount(){
@@ -3773,6 +3975,10 @@ loadMarketData().then(async () => {
       await ensureClientSession();
       if(clientSession?.access_token){await syncGuestJourneyToAccount();await loadClientJourney();}
     }catch(e){console.warn('Client account initialization skipped:',e);}
+  }
+
+  if(getRecoveryContext()){
+    openClientAccount();
   }
 });
 
