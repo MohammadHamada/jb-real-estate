@@ -1717,6 +1717,165 @@ async function getProjectMedia(slug) {
   }
 }
 
+async function getProjectExperience(slug) {
+  try {
+    const payload = await supabaseRpc('jb_get_project_experience_v1', { p_slug: slug });
+    return payload || {media:[],phases:[],units:[],unit_summary:{}};
+  } catch (error) {
+    console.warn('Project experience fallback:', error);
+    const media = await getProjectMedia(slug);
+    return {
+      media:Array.isArray(media?.media)?media.media:[],
+      phases:[],
+      units:[],
+      unit_summary:{}
+    };
+  }
+}
+
+function richText(value){
+  if(value===null || value===undefined || value==='') return '';
+  return String(value);
+}
+
+function areaLabel(value){
+  return value===null || value===undefined || value==='' ? '' : `${Number(value)} m²`;
+}
+
+function unitFamilyLabel(value){
+  const raw=String(value||'').toLowerCase();
+  const labels={
+    apartment:{en:'Apartment',ar:'شقة'},
+    villa:{en:'Villa',ar:'فيلا'},
+    townhouse:{en:'Townhouse',ar:'تاون هاوس'},
+    townhome:{en:'Townhome',ar:'تاون هاوس'},
+    chalet:{en:'Chalet',ar:'شاليه'}
+  };
+  return labels[raw]?.[lang] || value || '';
+}
+
+function renderProjectUnitInventory(experience){
+  const phases=Array.isArray(experience?.phases)?experience.phases:[];
+  const units=Array.isArray(experience?.units)?experience.units:[];
+  const summary=experience?.unit_summary||{};
+
+  if(!units.length) return '';
+
+  const phaseBlocks=phases.map((phase,phaseIndex)=>{
+    const phaseUnits=units.filter(u=>u.phase_name===phase.phase_name);
+    const bedroomText=Array.isArray(phase.bedrooms_available)&&phase.bedrooms_available.length
+      ? phase.bedrooms_available.join(', ')
+      : '';
+    const familyText=Array.isArray(phase.unit_families)&&phase.unit_families.length
+      ? phase.unit_families.map(unitFamilyLabel).join(' · ')
+      : '';
+
+    return `
+      <article class="rich-phase-card ${phaseIndex===0?'is-open':''}" data-rich-phase>
+        <button class="rich-phase-head" type="button" data-rich-phase-toggle aria-expanded="${phaseIndex===0?'true':'false'}">
+          <div>
+            <span class="rich-phase-kicker">${lang==='ar'?'المرحلة':'PHASE'}</span>
+            <strong>${escapeHtml(phase.phase_name||'')}</strong>
+            <small>
+              ${familyText?escapeHtml(familyText):''}
+              ${bedroomText?` · ${lang==='ar'?'غرف':'Beds'} ${escapeHtml(bedroomText)}`:''}
+            </small>
+          </div>
+          <div class="rich-phase-summary">
+            ${phase.min_area_sqm?`<span>${areaLabel(phase.min_area_sqm)} – ${areaLabel(phase.max_area_sqm||phase.min_area_sqm)}</span>`:''}
+            <b>${phase.unit_rows||phaseUnits.length}</b>
+            <i aria-hidden="true">⌄</i>
+          </div>
+        </button>
+
+        <div class="rich-phase-body" ${phaseIndex===0?'':'hidden'}>
+          <div class="rich-unit-grid">
+            ${phaseUnits.map(unit=>`
+              <div class="rich-unit-card">
+                <div class="rich-unit-title">
+                  <div>
+                    <strong>${escapeHtml(unit.model_name||'')}</strong>
+                    ${unit.variant_name?`<small>${escapeHtml(unit.variant_name)}</small>`:''}
+                  </div>
+                  ${unit.gross_area_sqm?`<span>${areaLabel(unit.gross_area_sqm)}</span>`:''}
+                </div>
+
+                <div class="rich-unit-facts">
+                  ${unit.unit_family?`<span><b>${lang==='ar'?'النوع':'Type'}</b>${escapeHtml(unitFamilyLabel(unit.unit_family))}</span>`:''}
+                  ${unit.bedrooms!==undefined&&unit.bedrooms!==null?`<span><b>${lang==='ar'?'غرف النوم':'Bedrooms'}</b>${escapeHtml(unit.bedrooms)}</span>`:''}
+                  ${unit.bathrooms!==undefined&&unit.bathrooms!==null?`<span><b>${lang==='ar'?'الحمامات':'Bathrooms'}</b>${escapeHtml(unit.bathrooms)}</span>`:''}
+                  ${unit.family_room_count?`<span><b>${lang==='ar'?'غرفة عائلية':'Family room'}</b>${escapeHtml(unit.family_room_count)}</span>`:''}
+                  ${unit.building_group?`<span class="wide"><b>${lang==='ar'?'المباني':'Buildings'}</b>${escapeHtml(unit.building_group)}</span>`:''}
+                </div>
+
+                ${(unit.ground_floor_area_sqm||unit.first_floor_area_sqm||unit.penthouse_area_sqm||unit.covered_terrace_area_sqm||unit.uncovered_terrace_area_sqm||unit.porch_area_sqm)?`
+                  <details class="rich-unit-details">
+                    <summary>${lang==='ar'?'تفاصيل المساحات':'Area breakdown'}</summary>
+                    <div>
+                      ${unit.ground_floor_area_sqm?`<span>${lang==='ar'?'الدور الأرضي':'Ground floor'} <b>${areaLabel(unit.ground_floor_area_sqm)}</b></span>`:''}
+                      ${unit.first_floor_area_sqm?`<span>${lang==='ar'?'الدور الأول':'First floor'} <b>${areaLabel(unit.first_floor_area_sqm)}</b></span>`:''}
+                      ${unit.penthouse_area_sqm?`<span>${lang==='ar'?'البنتهاوس':'Penthouse'} <b>${areaLabel(unit.penthouse_area_sqm)}</b></span>`:''}
+                      ${unit.covered_terrace_area_sqm?`<span>${lang==='ar'?'تراس مغطى':'Covered terrace'} <b>${areaLabel(unit.covered_terrace_area_sqm)}</b></span>`:''}
+                      ${unit.uncovered_terrace_area_sqm?`<span>${lang==='ar'?'تراس مفتوح':'Open terrace'} <b>${areaLabel(unit.uncovered_terrace_area_sqm)}</b></span>`:''}
+                      ${unit.porch_area_sqm?`<span>${lang==='ar'?'مدخل خارجي':'Porch'} <b>${areaLabel(unit.porch_area_sqm)}</b></span>`:''}
+                    </div>
+                  </details>`:''}
+
+                <div class="rich-unit-source">
+                  <span>✓ ${lang==='ar'?'بيانات موثقة من مصدر رسمي':'Verified official-source data'}</span>
+                  ${unit.source_page?`<small>${lang==='ar'?'صفحة المصدر':'Source page'} ${escapeHtml(unit.source_page)}</small>`:''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  return `
+    <section class="rich-units-shell" data-rich-units>
+      <div class="rich-section-heading">
+        <div>
+          <span class="eyebrow dark">${lang==='ar'?'الوحدات والمراحل':'UNITS & PHASES'}</span>
+          <h3>${lang==='ar'?'أنواع ومساحات الوحدات الموثقة':'Verified unit types and areas'}</h3>
+          <p>${lang==='ar'
+            ?'نعرض فقط بيانات الوحدات المتاحة من المصادر الرسمية التي تم التحقق منها.'
+            :'Only verified unit information available from official sources is shown.'}</p>
+        </div>
+        <div class="rich-units-overview">
+          <div><span>${lang==='ar'?'المراحل':'Phases'}</span><strong>${summary.phases||phases.length}</strong></div>
+          <div><span>${lang==='ar'?'نماذج الوحدات':'Unit records'}</span><strong>${summary.unit_rows||units.length}</strong></div>
+          ${(summary.min_area_sqm&&summary.max_area_sqm)?`<div><span>${lang==='ar'?'نطاق المساحات':'Area range'}</span><strong>${areaLabel(summary.min_area_sqm)} – ${areaLabel(summary.max_area_sqm)}</strong></div>`:''}
+        </div>
+      </div>
+
+      <div class="rich-phase-list">${phaseBlocks}</div>
+
+      <div class="rich-units-note">
+        <span>ⓘ</span>
+        <p>${lang==='ar'
+          ?'قد تختلف المساحات الفعلية حسب الوحدة والموقع والتحديثات الرسمية. المخططات المتاحة تظهر في معرض المشروع بالأعلى.'
+          :'Actual areas may vary by unit, location and official revisions. Available floor plans are shown in the project gallery above.'}</p>
+      </div>
+    </section>
+  `;
+}
+
+function bindRichUnitInventory(){
+  document.querySelectorAll('[data-rich-phase-toggle]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const card=btn.closest('[data-rich-phase]');
+      const body=card?.querySelector('.rich-phase-body');
+      if(!card||!body) return;
+      const opening=!card.classList.contains('is-open');
+      card.classList.toggle('is-open',opening);
+      body.hidden=!opening;
+      btn.setAttribute('aria-expanded',opening?'true':'false');
+    });
+  });
+}
+
 function mediaTypeLabel(type) {
   const labels = {
     cover:{en:'Cover',ar:'الرئيسية'},
@@ -1996,19 +2155,21 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
   }, pushHistory);
 
   let payload = null;
-  let mediaPayload = {media:[]};
+  let experiencePayload = {media:[],phases:[],units:[],unit_summary:{}};
 
   try {
-    [payload, mediaPayload] = await Promise.all([
+    [payload, experiencePayload] = await Promise.all([
       supabaseRpc('jb_get_project_details_v1', { p_slug: localProject.slug }),
-      getProjectMedia(localProject.slug)
+      getProjectExperience(localProject.slug)
     ]);
   } catch (error) {
-    console.warn('Project RPC/media fallback:', error);
+    console.warn('Project RPC/experience fallback:', error);
     try {
-      mediaPayload = await getProjectMedia(localProject.slug);
+      experiencePayload = await getProjectExperience(localProject.slug);
     } catch {}
   }
+
+  const mediaPayload = {media:Array.isArray(experiencePayload?.media)?experiencePayload.media:[]};
 
   const project = {
     ...localProject,
@@ -2169,6 +2330,8 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
       </div>
     </div>
 
+    ${renderProjectUnitInventory(experiencePayload)}
+
     <section class="jb-decision-layer">
       <div class="jb-decision-copy">
         <strong>
@@ -2238,6 +2401,7 @@ async function showProjectProfile(id, parentDeveloperId = null, pushHistory = tr
 
   addRecentlyViewedProject(project.id);
   bindProjectMediaGallery();
+  bindRichUnitInventory();
   bindProjectShare(project);
 
   document.querySelector('[data-project-share-toggle]')?.addEventListener('click', () => {
